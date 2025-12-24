@@ -1,1 +1,1 @@
-{"root":["./firebase.ts","./types.ts","./vite.config.ts","./services/geminiservice.ts","./services/localservice.ts","./app.tsx","./index.tsx","./components/starlinkheartapp.tsx"],"version":"5.9.3"}
+{"root":["./vite.config.ts","./src/firebase.ts","./src/types.ts","./src/vite-env.d.ts","./src/services/geminiservice.ts","./src/services/localservice.ts","./src/app.tsx","./src/main.tsx","./src/components/starlinkheartapp.tsx","./src/routes/home.tsx","./src/routes/welcomescreen.tsx"],"version":"5.9.3"}
