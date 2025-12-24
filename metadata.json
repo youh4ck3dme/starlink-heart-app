@@ -1,0 +1,7 @@
+{
+  "name": "Starlink Homework",
+  "description": "An interactive and playful AI assistant for homework for children aged 6-11. Starry the AI guide helps children solve problems without giving direct answers, making learning fun.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
