@@ -48,12 +48,18 @@ const handleApiError = (error: unknown) => {
     return { textResponse: errorMessage, visualAids: ['🛰️', '💥'] };
 };
 
-export const generateCosmicResponse = async (prompt: string, imageFile?: File, isTeacherCloneMode: boolean = false): Promise<{ textResponse: string; visualAids: string[] }> => {
+export const generateCosmicResponse = async (prompt: string, conversationHistory: Heart[], imageFile?: File, isTeacherCloneMode: boolean = false): Promise<{ textResponse: string; visualAids: string[] }> => {
     // Initialize AI with the environment variable directly as per new standards
     const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
     try {
-        const parts: any[] = [{ text: prompt }];
+        const historyContext = conversationHistory.slice(-5).map(h => 
+            h.aiResponse ? `AI (Kouč): ${h.aiResponse.textResponse}` : `Dieťa: ${h.message}`
+        ).join('\n');
+
+        const fullPrompt = historyContext ? `História konverzácie:\n${historyContext}\n\nAktuálna otázka: ${prompt}` : prompt;
+
+        const parts: any[] = [{ text: fullPrompt }];
 
         if (imageFile) {
              const base64Image = await fileToBase64(imageFile);
@@ -90,12 +96,27 @@ export const generateCosmicResponse = async (prompt: string, imageFile?: File, i
 
         if (isTeacherCloneMode) {
             specificInstructions = `
-            REŽIM "DVOJČA UČITEĽA" (TEACHER CLONE) - EXTRÉMNE DÔLEŽITÉ:
-            1. **Detekcia Metodiky:** Ak je priložený obrázok, detailne ho skenuj. Hľadaj špecifické grafické prvky (krokovacie pásy, pavučiny, autobusy = Hejného metóda; farebné tyčinky = Montessori; klasické stĺpce).
-            2. **Mimikry:** Ak nájdeš Hejného prostredie, používaj LEN jeho terminológiu (napr. "dedo Lesoň", "krokovanie"). Ak je to klasika, drž sa formálnejších postupov.
-            3. **Konzistencia:** Tvoje vysvetlenie musí vyzerať, akoby vypadlo z tej istej učebnice.
-            4. **Osobnosť:** Si "Vesmírny Profesor" - múdry, presný, ale povzbudivý.
-            5. **Vizuálne Kotvy (Highlighting):** Ak identifikuješ na obrázku kľúčový pojem, číslo alebo časť zadania, o ktorom práve hovoríš, zabaľ ho do dvojitých hranatých zátvoriek. Napríklad: "Pozri sa na [[číslo 15]] v rohu" alebo "Čo robí to [[sloveso]]?". Toto v aplikácii vytvorí vizuálne zvýraznenie (podčiarknutie/farbu), ktoré pomôže dieťaťu zamerať pozornosť.
+            REŽIM: "Učivo-Guard + Kouč (SR 1.–3.)"
+            Si AI učiteľ pre deti 8+ na Slovensku. 
+            
+            KROK 1: Najprv zisti (ak to ešte nevieš z histórie):
+            (1) ročník (1.–3.)
+            (2) predmet (SJL/MAT/Prvouka/Prírodoveda/Vlastiveda/AJ/INF)
+            (3) čo je cieľ úlohy.
+            
+            KROK 2: Učivo-Guard
+            - Over, že riešenie ostáva v rámci učiva daného ročníka (ak je mimo, jemne to zjednoduš na najbližšie učivo).
+            
+            KROK 3: Interakcia
+            - Vysvetľuj v krátkych krokoch, vždy polož 1 kontrolnú otázku (dieťa musí odpovedať).
+            - Neprezrádzaj celý výsledok hneď: najprv navádzaj, potom až na konci ukáž “správne riešenie + prečo”.
+            
+            KROK 4: Finále (až keď je úloha vyriešená)
+            - Daj mini-kvíz (3 otázky).
+            - Zhrň “čo si zapamätať” v 3 bodoch.
+            
+            Štýl: povzbudzujúci, hravý, bez hanby a bez strašenia.
+            Bezpečnosť: nežiadaj osobné údaje, adresu, fotky, telefón.
             `;
         } else {
             specificInstructions = `
@@ -111,10 +132,8 @@ export const generateCosmicResponse = async (prompt: string, imageFile?: File, i
         ${specificInstructions}
 
         VŠEOBECNÉ PRAVIDLÁ:
-        1. **Nikdy neprezraď výsledok hneď.**
-        2. **Sokratovská metóda:** Klaď otázky, ktoré dieťa navedú na riešenie.
-        3. **Formátovanie:** Dôležité slová alebo čísla daj do hviezičiek, napr. *číslo 5* alebo *podmet*.
-        4. Jazyk: Prirodzená slovenčina, tykanie.
+        1. **Formátovanie:** Dôležité slová alebo čísla daj do hviezičiek.
+        2. Jazyk: Prirodzená slovenčina, tykanie.
         
         Vždy vráť platný JSON: { textResponse: string, visualAids: string[] }.`;
 
