@@ -120,6 +120,111 @@ const StarryAvatarDisplay = ({
     );
 };
 
+// --- Game Style Components ---
+
+const IntroScreen = ({ onStart, avatar }: { onStart: () => void, avatar: string }) => {
+    return (
+        <div className="flex flex-col items-center justify-center h-full animate-fade-in-up text-center p-6 pb-20">
+            <div className="mb-8">
+                <StarryAvatarDisplay avatar={avatar} isExcited={true} size="text-[8rem]" />
+            </div>
+            <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-fuchsia-400 mb-4 drop-shadow-sm font-display tracking-tight">
+                Starlink Heart
+            </h1>
+            <p className="text-lg md:text-xl text-white/80 mb-12 max-w-md leading-relaxed">
+                Tvoj osobný vesmírny sprievodca. Pripravený na misiu?
+            </p>
+            <button 
+                onClick={onStart}
+                className="group relative px-12 py-5 bg-yellow-400 hover:bg-yellow-300 rounded-[2rem] shadow-[0_0_40px_-10px_rgba(250,204,21,0.5)] transition-all transform hover:scale-105 active:scale-95"
+            >
+                <div className="absolute inset-0 bg-white/20 rounded-[2rem] animate-pulse-ring"></div>
+                <span className="relative text-2xl font-black text-yellow-900 tracking-wider flex items-center gap-2">
+                    ŠTART <span className="text-3xl group-hover:translate-x-1 transition-transform">🚀</span>
+                </span>
+            </button>
+        </div>
+    );
+};
+
+const DashboardScreen = ({ 
+    onNewMission, 
+    onProfile, 
+    onCenter, 
+    onCoachToggle, 
+    isCoachMode, 
+    avatar, 
+    gems 
+}: { 
+    onNewMission: () => void, 
+    onProfile: () => void, 
+    onCenter: () => void, 
+    onCoachToggle: () => void,
+    isCoachMode: boolean,
+    avatar: string,
+    gems: number
+}) => {
+    return (
+        <div className="flex flex-col h-full animate-fade-in-up p-6 overflow-y-auto">
+            {/* Top Bar for Dashboard */}
+            <div className="flex justify-between items-center mb-8">
+                 <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-lg">
+                    <span className="text-2xl">{avatar}</span>
+                    <span className="text-white font-bold">Kadet</span>
+                 </div>
+                 <div className="flex items-center gap-1.5 bg-yellow-400/20 px-3 py-1.5 rounded-full border border-yellow-400/30">
+                    <span className="text-xl">💎</span>
+                    <span className="font-bold text-yellow-200">{gems}</span>
+                 </div>
+            </div>
+
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col items-center justify-center gap-8 pb-10">
+                <div className="relative mb-4">
+                    <StarryAvatarDisplay avatar={avatar} isThinking={false} size="text-[6rem]" />
+                    <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white/20 backdrop-blur-md px-4 py-1 rounded-full border border-white/10 whitespace-nowrap">
+                        <span className="text-sm font-medium text-white">Systémy online...</span>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+                    {/* Card 1: New Mission */}
+                    <button onClick={onNewMission} className="group relative aspect-square bg-gradient-to-br from-sky-500 to-indigo-600 rounded-3xl p-4 shadow-xl border-b-8 border-indigo-800 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center justify-center gap-3 overflow-hidden">
+                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <span className="text-5xl drop-shadow-md group-hover:scale-110 transition-transform">🚀</span>
+                        <span className="text-white font-bold text-lg leading-tight uppercase tracking-wide">Nová<br/>Misia</span>
+                    </button>
+
+                    {/* Card 2: My Profile */}
+                    <button onClick={onProfile} className="group relative aspect-square bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl p-4 shadow-xl border-b-8 border-orange-700 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center justify-center gap-3 overflow-hidden">
+                         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <span className="text-5xl drop-shadow-md group-hover:scale-110 transition-transform">🎒</span>
+                        <span className="text-white font-bold text-lg leading-tight uppercase tracking-wide">Môj<br/>Profil</span>
+                    </button>
+
+                    {/* Card 3: Centrum (Settings) */}
+                    <button onClick={onCenter} className="group relative aspect-square bg-gradient-to-br from-emerald-400 to-teal-600 rounded-3xl p-4 shadow-xl border-b-8 border-teal-800 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center justify-center gap-3 overflow-hidden">
+                         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <span className="text-5xl drop-shadow-md group-hover:rotate-45 transition-transform">⚙️</span>
+                        <span className="text-white font-bold text-lg leading-tight uppercase tracking-wide">Centrum</span>
+                    </button>
+
+                    {/* Card 4: Coach Mode Toggle */}
+                    <button onClick={onCoachToggle} className={`group relative aspect-square bg-gradient-to-br ${isCoachMode ? 'from-fuchsia-500 to-purple-600 border-purple-800' : 'from-gray-400 to-gray-500 border-gray-700'} rounded-3xl p-4 shadow-xl border-b-8 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center justify-center gap-3 overflow-hidden`}>
+                         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        <span className="text-5xl drop-shadow-md group-hover:scale-110 transition-transform">
+                            {isCoachMode ? '🎓' : '🎮'}
+                        </span>
+                        <span className="text-white font-bold text-lg leading-tight uppercase tracking-wide">
+                            {isCoachMode ? 'Kouč' : 'Hra'}
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const StarlinkHeartApp: React.FC = () => {
     // State
     const [hearts, setHearts] = useState<Heart[]>([]);
@@ -136,8 +241,10 @@ const StarlinkHeartApp: React.FC = () => {
     const [showCustomizeModal, setShowCustomizeModal] = useState(false);
     const [starryAvatar, setStarryAvatar] = useState<string>(STARRY_AVATARS[0]);
     const [showBackgroundModal, setShowBackgroundModal] = useState(false);
-    const [appBackground, setAppBackground] = useState(BACKGROUND_OPTIONS[0]);
+    const [appBackground, setAppBackground] = useState(BACKGROUND_OPTIONS[1]); // Default to space for game feel
     const [customApiKey, setCustomApiKey] = useState('');
+    const [viewMode, setViewMode] = useState<'intro' | 'dashboard' | 'chat'>('intro');
+    const [showProfileModal, setShowProfileModal] = useState(false);
     
     // Pagination
     const [lastVisible, setLastVisible] = useState<QueryDocumentSnapshot | null>(null);
@@ -463,9 +570,13 @@ const StarlinkHeartApp: React.FC = () => {
             {/* Main Layout Container */}
             <div className={`flex flex-col h-full h-[100dvh] transition-colors duration-700 ${appBackground.className} ${appBackground.textColor}`}>
                 
-                {/* Header - Glassmorphic */}
+                {/* Header - Glassmorphic (Only in Chat) */}
+                {viewMode === 'chat' && (
                 <header className={`shrink-0 px-4 py-3 flex items-center justify-between sticky top-0 z-20 ${appBackground.glass} backdrop-blur-md shadow-sm`}>
                     <div className="flex items-center gap-2">
+                         <button onClick={() => setViewMode('dashboard')} className="mr-1 p-1 hover:bg-black/10 rounded-full transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                        </button>
                         {/* Enhanced Avatar with Animations */}
                         <StarryAvatarDisplay 
                             avatar={starryAvatar} 
@@ -485,8 +596,31 @@ const StarlinkHeartApp: React.FC = () => {
                         </button>
                     </div>
                 </header>
+                )}
+
+                {/* Intro Screen */}
+                {viewMode === 'intro' && (
+                    <IntroScreen 
+                        onStart={() => setViewMode('dashboard')} 
+                        avatar={starryAvatar} 
+                    />
+                )}
+
+                {/* Dashboard Screen */}
+                {viewMode === 'dashboard' && (
+                    <DashboardScreen 
+                        onNewMission={() => setViewMode('chat')}
+                        onProfile={() => setShowProfileModal(true)}
+                        onCenter={() => setShowCustomizeModal(true)}
+                        onCoachToggle={() => setIsTeacherCloneMode(!isTeacherCloneMode)}
+                        isCoachMode={isTeacherCloneMode}
+                        avatar={starryAvatar}
+                        gems={gemCount}
+                    />
+                )}
 
                 {/* Chat Area */}
+                {viewMode === 'chat' && (
                 <main ref={chatContainerRef} className="flex-grow overflow-y-auto p-4 space-y-6 pb-32">
                     {!isLoading && hasMore && (
                         <div className="flex justify-center py-2">
@@ -583,8 +717,10 @@ const StarlinkHeartApp: React.FC = () => {
                     )}
                     <div ref={messagesEndRef} />
                 </main>
+                )}
 
-                {/* Input Area - Glassmorphic Bottom Bar */}
+                {/* Input Area - Glassmorphic Bottom Bar (Only in Chat) */}
+                {viewMode === 'chat' && (
                 <footer className="shrink-0 p-4">
                     <div className={`${appBackground.glass} backdrop-blur-xl rounded-[2rem] shadow-2xl p-2 border border-white/40 transition-all duration-300 ${isTeacherCloneMode ? 'ring-2 ring-indigo-500 shadow-indigo-500/20' : ''}`}>
                         
@@ -648,7 +784,7 @@ const StarlinkHeartApp: React.FC = () => {
                         </form>
                     </div>
                 </footer>
-            </div>
+                )}</div>
 
             {/* --- MODALS --- */}
 
@@ -738,6 +874,37 @@ const StarlinkHeartApp: React.FC = () => {
                         </div>
                     </div>
                     <canvas ref={canvasRef} className="hidden" />
+                </div>
+            )}
+
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-pop-in">
+                    <div className="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-indigo-500 to-purple-600"></div>
+                        <div className="relative z-10 flex flex-col items-center">
+                            <div className="bg-white p-2 rounded-full shadow-lg mb-3">
+                                <StarryAvatarDisplay avatar={starryAvatar} isExcited={gemJustEarned} size="text-6xl" />
+                            </div>
+                            <h2 className="text-2xl font-black text-gray-800 mb-1">Kadet</h2>
+                            <p className="text-gray-500 text-sm mb-6">Prieskumník Vesmíru 🚀</p>
+
+                            <div className="grid grid-cols-2 gap-4 w-full mb-6">
+                                <div className="bg-yellow-50 rounded-2xl p-4 text-center border border-yellow-200">
+                                    <div className="text-3xl mb-1">💎</div>
+                                    <div className="font-bold text-2xl text-yellow-800">{gemCount}</div>
+                                    <div className="text-xs text-yellow-600 uppercase font-bold tracking-wide">Drahokamy</div>
+                                </div>
+                                <div className="bg-sky-50 rounded-2xl p-4 text-center border border-sky-200">
+                                    <div className="text-3xl mb-1">❤️</div>
+                                    <div className="font-bold text-2xl text-sky-800">∞</div>
+                                    <div className="text-xs text-sky-600 uppercase font-bold tracking-wide">Srdiečka</div>
+                                </div>
+                            </div>
+
+                            <button onClick={() => setShowProfileModal(false)} className="w-full bg-gray-900 text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition-colors">
+                                Zatvoriť
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 
