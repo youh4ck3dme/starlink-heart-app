@@ -877,6 +877,8 @@ const StarlinkHeartApp: React.FC = () => {
                 </div>
             )}
 
+            {/* Profile Modal */}
+            {showProfileModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-pop-in">
                     <div className="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-indigo-500 to-purple-600"></div>
