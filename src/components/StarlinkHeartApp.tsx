@@ -295,7 +295,7 @@ const StarlinkHeartApp: React.FC = () => {
         const heartsCollection = collection(db, 'hearts');
         const q = query(heartsCollection, orderBy('timestamp', 'desc'), limit(15));
 
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const unsubscribe = onSnapshot(q, (querySnapshot: { docs: QueryDocumentSnapshot[] }) => {
             const firestoreHearts = querySnapshot.docs.map(processHeartDoc).reverse();
             setLastVisible(querySnapshot.docs[querySnapshot.docs.length - 1]);
 
@@ -309,7 +309,7 @@ const StarlinkHeartApp: React.FC = () => {
             
             setHasMore(querySnapshot.docs.length >= 15);
             setIsLoading(false);
-        }, (error) => {
+        }, (error: any) => {
             // Log string to avoid circular reference issues with Error objects in console
             console.error("Error fetching hearts:", String(error));
             setIsLoading(false);
@@ -695,7 +695,7 @@ const StarlinkHeartApp: React.FC = () => {
                                             {/* Visual Aids */}
                                             {heart.aiResponse.visualAids?.length > 0 && (
                                                 <div className="flex gap-2 mt-3 pt-2 border-t border-black/5">
-                                                    {heart.aiResponse.visualAids.map((v, i) => (
+                                                    {heart.aiResponse.visualAids.map((v: string, i: number) => (
                                                         <span key={i} className="text-2xl hover:scale-125 transition-transform cursor-default">{v}</span>
                                                     ))}
                                                 </div>

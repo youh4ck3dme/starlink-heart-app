@@ -1,27 +1,23 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import StarlinkHeartApp from '../components/StarlinkHeartApp'; // Integrating the existing app
+import StarlinkHeartApp from '../components/StarlinkHeartApp';
+import { Link } from 'react-router-dom';
 
-const Home: React.FC = () => {
-  const navigate = useNavigate();
-
+export default function Home() {
   return (
-    <div className="relative h-screen flex flex-col">
-      {/* Back Button Overlay */}
-      <div className="absolute top-4 left-4 z-50">
-        <button 
-          onClick={() => navigate('/')}
-          className="bg-black/20 hover:bg-black/40 text-white/50 hover:text-white px-4 py-2 rounded-full backdrop-blur-sm transition-all text-sm font-medium border border-white/10"
-        >
-          ← Späť na hlavnú
-        </button>
-      </div>
-
-      {/* We render the actual app here so functionality isn't lost, 
-          but technically this serves as the "Home" page requested. */}
+    <div className="relative min-h-screen">
+      {/* 
+        StarlinkHeartApp handles its own layout, but we wrap it to ensure it takes full height. 
+        We also render a "Back to Welcome" button if needed, but the App has its own UI.
+        For now, let's render the App directly.
+      */}
       <StarlinkHeartApp />
+      
+      {/* 
+         Optional: Absolute positioning back button if the App UI allows it. 
+         Given StarlinkHeartApp has a header in 'chat' mode and dashboard mode, 
+         placing a fixed back button might overlap. 
+         Let's stick to just rendering the App for now as the "Home" experience.
+         Users can use browser back button or we can add a specific "Exit" button later.
+      */}
     </div>
   );
-};
-
-export default Home;
+}
