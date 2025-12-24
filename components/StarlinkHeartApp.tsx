@@ -128,18 +128,18 @@ const IntroScreen = ({ onStart, avatar, textColor }: { onStart: () => void, avat
             <div className="mb-8">
                 <StarryAvatarDisplay avatar={avatar} isExcited={true} size="text-[8rem]" />
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-fuchsia-400 mb-4 drop-shadow-sm font-display tracking-tight">
+            <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-tr from-sky-400 via-blue-500 to-purple-500 mb-4 drop-shadow-sm font-display tracking-tight">
                 Starlink Heart
             </h1>
             <p className={`text-lg md:text-xl mb-12 max-w-md leading-relaxed ${textColor} opacity-80`}>
-                Tvoj osobný vesmírny sprievodca. Pripravený na misiu?
+                Tvoj osobný vesmírny sprievodca.
             </p>
             <button 
                 onClick={onStart}
-                className="group relative px-12 py-5 bg-yellow-400 hover:bg-yellow-300 rounded-[2rem] shadow-[0_0_40px_-10px_rgba(250,204,21,0.5)] transition-all transform hover:scale-105 active:scale-95"
+                className="group relative px-12 py-5 bg-gradient-to-b from-yellow-300 to-yellow-500 hover:from-yellow-200 hover:to-yellow-400 rounded-[2rem] shadow-[0_10px_20px_rgba(234,179,8,0.4)] border-b-[6px] border-yellow-700 active:border-b-0 active:translate-y-[6px] transition-all"
             >
-                <div className="absolute inset-0 bg-white/20 rounded-[2rem] animate-pulse-ring"></div>
-                <span className="relative text-2xl font-black text-yellow-900 tracking-wider flex items-center gap-2">
+                <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent rounded-[2rem] pointer-events-none"></div>
+                <span className="relative text-2xl font-black text-yellow-900 tracking-wider flex items-center gap-2 drop-shadow-sm">
                     ŠTART <span className="text-3xl group-hover:translate-x-1 transition-transform">🚀</span>
                 </span>
             </button>
@@ -191,33 +191,33 @@ const DashboardScreen = ({
 
                 <div className="grid grid-cols-2 gap-4 w-full max-w-md">
                     {/* Card 1: New Mission */}
-                    <button onClick={onNewMission} className="group relative aspect-square bg-gradient-to-br from-sky-500 to-indigo-600 rounded-3xl p-4 shadow-xl border-b-8 border-indigo-800 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center justify-center gap-3 overflow-hidden">
-                        <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <span className="text-5xl drop-shadow-md group-hover:scale-110 transition-transform">🚀</span>
-                        <span className="text-white font-bold text-lg leading-tight uppercase tracking-wide">Nová<br/>Misia</span>
+                    <button onClick={onNewMission} className="group relative aspect-square bg-gradient-to-b from-sky-400 to-blue-600 rounded-3xl p-4 shadow-xl border-b-[8px] border-blue-800 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center justify-center gap-2 overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-3xl pointer-events-none"></div>
+                        <span className="text-5xl drop-shadow-md group-hover:scale-110 transition-transform relative z-10">🚀</span>
+                        <span className="text-white font-black text-xl leading-tight uppercase tracking-wide drop-shadow-md relative z-10">Nová<br/>Misia</span>
                     </button>
 
                     {/* Card 2: My Profile */}
-                    <button onClick={onProfile} className="group relative aspect-square bg-gradient-to-br from-amber-400 to-orange-500 rounded-3xl p-4 shadow-xl border-b-8 border-orange-700 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center justify-center gap-3 overflow-hidden">
-                         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <span className="text-5xl drop-shadow-md group-hover:scale-110 transition-transform">🎒</span>
-                        <span className="text-white font-bold text-lg leading-tight uppercase tracking-wide">Môj<br/>Profil</span>
+                    <button onClick={onProfile} className="group relative aspect-square bg-gradient-to-b from-amber-300 to-orange-500 rounded-3xl p-4 shadow-xl border-b-[8px] border-orange-700 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center justify-center gap-2 overflow-hidden">
+                         <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-3xl pointer-events-none"></div>
+                        <span className="text-5xl drop-shadow-md group-hover:scale-110 transition-transform relative z-10">🎒</span>
+                        <span className="text-white font-black text-xl leading-tight uppercase tracking-wide drop-shadow-md relative z-10">Môj<br/>Profil</span>
                     </button>
 
                     {/* Card 3: Centrum (Settings) */}
-                    <button onClick={onCenter} className="group relative aspect-square bg-gradient-to-br from-emerald-400 to-teal-600 rounded-3xl p-4 shadow-xl border-b-8 border-teal-800 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center justify-center gap-3 overflow-hidden">
-                         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <span className="text-5xl drop-shadow-md group-hover:rotate-45 transition-transform">⚙️</span>
-                        <span className="text-white font-bold text-lg leading-tight uppercase tracking-wide">Centrum</span>
+                    <button onClick={onCenter} className="group relative aspect-square bg-gradient-to-b from-emerald-400 to-teal-600 rounded-3xl p-4 shadow-xl border-b-[8px] border-teal-800 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center justify-center gap-2 overflow-hidden">
+                         <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-3xl pointer-events-none"></div>
+                        <span className="text-5xl drop-shadow-md group-hover:rotate-45 transition-transform relative z-10">⚙️</span>
+                        <span className="text-white font-black text-xl leading-tight uppercase tracking-wide drop-shadow-md relative z-10">Centrum</span>
                     </button>
 
                     {/* Card 4: Coach Mode Toggle */}
-                    <button onClick={onCoachToggle} className={`group relative aspect-square bg-gradient-to-br ${isCoachMode ? 'from-fuchsia-500 to-purple-600 border-purple-800' : 'from-gray-400 to-gray-500 border-gray-700'} rounded-3xl p-4 shadow-xl border-b-8 active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center justify-center gap-3 overflow-hidden`}>
-                         <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <span className="text-5xl drop-shadow-md group-hover:scale-110 transition-transform">
+                    <button onClick={onCoachToggle} className={`group relative aspect-square bg-gradient-to-b ${isCoachMode ? 'from-fuchsia-400 to-purple-600 border-purple-800' : 'from-gray-300 to-gray-500 border-gray-600'} rounded-3xl p-4 shadow-xl border-b-[8px] active:border-b-0 active:translate-y-2 transition-all flex flex-col items-center justify-center gap-2 overflow-hidden`}>
+                         <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/30 to-transparent rounded-t-3xl pointer-events-none"></div>
+                        <span className="text-5xl drop-shadow-md group-hover:scale-110 transition-transform relative z-10">
                             {isCoachMode ? '🎓' : '🎮'}
                         </span>
-                        <span className="text-white font-bold text-lg leading-tight uppercase tracking-wide">
+                        <span className="text-white font-black text-xl leading-tight uppercase tracking-wide drop-shadow-md relative z-10">
                             {isCoachMode ? 'Kouč' : 'Hra'}
                         </span>
                     </button>
@@ -742,7 +742,7 @@ const StarlinkHeartApp: React.FC = () => {
                             
                             <div className="flex items-center gap-2">
                                 <span className={`text-xs font-bold transition-colors ${isTeacherCloneMode ? 'text-sky-600' : 'text-gray-400 group-hover:text-gray-600'}`}>
-                                {isTeacherCloneMode ? 'Starlink Kouč (1. stupeň)' : 'Hravý Starlink'}
+                                {isTeacherCloneMode ? 'Starlink Kouč' : 'Hravý Starlink'}
                             </span>
                                 <button 
                                     onClick={() => setIsTeacherCloneMode(!isTeacherCloneMode)}
