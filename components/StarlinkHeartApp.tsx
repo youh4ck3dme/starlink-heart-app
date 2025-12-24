@@ -122,7 +122,7 @@ const StarryAvatarDisplay = ({
 
 // --- Game Style Components ---
 
-const IntroScreen = ({ onStart, avatar }: { onStart: () => void, avatar: string }) => {
+const IntroScreen = ({ onStart, avatar, textColor }: { onStart: () => void, avatar: string, textColor: string }) => {
     return (
         <div className="flex flex-col items-center justify-center h-full animate-fade-in-up text-center p-6 pb-20">
             <div className="mb-8">
@@ -131,7 +131,7 @@ const IntroScreen = ({ onStart, avatar }: { onStart: () => void, avatar: string 
             <h1 className="text-4xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-fuchsia-400 mb-4 drop-shadow-sm font-display tracking-tight">
                 Starlink Heart
             </h1>
-            <p className="text-lg md:text-xl text-white/80 mb-12 max-w-md leading-relaxed">
+            <p className={`text-lg md:text-xl mb-12 max-w-md leading-relaxed ${textColor} opacity-80`}>
                 Tvoj osobný vesmírny sprievodca. Pripravený na misiu?
             </p>
             <button 
@@ -154,7 +154,8 @@ const DashboardScreen = ({
     onCoachToggle, 
     isCoachMode, 
     avatar, 
-    gems 
+    gems,
+    textColor
 }: { 
     onNewMission: () => void, 
     onProfile: () => void, 
@@ -162,19 +163,20 @@ const DashboardScreen = ({
     onCoachToggle: () => void,
     isCoachMode: boolean,
     avatar: string,
-    gems: number
+    gems: number,
+    textColor: string
 }) => {
     return (
         <div className="flex flex-col h-full animate-fade-in-up p-6 overflow-y-auto">
             {/* Top Bar for Dashboard */}
             <div className="flex justify-between items-center mb-8">
-                 <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-lg">
+                 <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 shadow-lg">
                     <span className="text-2xl">{avatar}</span>
-                    <span className="text-white font-bold">Kadet</span>
+                    <span className={`font-bold ${textColor}`}>Kadet</span>
                  </div>
                  <div className="flex items-center gap-1.5 bg-yellow-400/20 px-3 py-1.5 rounded-full border border-yellow-400/30">
                     <span className="text-xl">💎</span>
-                    <span className="font-bold text-yellow-200">{gems}</span>
+                    <span className={`font-bold ${textColor === 'text-white' ? 'text-yellow-200' : 'text-yellow-700'}`}>{gems}</span>
                  </div>
             </div>
 
@@ -183,7 +185,7 @@ const DashboardScreen = ({
                 <div className="relative mb-4">
                     <StarryAvatarDisplay avatar={avatar} isThinking={false} size="text-[6rem]" />
                     <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white/20 backdrop-blur-md px-4 py-1 rounded-full border border-white/10 whitespace-nowrap">
-                        <span className="text-sm font-medium text-white">Systémy online...</span>
+                        <span className={`text-sm font-medium ${textColor}`}>Systémy online...</span>
                     </div>
                 </div>
 
@@ -241,7 +243,7 @@ const StarlinkHeartApp: React.FC = () => {
     const [showCustomizeModal, setShowCustomizeModal] = useState(false);
     const [starryAvatar, setStarryAvatar] = useState<string>(STARRY_AVATARS[0]);
     const [showBackgroundModal, setShowBackgroundModal] = useState(false);
-    const [appBackground, setAppBackground] = useState(BACKGROUND_OPTIONS[1]); // Default to space for game feel
+    const [appBackground, setAppBackground] = useState(BACKGROUND_OPTIONS[0]); // Default to Sky
     const [customApiKey, setCustomApiKey] = useState('');
     const [viewMode, setViewMode] = useState<'intro' | 'dashboard' | 'chat'>('intro');
     const [showProfileModal, setShowProfileModal] = useState(false);
@@ -603,6 +605,7 @@ const StarlinkHeartApp: React.FC = () => {
                     <IntroScreen 
                         onStart={() => setViewMode('dashboard')} 
                         avatar={starryAvatar} 
+                        textColor={appBackground.textColor}
                     />
                 )}
 
@@ -616,6 +619,7 @@ const StarlinkHeartApp: React.FC = () => {
                         isCoachMode={isTeacherCloneMode}
                         avatar={starryAvatar}
                         gems={gemCount}
+                        textColor={appBackground.textColor}
                     />
                 )}
 
