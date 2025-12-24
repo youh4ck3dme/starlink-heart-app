@@ -289,7 +289,7 @@ const StarlinkHeartApp: React.FC = () => {
         const docRef = await addDoc(collection(db, 'hearts'), docData);
         
         // --- Teacher Clone Logic applied here ---
-        const response = await generateCosmicResponse(message, hearts, imageFile || undefined, isTeacherMode);
+        const response = await generateCosmicResponse(message, hearts, imageFile || undefined, isTeacherCloneMode);
         
         await updateDoc(docRef, { aiResponse: response });
 
@@ -586,7 +586,7 @@ const StarlinkHeartApp: React.FC = () => {
 
                 {/* Input Area - Glassmorphic Bottom Bar */}
                 <footer className="shrink-0 p-4">
-                    <div className={`${appBackground.glass} backdrop-blur-xl rounded-[2rem] shadow-2xl p-2 border border-white/40 transition-all duration-300 ${isTeacherMode ? 'ring-2 ring-indigo-500 shadow-indigo-500/20' : ''}`}>
+                    <div className={`${appBackground.glass} backdrop-blur-xl rounded-[2rem] shadow-2xl p-2 border border-white/40 transition-all duration-300 ${isTeacherCloneMode ? 'ring-2 ring-indigo-500 shadow-indigo-500/20' : ''}`}>
                         
                         {/* Mode Toggle & File Preview */}
                         <div className="flex items-center justify-between px-3 mb-1">
@@ -601,14 +601,14 @@ const StarlinkHeartApp: React.FC = () => {
                             ) : <div></div>}
                             
                             <div className="flex items-center gap-2">
-                                <span className={`text-xs font-bold transition-colors ${isTeacherMode ? 'text-sky-600' : 'text-gray-400 group-hover:text-gray-600'}`}>
-                                {isTeacherMode ? 'Starlink Kouč (1. stupeň)' : 'Hravý Starlink'}
+                                <span className={`text-xs font-bold transition-colors ${isTeacherCloneMode ? 'text-sky-600' : 'text-gray-400 group-hover:text-gray-600'}`}>
+                                {isTeacherCloneMode ? 'Starlink Kouč (1. stupeň)' : 'Hravý Starlink'}
                             </span>
                                 <button 
-                                    onClick={() => setIsTeacherMode(!isTeacherMode)}
-                                    className={`w-10 h-6 rounded-full flex items-center p-1 transition-colors duration-300 ${isTeacherMode ? 'bg-indigo-600' : 'bg-gray-300'}`}
+                                    onClick={() => setIsTeacherCloneMode(!isTeacherCloneMode)}
+                                    className={`w-10 h-6 rounded-full flex items-center p-1 transition-colors duration-300 ${isTeacherCloneMode ? 'bg-indigo-600' : 'bg-gray-300'}`}
                                 >
-                                    <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isTeacherMode ? 'translate-x-4' : ''}`}></div>
+                                    <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isTeacherCloneMode ? 'translate-x-4' : ''}`}></div>
                                 </button>
                             </div>
                         </div>
