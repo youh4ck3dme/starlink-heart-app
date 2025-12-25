@@ -4,6 +4,7 @@ import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, u
 import { ref, uploadBytes, getDownloadURL } from '../services/localService';
 import { Heart } from '../types';
 import { generateCosmicResponse, getStarryTip, generateCosmicHint, generateParentGuide } from '../services/geminiService';
+import { BACKGROUND_OPTIONS, DEFAULT_BACKGROUND, STARRY_BACKGROUND_KEY } from '../constants/theme';
 
 // Define Avatars with Names
 const AVATAR_OPTIONS = [
@@ -17,15 +18,7 @@ const AVATAR_OPTIONS = [
 // Compatibility constant for existing logic
 const STARRY_AVATARS = AVATAR_OPTIONS.map(opt => opt.emoji);
 const STARRY_AVATAR_KEY = 'starryAvatar';
-const STARRY_BACKGROUND_KEY = 'starryBackground';
 const STARRY_GEMS_KEY = 'starryGems';
-
-const BACKGROUND_OPTIONS = [
-    { id: 'sky', name: 'Svetlá obloha', className: 'bg-sky-50', textColor: 'text-gray-800', accent: 'bg-sky-500', glass: 'bg-white/70' },
-    { id: 'space', name: 'Hlboký vesmír', className: 'bg-deep-space', textColor: 'text-gray-100', accent: 'bg-indigo-500', glass: 'bg-slate-900/60' },
-    { id: 'mars', name: 'Západ na Marse', className: 'bg-mars-sunset', textColor: 'text-white', accent: 'bg-orange-600', glass: 'bg-orange-900/40' },
-    { id: 'galaxy', name: 'Galaktický vír', className: 'bg-galaxy-swirl', textColor: 'text-white', accent: 'bg-fuchsia-500', glass: 'bg-purple-900/40' }
-];
 
 const processHeartDoc = (doc: QueryDocumentSnapshot): Heart => {
     const data = doc.data();
@@ -105,10 +98,11 @@ const StarryAvatarDisplay = ({
     isExcited?: boolean; 
     size?: string; 
 }) => {
+    const displayAvatar = avatar?.trim() ? avatar : '💙⭐';
     return (
         <div className={`relative flex items-center justify-center ${size} transition-all duration-300`}>
             <div className={`relative z-10 transition-transform duration-500 ${isExcited ? 'scale-125 rotate-[360deg]' : 'scale-100'} ${isThinking ? 'animate-bounce' : ''}`}>
-                {avatar}
+                {displayAvatar}
             </div>
             {isThinking && (
                  <span className="absolute -top-1 -right-1 flex h-3 w-3">
@@ -124,7 +118,7 @@ const StarryAvatarDisplay = ({
 
 const IntroScreen = ({ onStart, avatar, textColor }: { onStart: () => void, avatar: string, textColor: string }) => {
     return (
-        <div className="flex flex-col items-center justify-center h-full animate-fade-in-up text-center p-6 pb-20">
+        <div className="flex flex-col items-center justify-center min-h-[100dvh] animate-fade-in-up text-center p-6 pb-20 w-full" data-testid="intro-screen">
             <div className="mb-8">
                 <StarryAvatarDisplay avatar={avatar} isExcited={true} size="text-[8rem]" />
             </div>
@@ -166,12 +160,13 @@ const DashboardScreen = ({
     gems: number,
     textColor: string
 }) => {
+    const safeAvatar = avatar?.trim() ? avatar : '💙⭐';
     return (
         <div className="flex flex-col h-full animate-fade-in-up p-6 overflow-y-auto">
             {/* Top Bar for Dashboard */}
             <div className="flex justify-between items-center mb-8">
                  <div className="flex items-center gap-2 bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30 shadow-lg">
-                    <span className="text-2xl">{avatar}</span>
+                    <span className="text-2xl">{safeAvatar}</span>
                     <span className={`font-bold ${textColor}`}>Kadet</span>
                  </div>
                  <div className="flex items-center gap-1.5 bg-yellow-400/20 px-3 py-1.5 rounded-full border border-yellow-400/30">
@@ -183,7 +178,7 @@ const DashboardScreen = ({
             {/* Main Content */}
             <div className="flex-1 flex flex-col items-center justify-center gap-8 pb-10">
                 <div className="relative mb-4">
-                    <StarryAvatarDisplay avatar={avatar} isThinking={false} size="text-[6rem]" />
+                    <StarryAvatarDisplay avatar={safeAvatar} isThinking={false} size="text-[6rem]" />
                     <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white/20 backdrop-blur-md px-4 py-1 rounded-full border border-white/10 whitespace-nowrap">
                         <span className={`text-sm font-medium ${textColor}`}>Systémy online...</span>
                     </div>
@@ -243,7 +238,7 @@ const StarlinkHeartApp: React.FC = () => {
     const [showCustomizeModal, setShowCustomizeModal] = useState(false);
     const [starryAvatar, setStarryAvatar] = useState<string>(STARRY_AVATARS[0]);
     const [showBackgroundModal, setShowBackgroundModal] = useState(false);
-    const [appBackground, setAppBackground] = useState(BACKGROUND_OPTIONS[0]); // Default to Sky
+    const [appBackground, setAppBackground] = useState(DEFAULT_BACKGROUND); // Default to Sky
     const [customApiKey, setCustomApiKey] = useState('');
     const [viewMode, setViewMode] = useState<'intro' | 'dashboard' | 'chat'>('intro');
     const [showProfileModal, setShowProfileModal] = useState(false);

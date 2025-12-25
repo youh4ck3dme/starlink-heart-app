@@ -6,6 +6,14 @@
   .animate-fade-in-up {
     animation: fadeInUp 0.8s ease-out forwards;
   }
+
+  .bg-mars-sunset {
+    background-image: linear-gradient(135deg, #f97316 0%, #dc2626 45%, #6d28d9 100%);
+  }
+
+  .bg-galaxy-swirl {
+    background-image: radial-gradient(circle at 20% 20%, #8b5cf6 0%, #4c1d95 40%, #0f172a 100%);
+  }
 }
 
 @keyframes fadeInUp {
