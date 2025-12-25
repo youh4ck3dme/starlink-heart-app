@@ -57,7 +57,8 @@ export function clearAllAppData(): void {
     'starryAvatar',
     'starryBackground',
     'starryGems',
-    'custom_api_key'
+    'custom_api_key',
+    'hasStarted'
   ];
   
   appKeys.forEach(key => localStorage.removeItem(key));

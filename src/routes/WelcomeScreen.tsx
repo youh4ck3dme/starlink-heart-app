@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import welcomeImg from '../assets/image.png';
 
@@ -67,8 +66,11 @@ export default function WelcomeScreen() {
         {/* Title removed per request, but keeping structure clean */}
         
         {/* Premium CTA Button */}
-        <Link 
-          to="/home"
+        <button 
+          onClick={() => {
+            localStorage.setItem('hasStarted', '1');
+            window.location.href = '/home';
+          }}
           className="group relative w-full max-w-[280px] flex items-center justify-center px-8 py-5 
                      bg-gradient-to-r from-blue-600 to-blue-500 
                      text-white font-black text-xl tracking-wider uppercase
@@ -87,7 +89,7 @@ export default function WelcomeScreen() {
                 Začať misiu 
                 <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">🚀</span>
             </span>
-        </Link>
+        </button>
 
         {/* Safe Area Spacer for modern notches/home bars */}
         <div className="h-4 w-full" />
