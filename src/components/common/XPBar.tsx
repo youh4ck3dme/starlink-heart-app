@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { getPlayerStats, type PlayerStats } from '../../services/xpService';
+import ProfileModal from './ProfileModal';
 
 export default function XPBar() {
   const [stats, setStats] = useState<PlayerStats | null>(null);
   const [showLevelUp, setShowLevelUp] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   useEffect(() => {
     // Load initial stats
@@ -32,8 +34,11 @@ export default function XPBar() {
     <>
       {/* XP Bar - Top Right */}
       <div className="fixed top-4 right-4 z-50 flex items-center gap-3 bg-gradient-to-r from-indigo-600/90 to-purple-600/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-white/20">
-        {/* Level Badge */}
-        <div className="flex items-center gap-2">
+        {/* Level Badge - Clickable */}
+        <button 
+          onClick={() => setShowProfile(true)}
+          className="flex items-center gap-2 hover:scale-105 transition-transform active:scale-95"
+        >
           <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center font-black text-sm text-indigo-900">
             {stats.level}
           </div>
@@ -41,7 +46,7 @@ export default function XPBar() {
             <div className="text-xs text-white/70 leading-none">Level {stats.level}</div>
             <div className="text-[10px] text-white/50 leading-none mt-0.5">{stats.title}</div>
           </div>
-        </div>
+        </button>
 
         {/* Progress Bar */}
         <div className="w-32 sm:w-40 h-2 bg-white/20 rounded-full overflow-hidden">
@@ -78,6 +83,15 @@ export default function XPBar() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Profile Modal */}
+      {showProfile && (
+        <ProfileModal 
+          onClose={() => setShowProfile(false)}
+          gems={0}
+          hearts="∞"
+        />
       )}
     </>
   );
