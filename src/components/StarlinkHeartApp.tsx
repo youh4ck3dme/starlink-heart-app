@@ -8,6 +8,7 @@ import { hasParentConsent, setParentConsent, clearAllAppData } from '../services
 import ParentNotice from './ParentNotice';
 import Starry3D from './mascot/Starry3D';
 import ChatView from './chat/ChatView';
+import CameraModal from './camera/CameraModal';
 import { useVoiceMode } from '../hooks/useVoiceMode';
 
 // Define Avatars with Names
@@ -271,9 +272,7 @@ const StarlinkHeartApp: React.FC = () => {
     
     // Camera
     const [showCameraModal, setShowCameraModal] = useState(false);
-    const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
-    const [cameraFacingMode, setCameraFacingMode] = useState<'user' | 'environment'>('environment');
-    const [isTextMode, setIsTextMode] = useState(false);
+    // Camera state moved to CameraModal
     
     // Gamification
     const [gemCount, setGemCount] = useState<number>(0);
@@ -295,8 +294,6 @@ const StarlinkHeartApp: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const chatContainerRef = useRef<HTMLElement>(null);
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const canvasRef = useRef<HTMLCanvasElement>(null);
 
     // --- Effects ---
 
@@ -347,19 +344,6 @@ const StarlinkHeartApp: React.FC = () => {
         }
     }, [hearts.length, isSending]);
 
-    useEffect(() => {
-        if (showCameraModal && cameraStream && videoRef.current) {
-            videoRef.current.srcObject = cameraStream;
-        }
-    }, [showCameraModal, cameraStream]);
-
-    useEffect(() => {
-        return () => {
-            if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
-        };
-    }, [cameraStream]);
-
-    // Image preview effect
     useEffect(() => {
         if (!imageFile) {
             setImagePreviewUrl(null);
@@ -549,69 +533,15 @@ const StarlinkHeartApp: React.FC = () => {
         }
     };
 
-    // Camera Handlers
-    const startCameraStream = async (mode: 'user' | 'environment') => {
-        if (navigator.mediaDevices?.getUserMedia) {
-            try {
-                // Stop existing tracks if any
-                if (cameraStream) {
-                    cameraStream.getTracks().forEach(track => track.stop());
-                }
-                const stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: mode } 
-                });
-                setCameraStream(stream);
-                setCameraFacingMode(mode);
-                setShowCameraModal(true);
-            } catch (e) {
-                alert("Potrebný prístup ku kamere. Skontrolujte nastavenia.");
-                console.error(e);
-            }
-        }
-    };
-
+    // Camera Handlers are now in CameraModal
+    // Simple callback to open it
     const handleOpenCamera = () => {
-        startCameraStream(cameraFacingMode);
+        setShowCameraModal(true);
     };
 
-    const handleSwitchCamera = () => {
-        const newMode = cameraFacingMode === 'environment' ? 'user' : 'environment';
-        startCameraStream(newMode);
-    };
-
-    const handleCloseCamera = () => {
-        if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
-        setCameraStream(null);
+    const handlePhotoTaken = (file: File) => {
+        setImageFile(file);
         setShowCameraModal(false);
-    };
-
-    const handleTakePhoto = () => {
-        if (videoRef.current && canvasRef.current) {
-            const vid = videoRef.current;
-            const cvs = canvasRef.current;
-            const ctx = cvs.getContext('2d');
-            
-            if (ctx) {
-                cvs.width = vid.videoWidth;
-                cvs.height = vid.videoHeight;
-                
-                // Apply filter to context if Text Mode is active
-                if (isTextMode) {
-                    ctx.filter = 'grayscale(100%) contrast(150%) brightness(110%)';
-                } else {
-                    ctx.filter = 'none';
-                }
-                
-                ctx.drawImage(vid, 0, 0);
-                
-                cvs.toBlob(blob => {
-                    if (blob) {
-                        setImageFile(new File([blob], `cam-${Date.now()}.jpg`, { type: 'image/jpeg' }));
-                        handleCloseCamera();
-                    }
-                }, 'image/jpeg');
-            }
-        }
     };
 
     const saveCustomization = () => {
@@ -748,69 +678,11 @@ const StarlinkHeartApp: React.FC = () => {
             )}
 
             {/* Enhanced Camera Modal */}
-            {showCameraModal && (
-                <div className="fixed inset-0 z-50 bg-black flex flex-col animate-fade-in-up">
-                    <div className="flex-1 relative bg-black flex items-center justify-center overflow-hidden">
-                        <video 
-                            ref={videoRef} 
-                            autoPlay 
-                            playsInline 
-                            className="w-full h-full object-cover transition-all duration-300"
-                            style={{ filter: isTextMode ? 'grayscale(100%) contrast(150%) brightness(110%)' : 'none' }}
-                        />
-                        {/* Camera Grid Overlay */}
-                        <div className="absolute inset-0 pointer-events-none opacity-30">
-                            <div className="w-full h-full border border-white/20 flex flex-col">
-                                <div className="flex-1 border-b border-white/20"></div>
-                                <div className="flex-1 border-b border-white/20"></div>
-                                <div className="flex-1"></div>
-                            </div>
-                        </div>
-                        
-                        {/* Status Indicators */}
-                        <div className="absolute top-4 left-0 right-0 flex justify-center gap-2 pointer-events-none">
-                            {isTextMode && <span className="bg-white/20 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-widest border border-white/30">Textový Režim</span>}
-                        </div>
-                    </div>
-                    
-                    {/* Camera Controls */}
-                    <div className="bg-black/80 backdrop-blur-md pb-8 pt-4 px-6">
-                        <div className="flex items-center justify-between max-w-sm mx-auto">
-                            {/* Text Mode Toggle */}
-                            <button 
-                                onClick={() => setIsTextMode(!isTextMode)} 
-                                className={`p-3 rounded-full transition-all ${isTextMode ? 'bg-white text-black' : 'bg-white/10 text-white hover:bg-white/20'}`}
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                            </button>
-
-                            {/* Shutter Button */}
-                            <button onClick={handleTakePhoto} className="w-20 h-20 rounded-full border-4 border-white flex items-center justify-center relative group">
-                                <div className="w-16 h-16 bg-white rounded-full transition-transform group-active:scale-90"></div>
-                            </button>
-
-                            {/* Camera Switch */}
-                            <button 
-                                onClick={handleSwitchCamera}
-                                className="p-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                </svg>
-                            </button>
-                        </div>
-                        
-                        <div className="mt-6 flex justify-center">
-                            <button onClick={handleCloseCamera} className="text-white text-sm font-medium opacity-70 hover:opacity-100 transition-opacity">
-                                Zrušiť
-                            </button>
-                        </div>
-                    </div>
-                    <canvas ref={canvasRef} className="hidden" />
-                </div>
-            )}
+            <CameraModal 
+                isOpen={showCameraModal}
+                onClose={() => setShowCameraModal(false)}
+                onPhotoTaken={handlePhotoTaken}
+            />
 
             {/* Profile Modal */}
             {showProfileModal && (
