@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 
 const WelcomeScreen = lazy(() => import('./routes/WelcomeScreen'));
 const Home = lazy(() => import('./routes/Home'));
+const AuthPage = lazy(() => import('./routes/AuthPage'));
 
 const LoadingFallback = () => (
   <div className="flex items-center justify-center min-h-screen bg-[#0b1226] text-sky-400">
@@ -27,6 +28,14 @@ const router = createBrowserRouter([
     element: (
       <Suspense fallback={<LoadingFallback />}>
         <Home />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/auth",
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <AuthPage />
       </Suspense>
     ),
   },
