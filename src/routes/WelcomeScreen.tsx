@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import heroImg from '../assets/welcome-hero.webp';
+import heroImg from '../assets/welcome-hero.png';
 
 // Floating particles config (limited for performance)
 const PARTICLES = [

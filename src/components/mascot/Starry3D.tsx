@@ -3,7 +3,7 @@ import { useState, useEffect, Suspense, lazy } from 'react';
 const ReactSpline = lazy(() => import('@splinetool/react-spline'));
 
 // Import image to ensure correct hashing/path in build
-import fallbackImage from '../../assets/image.png';
+import fallbackImage from '../../assets/welcome-hero.png';
 
 const SPLINE_SCENE_URL = "PASTE_YOUR_SPLINE_URL_HERE";
 

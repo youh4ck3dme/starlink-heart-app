@@ -11,7 +11,7 @@ import { useToast } from "../hooks/use-toast";
 import { useAuth } from "../hooks/useAuth";
 
 // Use existing mascot image as logo
-import logoImage from "../assets/image.png";
+import logoImage from "../assets/welcome-hero.png";
 
 const loginSchema = z.object({
   email: z.string().email("Zadaj platný email"),
@@ -90,7 +90,7 @@ export default function AuthPage() {
             description: error.message.includes("Invalid") 
               ? "Nesprávny email alebo heslo." 
               : error.message,
-            variant: "destructive",
+            variant: "error",
           });
           return;
         }
@@ -106,7 +106,7 @@ export default function AuthPage() {
             description: error.message.includes("registered")
               ? "Tento email je už zaregistrovaný."
               : error.message,
-            variant: "destructive",
+            variant: "error",
           });
           return;
         }
@@ -127,13 +127,13 @@ export default function AuthPage() {
     try {
       const { error } = await verifyMfa(mfaCode.trim());
       if (error) {
-        toast({ title: "MFA zlyhalo", description: error.message, variant: "destructive" });
+        toast({ title: "MFA zlyhalo", description: error.message, variant: "error" });
         return;
       }
       toast({ title: "Prihlásenie úspešné!", description: "Vitaj späť." });
       navigate("/home", { replace: true });
     } catch {
-      toast({ title: "MFA zlyhalo", description: "Neplatný kód.", variant: "destructive" });
+      toast({ title: "MFA zlyhalo", description: "Neplatný kód.", variant: "error" });
     } finally {
       setIsSubmitting(false);
     }

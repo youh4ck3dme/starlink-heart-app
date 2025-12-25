@@ -1,9 +1,11 @@
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
+import { ToastProvider } from './hooks/use-toast';
 
 const WelcomeScreen = lazy(() => import('./routes/WelcomeScreen'));
 const Home = lazy(() => import('./routes/Home'));
 const AuthPage = lazy(() => import('./routes/AuthPage'));
+const NotFound = lazy(() => import('./routes/NotFound'));
 
 /**
  * Check if user has started the app (clicked "Začať misiu")
@@ -66,11 +68,21 @@ const router = createBrowserRouter([
       </Suspense>
     ),
   },
+  {
+    path: "*",
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <NotFound />
+      </Suspense>
+    ),
+  },
 ]);
 
 function App() {
   return (
-    <RouterProvider router={router} />
+    <ToastProvider>
+      <RouterProvider router={router} />
+    </ToastProvider>
   );
 }
 
