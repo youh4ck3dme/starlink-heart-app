@@ -31,7 +31,7 @@
 | 3 | ✅ **Add Delete Data button** | Settings → "Vymazať dáta" clears localStorage | `StarlinkHeartApp.tsx` (Settings section) |
 | 4 | ✅ **Extract ChatView component** | Created components, ready for integration | `src/components/chat/ChatView.tsx` (new), `ChatMessage.tsx` (new), `ChatInput.tsx` (new) |
 | 5 | 🔲 **Extract CameraModal component** | Reduce monolith by ~100 lines | `src/components/camera/CameraModal.tsx` (new) |
-| 6 | 🔲 **Add basic error boundary** | Graceful crash handling for kids | `src/components/ErrorBoundary.tsx` (new), `main.tsx` |
+| 6 | ✅ **Add basic error boundary** | Graceful crash handling for kids | `src/components/common/ErrorBoundary.tsx` (new), `main.tsx` (wraps App) |
 
 ---
 

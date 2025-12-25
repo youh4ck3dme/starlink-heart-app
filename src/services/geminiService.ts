@@ -1,6 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Heart } from "../types";
 import { checkInputSafety, getSafetyBlockMessage } from "./safetyFilter";
+import { PROF_STARLINK_SYSTEM_PROMPT, TEACHER_CLONE_SYSTEM_PROMPT } from "../config/prompts";
 
 const getApiKey = () => {
     return localStorage.getItem('custom_api_key') || process.env.API_KEY;
