@@ -14,12 +14,15 @@
   /* App gradient colors */
   --bg-gradient-start: #eaf3ff;
   --bg-gradient-end: #ffffff;
+  
+  /* Dark theme */
+  --bg-dark: #060819;
 }
 
 html {
   height: 100%;
-  /* Prevent iOS bounce/overscroll showing white */
-  background: var(--bg-gradient-start);
+  /* Dark background to prevent white gaps */
+  background: var(--bg-dark);
 }
 
 body {
@@ -27,9 +30,8 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  /* Consistent gradient background */
-  background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 70%);
-  background-attachment: fixed;
+  /* Dark background - no white gaps */
+  background: var(--bg-dark);
   /* Smooth font rendering */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
