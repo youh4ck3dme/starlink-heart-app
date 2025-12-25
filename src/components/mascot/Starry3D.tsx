@@ -2,8 +2,10 @@ import { useState, useEffect, Suspense, lazy } from 'react';
 
 const ReactSpline = lazy(() => import('@splinetool/react-spline'));
 
+// Import image to ensure correct hashing/path in build
+import fallbackImage from '../../assets/image.png';
+
 const SPLINE_SCENE_URL = "PASTE_YOUR_SPLINE_URL_HERE";
-const STATIC_FALLBACK_IMG = "/assets/image.png"; // Using public path, assuming image is copied there or exists
 
 interface Starry3DProps {
   className?: string;
@@ -62,13 +64,9 @@ export default function Starry3D({ className = "" }: Starry3DProps) {
         </div>
       ) : (
         <img 
-          src={STATIC_FALLBACK_IMG} 
+          src={fallbackImage} 
           alt="Prof. StarLink" 
           className="w-full h-full object-contain drop-shadow-xl"
-          onError={(e) => {
-            // Fallback if image fails - try relative path
-            (e.target as HTMLImageElement).src = new URL('../../assets/image.png', import.meta.url).href;
-          }}
         />
       )}
     </div>
