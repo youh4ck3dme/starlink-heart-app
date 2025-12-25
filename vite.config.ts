@@ -19,8 +19,8 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks: {
             'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-            'firebase-vendor': ['firebase/app', 'firebase/firestore', 'firebase/storage'],
             'genai-vendor': ['@google/genai'],
+            'spline-vendor': ['@splinetool/react-spline', '@splinetool/runtime'],
           },
         },
       },

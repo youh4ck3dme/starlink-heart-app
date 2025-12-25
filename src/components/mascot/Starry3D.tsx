@@ -1,5 +1,6 @@
-import { useState, useEffect, Suspense } from 'react';
-import ReactSpline from '@splinetool/react-spline';
+import { useState, useEffect, Suspense, lazy } from 'react';
+
+const ReactSpline = lazy(() => import('@splinetool/react-spline'));
 
 const SPLINE_SCENE_URL = "PASTE_YOUR_SPLINE_URL_HERE";
 const STATIC_FALLBACK_IMG = "/assets/image.png"; // Using public path, assuming image is copied there or exists
