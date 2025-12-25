@@ -24,12 +24,9 @@ const LoadingFallback = () => (
 );
 
 /**
- * Route guard: Redirect to /home if user has already started
+ * Welcome page - always accessible
  */
 const WelcomeRoute = () => {
-  if (hasStarted()) {
-    return <Navigate to="/home" replace />;
-  }
   return (
     <Suspense fallback={<LoadingFallback />}>
       <WelcomeScreen />
