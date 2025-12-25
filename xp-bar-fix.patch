@@ -1,0 +1,48 @@
+diff --git a/src/components/common/XPBar.tsx b/src/components/common/XPBar.tsx
+index 59455d1..b1598a2 100644
+--- a/src/components/common/XPBar.tsx
++++ b/src/components/common/XPBar.tsx
+@@ -1,4 +1,4 @@
+-import { useEffect, useState } from 'react';
++import { useEffect, useState, useRef } from 'react';
+ import { getPlayerStats, type PlayerStats } from '../../services/xpService';
+ import ProfileModal from './ProfileModal';
+ 
+@@ -6,27 +6,33 @@ export default function XPBar() {
+   const [stats, setStats] = useState<PlayerStats | null>(null);
+   const [showLevelUp, setShowLevelUp] = useState(false);
+   const [showProfile, setShowProfile] = useState(false);
++  
++  // Track previous level to detect level ups without triggering re-renders
++  const prevLevelRef = useRef<number>(0);
+ 
+   useEffect(() => {
+     // Load initial stats
+-    setStats(getPlayerStats());
++    const initialStats = getPlayerStats();
++    setStats(initialStats);
++    prevLevelRef.current = initialStats.level;
+ 
+     // Listen for XP updates
+     const handleXPUpdate = () => {
+       const newStats = getPlayerStats();
+-      const oldStats = stats;
+       
+-      if (oldStats && newStats.level > oldStats.level) {
++      // Check for level up using ref to avoid dependency cycle
++      if (newStats.level > prevLevelRef.current) {
+         setShowLevelUp(true);
+         setTimeout(() => setShowLevelUp(false), 3000);
+       }
+       
++      prevLevelRef.current = newStats.level;
+       setStats(newStats);
+     };
+ 
+     window.addEventListener('xp-updated', handleXPUpdate);
+     return () => window.removeEventListener('xp-updated', handleXPUpdate);
+-  }, [stats]);
++  }, []); // Empty dependency array prevents infinite loop
+ 
+   if (!stats) return null;
+ 
