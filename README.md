@@ -43,6 +43,27 @@ src/
     npm run build
     ```
 
+## Testing
+
+The project includes both Unit and End-to-End (E2E) tests.
+
+- **Unit Tests** (Vitest):
+  ```bash
+  npm run test
+  ```
+  *Verifies component rendering, app logic, and mocked service interactions.*
+
+- **E2E Tests** (Playwright):
+  ```bash
+  npm run test:e2e
+  ```
+  *Verifies critical user flows in a browser environment (Welcome -> Dashboard -> Chat).*
+
+- **Coverage Report**:
+  ```bash
+  npm run coverage
+  ```
+
 ## Customization
 
 - **Animations**: Configured in `tailwind.config.js` (`fade-in-up`, `float`, `pulse-glow`).

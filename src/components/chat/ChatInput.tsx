@@ -102,8 +102,39 @@ export default function ChatInput({
                         />
                     </div>
                     
+                    {/* Microphone Button - Voice Input */}
+                    {voiceMode.isSupported && voiceMode.isEnabled && (
+                        <button 
+                            type="button"
+                            onClick={() => {
+                                if (voiceMode.isListening) {
+                                    voiceMode.stopListening();
+                                } else {
+                                    voiceMode.startListening((text: string) => setNewMessage(newMessage ? newMessage + ' ' + text : text));
+                                }
+                            }}
+                            className={`h-12 w-12 rounded-full flex items-center justify-center shadow-lg transition-all ${
+                                voiceMode.isListening 
+                                    ? 'bg-red-500 animate-pulse scale-110' 
+                                    : 'bg-emerald-500 hover:bg-emerald-600'
+                            }`}
+                            aria-label={voiceMode.isListening ? "Zastaviť nahrávanie" : "Hlasový vstup"}
+                        >
+                            {voiceMode.isListening ? (
+                                <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <rect x="6" y="6" width="12" height="12" rx="2" />
+                                </svg>
+                            ) : (
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                                </svg>
+                            )}
+                        </button>
+                    )}
+                    
                     <button 
                         type="submit" 
+                        aria-label="Poslať správu"
                         disabled={isSending || (!newMessage.trim() && !imageFile)}
                         className={`h-12 w-12 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-95 text-white ${isSending ? 'bg-gray-400' : (isTeacherCloneMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-sky-500 hover:bg-sky-600')}`}
                     >

@@ -15,11 +15,11 @@ import { useVoiceMode } from '../hooks/useVoiceMode';
 
 // Define Avatars with Names
 const AVATAR_OPTIONS = [
-    { emoji: '✨', name: 'Iskra' },
-    { emoji: '🚀', name: 'Raketka' },
-    { emoji: '🤖', name: 'Robo' },
-    { emoji: '🧠', name: 'Génius' },
-    { emoji: '💡', name: 'Lumen' }
+    { emoji: '✨', name: 'Iskra', price: 0 },
+    { emoji: '🚀', name: 'Raketka', price: 30 },
+    { emoji: '🤖', name: 'Robo', price: 50 },
+    { emoji: '🧠', name: 'Génius', price: 75 },
+    { emoji: '💡', name: 'Lumen', price: 100 }
 ];
 
 // Compatibility constant for existing logic
@@ -29,10 +29,10 @@ const STARRY_BACKGROUND_KEY = 'starryBackground';
 const STARRY_GEMS_KEY = 'starryGems';
 
 const BACKGROUND_OPTIONS = [
-    { id: 'sky', name: 'Svetlá obloha', className: 'bg-sky-50', textColor: 'text-gray-800', accent: 'bg-sky-500', glass: 'bg-white/70' },
-    { id: 'space', name: 'Hlboký vesmír', className: 'bg-deep-space', textColor: 'text-gray-100', accent: 'bg-indigo-500', glass: 'bg-slate-900/60' },
-    { id: 'mars', name: 'Západ na Marse', className: 'bg-mars-sunset', textColor: 'text-white', accent: 'bg-orange-600', glass: 'bg-orange-900/40' },
-    { id: 'galaxy', name: 'Galaktický vír', className: 'bg-galaxy-swirl', textColor: 'text-white', accent: 'bg-fuchsia-500', glass: 'bg-purple-900/40' }
+    { id: 'sky', name: 'Svetlá obloha', price: 0, className: 'bg-sky-50', textColor: 'text-gray-800', accent: 'bg-sky-500', glass: 'bg-white/70' },
+    { id: 'space', name: 'Hlboký vesmír', price: 0, className: 'bg-deep-space', textColor: 'text-gray-100', accent: 'bg-indigo-500', glass: 'bg-slate-900/60' },
+    { id: 'mars', name: 'Západ na Marse', price: 60, className: 'bg-mars-sunset', textColor: 'text-white', accent: 'bg-orange-600', glass: 'bg-orange-900/40' },
+    { id: 'galaxy', name: 'Galaktický vír', price: 120, className: 'bg-galaxy-swirl', textColor: 'text-white', accent: 'bg-fuchsia-500', glass: 'bg-purple-900/40' }
 ];
 
 const processHeartDoc = (doc: QueryDocumentSnapshot): Heart => {
@@ -260,6 +260,16 @@ const StarlinkHeartApp: React.FC = () => {
     const [gemCount, setGemCount] = useState<number>(0);
     const [gemJustEarned, setGemJustEarned] = useState(false);
     
+    // Shop - Unlocked Items
+    const [unlockedAvatars, setUnlockedAvatars] = useState<string[]>(() => {
+        const saved = localStorage.getItem('unlockedAvatars');
+        return saved ? JSON.parse(saved) : ['✨']; // Iskra is free
+    });
+    const [unlockedBackgrounds, setUnlockedBackgrounds] = useState<string[]>(() => {
+        const saved = localStorage.getItem('unlockedBackgrounds');
+        return saved ? JSON.parse(saved) : ['sky', 'space']; // Free ones
+    });
+    
     // Advanced Features
     const [isTeacherCloneMode, setIsTeacherCloneMode] = useState(false);
     const [hintLoadingId, setHintLoadingId] = useState<string | null>(null);
@@ -447,6 +457,39 @@ const StarlinkHeartApp: React.FC = () => {
         }
     };
 
+    // Shop - Purchase Item
+    const purchaseItem = (type: 'avatar' | 'background', id: string, price: number) => {
+        if (gemCount < price) {
+            // Could show a "not enough gems" toast here
+            return false;
+        }
+        
+        // Deduct gems
+        setGemCount(prev => {
+            const newCount = prev - price;
+            localStorage.setItem(STARRY_GEMS_KEY, String(newCount));
+            return newCount;
+        });
+        
+        // Unlock item
+        if (type === 'avatar') {
+            const newUnlocked = [...unlockedAvatars, id];
+            setUnlockedAvatars(newUnlocked);
+            localStorage.setItem('unlockedAvatars', JSON.stringify(newUnlocked));
+            // Auto-select purchased avatar
+            setStarryAvatar(id);
+        } else {
+            const newUnlocked = [...unlockedBackgrounds, id];
+            setUnlockedBackgrounds(newUnlocked);
+            localStorage.setItem('unlockedBackgrounds', JSON.stringify(newUnlocked));
+            // Auto-select purchased background
+            const bg = BACKGROUND_OPTIONS.find(b => b.id === id);
+            if (bg) setAppBackground(bg);
+        }
+        
+        return true;
+    };
+
     // Parent Consent Handlers
     const handleConsentAccept = async () => {
         setParentConsent(true);
@@ -580,6 +623,7 @@ const StarlinkHeartApp: React.FC = () => {
                     />
                 )}
 
+                {/* Dashboard Screen */}
                 {/* Dashboard Screen */}
                 {viewMode === 'dashboard' && (
                     <DashboardScreen 
@@ -725,37 +769,92 @@ const StarlinkHeartApp: React.FC = () => {
                         
                         <h3 className="text-lg font-bold text-gray-800 mb-6 text-center">Vzhľad a Téma</h3>
                         
-                        {/* Avatars with Names */}
-                        <div className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">Tvoj Avatar</div>
+                        {/* Avatars with Prices */}
+                        <div className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1 flex items-center gap-2">
+                            Tvoj Avatar
+                            <span className="text-yellow-600 font-bold">💎 {gemCount}</span>
+                        </div>
                         <div className="grid grid-cols-3 gap-3 mb-8">
-                            {AVATAR_OPTIONS.map((option) => (
-                                <button 
-                                    key={option.emoji} 
-                                    onClick={() => setStarryAvatar(option.emoji)} 
-                                    className={`flex flex-col items-center justify-center p-3 rounded-2xl transition-all ${starryAvatar === option.emoji ? 'bg-sky-100 ring-2 ring-sky-500 transform scale-105 shadow-md' : 'hover:bg-gray-50 border border-transparent hover:border-gray-100'}`}
-                                >
-                                    <span className="text-3xl mb-1">{option.emoji}</span>
-                                    <span className="text-xs font-bold text-gray-600">{option.name}</span>
-                                </button>
-                            ))}
+                            {AVATAR_OPTIONS.map((option) => {
+                                const isUnlocked = unlockedAvatars.includes(option.emoji);
+                                const isSelected = starryAvatar === option.emoji;
+                                const canAfford = gemCount >= option.price;
+                                
+                                return (
+                                    <button 
+                                        key={option.emoji} 
+                                        onClick={() => {
+                                            if (isUnlocked) {
+                                                setStarryAvatar(option.emoji);
+                                            } else if (canAfford) {
+                                                purchaseItem('avatar', option.emoji, option.price);
+                                            }
+                                        }} 
+                                        className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all ${
+                                            isSelected ? 'bg-sky-100 ring-2 ring-sky-500 transform scale-105 shadow-md' : 
+                                            !isUnlocked ? 'bg-gray-100 opacity-75' :
+                                            'hover:bg-gray-50 border border-transparent hover:border-gray-100'
+                                        }`}
+                                    >
+                                        <span className={`text-3xl mb-1 ${!isUnlocked ? 'grayscale' : ''}`}>{option.emoji}</span>
+                                        <span className="text-xs font-bold text-gray-600">{option.name}</span>
+                                        
+                                        {/* Price or Lock indicator */}
+                                        {!isUnlocked && (
+                                            <div className={`absolute -top-1 -right-1 px-2 py-0.5 rounded-full text-[10px] font-bold shadow-md ${
+                                                canAfford ? 'bg-yellow-400 text-yellow-900' : 'bg-gray-300 text-gray-600'
+                                            }`}>
+                                                💎{option.price}
+                                            </div>
+                                        )}
+                                        {isSelected && isUnlocked && (
+                                            <div className="absolute -top-1 -right-1 bg-sky-500 text-white rounded-full p-1 shadow-md">
+                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                                            </div>
+                                        )}
+                                    </button>
+                                );
+                            })}
                         </div>
                         
-                        {/* Backgrounds with Indicators */}
+                        {/* Backgrounds with Prices */}
                         <div className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">Prostredie</div>
                         <div className="grid grid-cols-2 gap-3 mb-4">
                             {BACKGROUND_OPTIONS.map(bg => {
+                                const isUnlocked = unlockedBackgrounds.includes(bg.id);
                                 const isSelected = appBackground.id === bg.id;
+                                const canAfford = gemCount >= bg.price;
+                                
                                 return (
                                     <button 
                                         key={bg.id} 
-                                        onClick={() => { setAppBackground(bg); }} 
-                                        className={`relative rounded-xl overflow-hidden h-20 group transition-all duration-300 ${isSelected ? 'ring-4 ring-sky-500 ring-offset-2 shadow-lg scale-[1.02]' : 'hover:opacity-90 shadow-sm'}`}
+                                        onClick={() => {
+                                            if (isUnlocked) {
+                                                setAppBackground(bg);
+                                            } else if (canAfford) {
+                                                purchaseItem('background', bg.id, bg.price);
+                                            }
+                                        }} 
+                                        className={`relative rounded-xl overflow-hidden h-20 group transition-all duration-300 ${
+                                            isSelected ? 'ring-4 ring-sky-500 ring-offset-2 shadow-lg scale-[1.02]' : 
+                                            !isUnlocked ? 'opacity-60 grayscale' :
+                                            'hover:opacity-90 shadow-sm'
+                                        }`}
                                     >
                                         <div className={`absolute inset-0 ${bg.className}`}></div>
                                         <span className={`relative z-10 text-sm font-bold block mt-1 ${bg.id === 'sky' ? 'text-gray-800' : 'text-white'} drop-shadow-md`}>{bg.name}</span>
                                         
-                                        {/* Checkmark Indicator */}
-                                        {isSelected && (
+                                        {/* Price indicator for locked */}
+                                        {!isUnlocked && (
+                                            <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold shadow-md ${
+                                                canAfford ? 'bg-yellow-400 text-yellow-900' : 'bg-gray-400 text-white'
+                                            }`}>
+                                                💎{bg.price}
+                                            </div>
+                                        )}
+                                        
+                                        {/* Checkmark for selected & unlocked */}
+                                        {isSelected && isUnlocked && (
                                             <div className="absolute top-2 right-2 bg-sky-500 text-white rounded-full p-1 shadow-md animate-pop-in">
                                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                                             </div>

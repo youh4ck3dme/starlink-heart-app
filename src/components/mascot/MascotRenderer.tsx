@@ -1,9 +1,9 @@
-import { lazy, Suspense } from "react";
 import RiveMascot from "./RiveMascot";
 import fallbackImage from '../../assets/welcome-hero.png';
+import Starry3D from "./Starry3D";
 
-// Lazy load Starry3D - this ensures @splinetool is NOT bundled until user requests 3D mode
-const Starry3D = lazy(() => import("./Starry3D"));
+// Lazy load Starry3D - DISABLED for E2E stability
+// const Starry3D = lazy(() => import("./Starry3D"));
 
 export type MascotMode = "image" | "rive" | "spline3d";
 
@@ -39,17 +39,11 @@ export default function MascotRenderer({
   // Mode: 3D Spline (only if configured)
   if (mode === "spline3d" && isSplineConfigured) {
     return (
-      <Suspense fallback={
-        <div className={`${className} flex items-center justify-center`}>
-          <div className="w-6 h-6 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
-        </div>
-      }>
         <Starry3D 
           className={className} 
           enabled={true} 
           scene={splineScene} 
         />
-      </Suspense>
     );
   }
 
