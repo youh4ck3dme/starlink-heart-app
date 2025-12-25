@@ -1,4 +1,5 @@
 import React, { RefObject } from 'react';
+import VoiceRecordingModal from './VoiceRecordingModal';
 
 interface ChatInputProps {
     newMessage: string;
@@ -31,6 +32,7 @@ export default function ChatInput({
     voiceMode
 }: ChatInputProps & { voiceMode: any }) {
     return (
+        <>
         <footer className="shrink-0 p-4">
             <div className={`${appBackground.glass} backdrop-blur-xl rounded-[2rem] shadow-2xl p-2 border border-white/40 transition-all duration-300 ${isTeacherCloneMode ? 'ring-2 ring-indigo-500 shadow-indigo-500/20' : ''}`}>
                 
@@ -112,5 +114,12 @@ export default function ChatInput({
                 </form>
             </div>
         </footer>
+
+        {/* Voice Recording Modal */}
+        <VoiceRecordingModal 
+            isListening={voiceMode?.isListening || false}
+            onCancel={voiceMode?.stopListening || (() => {})}
+        />
+    </>
     );
 }
