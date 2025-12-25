@@ -5,9 +5,10 @@ type Props = {
   enabled: boolean;
   scene: string;
   className?: string;
+  onFallback?: () => void;
 };
 
-export default function Starry3D({ enabled, scene, className }: Props) {
+export default function Starry3D({ enabled, scene, className, onFallback }: Props) {
   const [Spline, setSpline] = useState<React.ComponentType<any> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -17,7 +18,7 @@ export default function Starry3D({ enabled, scene, className }: Props) {
     
     // Don't load if scene is placeholder
     if (scene === "PASTE_YOUR_SPLINE_URL_HERE" || !scene) {
-      setError("3D scéna nie je nakonfigurovaná");
+      if (onFallback) onFallback();
       return;
     }
     

@@ -32,8 +32,12 @@ export default function MascotRenderer({
     );
   }
 
-  // Mode: 3D Spline (lazy-loaded, premium)
-  if (mode === "spline3d") {
+
+
+  const isSplineConfigured = splineScene && splineScene !== "PASTE_YOUR_SPLINE_URL_HERE";
+  
+  // Mode: 3D Spline (only if configured)
+  if (mode === "spline3d" && isSplineConfigured) {
     return (
       <Suspense fallback={
         <div className={`${className} flex items-center justify-center`}>

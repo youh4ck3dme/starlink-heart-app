@@ -36,7 +36,7 @@ export default function ProfileModal({
         />
 
         {/* Modal Container */}
-        <div className="relative w-full max-w-[420px] max-h-[85svh] overflow-hidden rounded-3xl bg-white shadow-[0_30px_90px_rgba(0,0,0,0.4)] flex flex-col motion-reduce:animate-none">
+        <div className="relative w-full max-w-[420px] max-h-[85svh] overflow-hidden rounded-3xl bg-white/90 backdrop-blur-xl shadow-[0_30px_90px_rgba(0,0,0,0.4)] flex flex-col motion-reduce:animate-none border border-white/20">
           
           {/* Header gradient - stable */}
           <div className="relative shrink-0 px-6 pt-6 pb-5 bg-gradient-to-r from-[#6a5cff] via-[#5aaeff] to-[#7c4dff]">
@@ -122,7 +122,7 @@ export default function ProfileModal({
 
           {/* Footer - stable */}
           <div 
-            className="shrink-0 border-t border-black/5 bg-white px-5 py-4"
+            className="shrink-0 border-t border-black/5 bg-white/50 backdrop-blur-sm px-5 py-4"
             style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
           >
             <button

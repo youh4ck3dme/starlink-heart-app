@@ -99,7 +99,7 @@ export default function ChatView({
                         <div className="shrink-0">
                             <StarryAvatarDisplay avatar={starryAvatar} isThinking={true} size="text-2xl" />
                         </div>
-                        <div className="bg-white/50 rounded-2xl p-3 flex gap-1 items-center">
+                        <div className="bg-white/10 rounded-2xl p-3 flex gap-1 items-center">
                             <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce"></div>
                             <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                             <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>

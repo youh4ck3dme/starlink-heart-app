@@ -14,7 +14,7 @@ interface ParentNoticeProps {
 export default function ParentNotice({ onAccept, onCancel }: ParentNoticeProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in-up">
-      <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden">
+      <div className="bg-white/95 backdrop-blur-xl w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-white/20">
         
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-5">

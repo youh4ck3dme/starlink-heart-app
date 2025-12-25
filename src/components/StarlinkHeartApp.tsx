@@ -7,6 +7,8 @@ import { generateCosmicResponse, getStarryTip, generateCosmicHint, generateParen
 import { hasParentConsent, setParentConsent, clearAllAppData } from '../services/consentService';
 import ParentNotice from './ParentNotice';
 import MascotRenderer, { MascotMode } from './mascot/MascotRenderer';
+import Header from './layout/Header';
+import LiveStarryBackground from './layout/LiveStarryBackground';
 import ChatView from './chat/ChatView';
 import CameraModal from './camera/CameraModal';
 import { useVoiceMode } from '../hooks/useVoiceMode';
@@ -240,7 +242,7 @@ const StarlinkHeartApp: React.FC = () => {
     const [showCustomizeModal, setShowCustomizeModal] = useState(false);
     const [starryAvatar, setStarryAvatar] = useState<string>(STARRY_AVATARS[0]);
     const [showBackgroundModal, setShowBackgroundModal] = useState(false);
-    const [appBackground, setAppBackground] = useState(BACKGROUND_OPTIONS[0]); // Default to Sky
+    const [appBackground, setAppBackground] = useState(BACKGROUND_OPTIONS[1]); // Default to Deep Space
     const [customApiKey, setCustomApiKey] = useState('');
     const [viewMode, setViewMode] = useState<'intro' | 'dashboard' | 'chat'>('intro');
     const [showProfileModal, setShowProfileModal] = useState(false);
@@ -548,34 +550,25 @@ const StarlinkHeartApp: React.FC = () => {
     return (
         <>
             {/* Main Layout Container */}
-            <div className={`flex flex-col min-h-dvh transition-colors duration-700 ${appBackground.className} ${appBackground.textColor}`}>
+            <div className={`flex flex-col min-h-dvh transition-colors duration-700 ${appBackground.className} ${appBackground.textColor} relative`}>
                 
-                {/* Header - Glassmorphic (Only in Chat) */}
+                {/* Live Starry Background - Only for space/galaxy themes */}
+                {(appBackground.id === 'space' || appBackground.id === 'galaxy' || appBackground.id === 'mars') && (
+                    <LiveStarryBackground />
+                )}
+
+                {/* Header - Unified Glassmorphic Component */}
                 {viewMode === 'chat' && (
-                <header className={`shrink-0 px-4 py-3 flex items-center justify-between sticky top-0 z-20 ${appBackground.glass} backdrop-blur-md shadow-sm`}>
-                    <div className="flex items-center gap-2">
-                         <button onClick={() => setViewMode('dashboard')} className="mr-1 p-1 hover:bg-black/10 rounded-full transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500 hover:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                        </button>
-                        {/* Enhanced Avatar with Animations */}
-                        <StarryAvatarDisplay 
-                            avatar={starryAvatar} 
-                            isThinking={isSending} 
-                            isExcited={gemJustEarned} 
-                        />
-                        <h1 className={`text-xl font-bold tracking-tight ${appBackground.id === 'sky' ? 'text-sky-600' : 'text-white'}`}>Starlink Heart</h1>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                        <div onClick={handleGetTip} className="cursor-pointer flex items-center gap-1.5 bg-yellow-400/20 px-3 py-1.5 rounded-full border border-yellow-400/30">
-                            <span className={`text-lg ${gemJustEarned ? 'animate-pulse-ring' : ''}`}>💎</span>
-                            <span className={`font-bold text-sm ${appBackground.id === 'sky' ? 'text-yellow-800' : 'text-yellow-200'}`}>{gemCount}</span>
-                        </div>
-                        <button onClick={() => setShowCustomizeModal(true)} className="p-2 rounded-full hover:bg-black/10 transition-colors">
-                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        </button>
-                    </div>
-                </header>
+                    <Header
+                        onBack={() => setViewMode('dashboard')}
+                        onSettings={() => setShowCustomizeModal(true)}
+                        onGemsTap={handleGetTip}
+                        avatar={starryAvatar}
+                        gemCount={gemCount}
+                        isThinking={isSending}
+                        gemJustEarned={gemJustEarned}
+                        appBackground={appBackground}
+                    />
                 )}
 
                 {/* Intro Screen */}

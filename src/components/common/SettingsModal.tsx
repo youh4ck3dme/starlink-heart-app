@@ -181,28 +181,32 @@ export default function SettingsModal({
             </div>
           </section>
 
-          {/* SECTION: API KEY - visually secondary */}
-          <section className="rounded-2xl border border-gray-100 bg-gray-50/50 p-4">
-            <div className="flex items-center justify-between">
+          {/* SECTION: API KEY - Advanced Parent Settings */}
+          <section className="rounded-2xl border border-indigo-100 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
               <div>
-                <div className="text-xs font-bold tracking-widest text-gray-400 uppercase">Vlastný API Kľúč</div>
-                <div className="text-sm font-medium text-gray-600 mt-0.5">Voliteľné (pre rodiča)</div>
+                <div className="text-xs font-bold tracking-widest text-indigo-500 uppercase">Rodičovské Nastavenia</div>
+                <div className="text-sm font-bold text-gray-800 mt-0.5">Gemini API Kľúč</div>
               </div>
-              <span className="text-xs text-gray-400 font-medium px-2 py-1 bg-white rounded-full border border-gray-200">Gemini</span>
+              <span className="text-[10px] font-bold text-indigo-600 px-2 py-0.5 bg-indigo-50 rounded-full border border-indigo-100">PRO</span>
             </div>
 
-            <div className="mt-3">
+            <div className="relative">
               <input
-                type="text"
+                type="password"
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Vlož Gemini API Key…"
-                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-sky-500/40 focus:border-sky-500 transition-all"
+                placeholder="sk-..."
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 pl-10 pr-4 py-3 text-sm font-mono outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-gray-400"
               />
-              <p className="mt-2 text-xs text-gray-500 leading-relaxed">
-                Ak necháš prázdne, použije sa demo kľúč. Na produkciu odporúčam vlastný.
-              </p>
+              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+              </div>
             </div>
+            <p className="mt-2 text-xs text-gray-400 leading-relaxed">
+              Vložte vlastný Google Gemini kľúč pre neobmedzené odpovede.
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 ml-1 font-medium underline">Získať kľúč &rarr;</a>
+            </p>
           </section>
 
           {/* SECTION: 3D MASCOT (BETA) */}

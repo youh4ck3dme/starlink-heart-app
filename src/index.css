@@ -99,6 +99,26 @@ html, body {
   overscroll-behavior-y: none;
 }
 
+/* ===== THEME BACKGROUNDS ===== */
+
+/* Deep Space - Dark starry gradient */
+.bg-deep-space {
+  background: linear-gradient(135deg, #0b1226 0%, #1a1a3e 30%, #0d1b2a 60%, #060819 100%);
+  background-attachment: fixed;
+}
+
+/* Mars Sunset - Warm orange/red tones */
+.bg-mars-sunset {
+  background: linear-gradient(180deg, #1a0a0a 0%, #3d1c1c 25%, #8b3a3a 50%, #c85a17 75%, #ff6b35 100%);
+  background-attachment: fixed;
+}
+
+/* Galaxy Swirl - Purple/pink cosmic gradient */
+.bg-galaxy-swirl {
+  background: linear-gradient(135deg, #0f0c29 0%, #302b63 35%, #24243e 65%, #1a0033 100%);
+  background-attachment: fixed;
+}
+
 /* ===== WELCOME SCREEN ANIMATIONS ===== */
 
 /* Slow floating effect for hero */
@@ -109,6 +129,31 @@ html, body {
 
 .animate-float {
   animation: float 6s ease-in-out infinite;
+}
+
+/* Comet Animation */
+@keyframes shooting-star {
+  0% {
+    transform: translateX(0) translateY(0) rotate(-45deg) scale(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+    transform: translateX(-50px) translateY(50px) rotate(-45deg) scale(1);
+  }
+  20% {
+    opacity: 0;
+    transform: translateX(-300px) translateY(300px) rotate(-45deg) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(0) translateY(0) rotate(-45deg) scale(0);
+  }
+}
+
+.animate-comet {
+  animation: shooting-star 8s ease-in-out infinite;
+  animation-delay: 2s; /* Start after a brief pause */
 }
 
 /* Gentle glow pulse */

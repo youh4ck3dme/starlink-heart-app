@@ -8,7 +8,7 @@ export default function VoiceRecordingModal({ isListening, onCancel }: VoiceReco
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white rounded-3xl p-8 max-w-sm w-full mx-4 shadow-2xl animate-scale-in">
+      <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-8 max-w-sm w-full mx-4 shadow-2xl animate-scale-in border border-white/20">
         
         {/* Microphone Icon with Pulse */}
         <div className="flex justify-center mb-6">

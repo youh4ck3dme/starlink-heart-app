@@ -39,7 +39,7 @@ export default function ChatInput({
                 {/* Mode Toggle & File Preview */}
                 <div className="flex items-center justify-between px-3 mb-1">
                     {imageFile ? (
-                        <div className="flex items-center gap-2 bg-sky-100 text-sky-800 px-2 py-1 rounded-lg text-xs border border-sky-200 shadow-sm animate-pop-in">
+                        <div className="flex items-center gap-2 bg-sky-500/20 text-sky-200 px-2 py-1 rounded-lg text-xs border border-sky-400/30 shadow-sm animate-pop-in">
                             {imagePreviewUrl && (
                                 <img src={imagePreviewUrl} alt="Preview" className="w-8 h-8 rounded-md object-cover border border-white/50" />
                             )}
@@ -62,7 +62,7 @@ export default function ChatInput({
                 </div>
 
                 <form onSubmit={onSubmit} className="flex items-end gap-2">
-                    <div className="flex-1 bg-white/60 hover:bg-white/80 transition-colors rounded-[1.5rem] flex items-center px-2">
+                    <div className="flex-1 bg-white/10 hover:bg-white/20 transition-colors rounded-[1.5rem] flex items-center px-2">
                         <button type="button" onClick={onOpenCamera} className="p-2 text-gray-500 hover:text-sky-600 transition-colors">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -97,7 +97,7 @@ export default function ChatInput({
                             onChange={(e) => setNewMessage(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSubmit(e); } }}
                             placeholder={voiceMode.isListening ? "Počúvam..." : (isTeacherCloneMode ? "Režim Učiteľa: Pošli úlohu..." : "Spýtaj sa Starryho...")}
-                            className="flex-1 bg-transparent border-none focus:ring-0 py-3 px-2 text-gray-800 placeholder-gray-500 resize-none max-h-24"
+                            className="flex-1 bg-transparent border-none focus:ring-0 py-3 px-2 text-white placeholder-gray-400 resize-none max-h-24"
                             rows={1}
                         />
                     </div>

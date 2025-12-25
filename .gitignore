@@ -29,3 +29,7 @@ dist-ssr
 .env.*
 .vercel
 *.patch
+
+# Test Coverage
+coverage/
+junit.xml
