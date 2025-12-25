@@ -15,8 +15,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Config
-const SOURCE_IMAGE = join(__dirname, '../src/assets/image.png');
+const SOURCE_IMAGE = join(__dirname, '../public/android-chrome-512x512.png');
 const OUTPUT_DIR = join(__dirname, '../public/icons');
+// Use neutral/transparent background if source has it, or keep existing logic.
+// Since user says this IS the pattern, we likely just want to resize it.
 const THEME_COLOR = '#0b1226';
 const BG_COLOR = '#eaf3ff';
 
