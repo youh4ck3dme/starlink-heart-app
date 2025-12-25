@@ -26,12 +26,12 @@ const THEMES = [
   {
     id: "light",
     label: "Svetlá obloha",
-    preview: "bg-[radial-gradient(circle_at_30%_20%,rgba(90,174,255,0.45),transparent_55%),linear-gradient(#f6fbff,#eaf3ff)]",
+    preview: "bg-gradient-to-b from-sky-100 to-blue-50",
   },
   {
     id: "space",
     label: "Nočný vesmír",
-    preview: "bg-[radial-gradient(circle_at_35%_25%,rgba(120,90,255,0.45),transparent_55%),linear-gradient(#070a22,#040515)]",
+    preview: "bg-gradient-to-b from-indigo-950 to-slate-900",
   },
 ];
 
@@ -51,9 +51,7 @@ export default function SettingsModal({
 
   const handleSave = () => {
     onSave({ selectedAvatar, theme, apiKey });
-    // Save 3D setting directly to localStorage
     localStorage.setItem('enable3DMascot', String(enable3D));
-    // Reload to apply changes cleanly if changed
     if (localStorage.getItem('enable3DMascot') !== String(initial3DEnabled)) {
       window.location.reload();
     }
@@ -61,45 +59,57 @@ export default function SettingsModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 animate-fade-in-up">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 animate-fade-in-up motion-reduce:animate-none"
+      style={{ 
+        paddingTop: 'max(0.75rem, env(safe-area-inset-top))',
+        paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))',
+        paddingLeft: 'max(0.75rem, env(safe-area-inset-left))',
+        paddingRight: 'max(0.75rem, env(safe-area-inset-right))'
+      }}
+    >
       {/* Overlay */}
       <button
         aria-label="Zatvoriť"
         onClick={onClose}
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-[520px] overflow-hidden rounded-[28px] bg-white shadow-[0_30px_100px_rgba(0,0,0,0.35)]">
-        {/* Header */}
-        <div className="relative px-6 pt-6 pb-4 border-b border-black/5">
+      <div className="relative w-full max-w-[520px] max-h-[90svh] overflow-hidden rounded-3xl bg-white shadow-[0_30px_100px_rgba(0,0,0,0.4)] flex flex-col">
+        
+        {/* Header - stable */}
+        <div className="relative shrink-0 px-5 pt-5 pb-4 border-b border-gray-100 bg-white">
+          {/* Close X - 44px hit area */}
           <button
             onClick={onClose}
-            className="absolute right-4 top-4 h-9 w-9 rounded-full bg-black/5 hover:bg-black/10 flex items-center justify-center transition-all"
+            className="absolute right-3 top-3 w-11 h-11 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors active:scale-95 motion-reduce:transition-none"
             aria-label="Zatvoriť"
           >
-            ✕
+            <span className="text-gray-600 text-lg font-bold">✕</span>
           </button>
 
-          <h2 className="text-center text-xl font-extrabold tracking-tight">Vzhľad a téma</h2>
-          <p className="text-center text-black/50 text-sm mt-1">
-            Nastav si avatara, prostredie a (ak chceš) vlastný kľúč.
+          <h2 className="text-center text-xl font-black tracking-tight text-gray-900">Vzhľad a téma</h2>
+          <p className="text-center text-gray-500 text-sm mt-1">
+            Nastav si avatara, prostredie a vlastný kľúč.
           </p>
         </div>
 
         {/* Scroll Body */}
-        <div className="max-h-[72svh] overflow-y-auto px-6 py-5 space-y-5">
+        <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-5 space-y-5">
+          
           {/* SECTION: AVATAR */}
-          <section className="rounded-2xl border border-black/5 bg-gradient-to-b from-[#f7fbff] to-white p-4">
-            <div className="flex items-center justify-between">
+          <section className="rounded-2xl border border-gray-100 bg-gradient-to-b from-gray-50/80 to-white p-4">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <div className="text-xs font-bold tracking-widest text-black/40">TVÔJ AVATAR</div>
-                <div className="text-sm font-semibold text-black/70 mt-1">Vyber si parťáka</div>
+                <div className="text-xs font-bold tracking-widest text-gray-400 uppercase">Tvôj Avatar</div>
+                <div className="text-sm font-semibold text-gray-700 mt-0.5">Vyber si parťáka</div>
               </div>
-              <div className="text-xs text-black/40">tapni na kartu</div>
+              <div className="text-xs text-gray-400">tapni na kartu</div>
             </div>
 
-            <div className="mt-4 grid grid-cols-3 gap-3">
+            {/* Avatar Grid - consistent sizing */}
+            <div className="grid grid-cols-3 gap-2.5">
               {AVATARS.map((a) => {
                 const active = selectedAvatar === a.id;
                 return (
@@ -107,44 +117,30 @@ export default function SettingsModal({
                     key={a.id}
                     onClick={() => setSelectedAvatar(a.id)}
                     className={[
-                      "group relative rounded-2xl p-3 text-left",
-                      "border bg-white",
-                      "transition-transform duration-200",
-                      "will-change-transform",
-                      "hover:-translate-y-[2px] active:translate-y-0 active:scale-[0.98]",
+                      "group relative rounded-2xl p-3 text-center min-h-[88px] flex flex-col items-center justify-center",
+                      "border-2 bg-white",
+                      "transition-all duration-150",
+                      "active:scale-[0.97]",
                       "motion-reduce:transform-none motion-reduce:transition-none",
                       active
-                        ? "border-[#5aaeff] ring-2 ring-[#5aaeff]/35 shadow-[0_10px_30px_rgba(90,174,255,0.25)]"
-                        : "border-black/5 hover:border-black/10 hover:bg-black/[0.02]",
+                        ? "border-sky-500 bg-sky-50 shadow-lg shadow-sky-500/20"
+                        : "border-gray-100 hover:border-gray-200 hover:bg-gray-50",
                     ].join(" ")}
                   >
-                    {/* Sparkle aura iba keď je active */}
+                    {/* Sparkle only on active - respect reduced motion */}
                     {active && (
-                      <div
-                        className={[
-                          "pointer-events-none absolute -inset-[10px] rounded-[26px]",
-                          "motion-reduce:hidden",
-                        ].join(" ")}
-                        aria-hidden
-                      >
-                        {/* rotating conic sparkle */}
-                        <div className="absolute inset-0 rounded-[26px] blur-[10px] opacity-60 animate-sh-sparkleRotate bg-[conic-gradient(from_180deg,rgba(33,198,255,0.0),rgba(33,198,255,0.45),rgba(255,179,87,0.35),rgba(91,109,255,0.45),rgba(33,198,255,0.0))]" />
-                        {/* pulse halo */}
-                        <div className="absolute inset-0 rounded-[26px] blur-[16px] opacity-40 animate-sh-sparklePulse bg-[radial-gradient(circle_at_35%_30%,rgba(90,174,255,0.55),transparent_60%)]" />
-                        {/* twinkle dots */}
-                        <div className="absolute left-3 top-4 h-1.5 w-1.5 rounded-full bg-white/80 animate-sh-twinkle" />
-                        <div className="absolute right-5 bottom-4 h-1 w-1 rounded-full bg-white/70 animate-sh-twinkle [animation-delay:.25s]" />
-                        <div className="absolute right-8 top-6 h-1.5 w-1.5 rounded-full bg-white/60 animate-sh-twinkle [animation-delay:.55s]" />
+                      <div className="absolute -inset-1 rounded-[18px] pointer-events-none motion-reduce:hidden" aria-hidden>
+                        <div className="absolute inset-0 rounded-[18px] blur-md opacity-40 animate-sh-sparklePulse bg-gradient-to-r from-sky-400 to-indigo-400" />
                       </div>
                     )}
 
-                    <div className="text-2xl transition-transform duration-200 group-hover:scale-[1.06] motion-reduce:transform-none">
+                    <div className="relative text-3xl group-hover:scale-110 transition-transform duration-150 motion-reduce:transform-none">
                       {a.emoji}
                     </div>
-                    <div className="mt-2 text-sm font-extrabold">{a.label}</div>
+                    <div className="relative mt-1.5 text-xs font-bold text-gray-800">{a.label}</div>
 
                     {active && (
-                      <div className="absolute right-2 top-2 h-6 w-6 rounded-full bg-[#5aaeff] text-white flex items-center justify-center text-xs shadow">
+                      <div className="absolute -right-1 -top-1 w-6 h-6 rounded-full bg-sky-500 text-white flex items-center justify-center text-xs font-bold shadow-md">
                         ✓
                       </div>
                     )}
@@ -155,11 +151,11 @@ export default function SettingsModal({
           </section>
 
           {/* SECTION: THEME */}
-          <section className="rounded-2xl border border-black/5 bg-white p-4">
-            <div className="text-xs font-bold tracking-widest text-black/40">PROSTREDIE</div>
-            <div className="text-sm font-semibold text-black/70 mt-1">Ako má vyzerať appka</div>
+          <section className="rounded-2xl border border-gray-100 bg-white p-4">
+            <div className="text-xs font-bold tracking-widest text-gray-400 uppercase">Prostredie</div>
+            <div className="text-sm font-semibold text-gray-700 mt-0.5 mb-4">Ako má vyzerať appka</div>
 
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {THEMES.map((t) => {
                 const active = theme === t.id;
                 return (
@@ -167,14 +163,17 @@ export default function SettingsModal({
                     key={t.id}
                     onClick={() => setTheme(t.id)}
                     className={[
-                      "relative overflow-hidden rounded-2xl border p-3 text-left transition",
-                      active ? "border-[#5aaeff] ring-2 ring-[#5aaeff]/30" : "border-black/5 hover:border-black/10",
+                      "relative overflow-hidden rounded-2xl border-2 p-3 text-left transition-all",
+                      "active:scale-[0.98] motion-reduce:transform-none",
+                      active 
+                        ? "border-sky-500 shadow-lg shadow-sky-500/20" 
+                        : "border-gray-100 hover:border-gray-200",
                     ].join(" ")}
                   >
-                    <div className={["h-14 w-full rounded-xl", t.preview].join(" ")} />
+                    <div className={["h-16 w-full rounded-xl", t.preview].join(" ")} />
                     <div className="mt-3 flex items-center justify-between">
-                      <div className="text-sm font-extrabold">{t.label}</div>
-                      {active && <span className="text-xs font-bold text-[#2b7fff]">Zvolené</span>}
+                      <div className="text-sm font-bold text-gray-900">{t.label}</div>
+                      {active && <span className="text-xs font-bold text-sky-600">Zvolené</span>}
                     </div>
                   </button>
                 );
@@ -182,14 +181,14 @@ export default function SettingsModal({
             </div>
           </section>
 
-          {/* SECTION: API KEY */}
-          <section className="rounded-2xl border border-black/5 bg-white p-4">
+          {/* SECTION: API KEY - visually secondary */}
+          <section className="rounded-2xl border border-gray-100 bg-gray-50/50 p-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-bold tracking-widest text-black/40">VLASTNÝ API KĽÚČ</div>
-                <div className="text-sm font-semibold text-black/70 mt-1">Voliteľné (pre rodiča)</div>
+                <div className="text-xs font-bold tracking-widest text-gray-400 uppercase">Vlastný API Kľúč</div>
+                <div className="text-sm font-medium text-gray-600 mt-0.5">Voliteľné (pre rodiča)</div>
               </div>
-              <span className="text-xs text-black/40">Gemini</span>
+              <span className="text-xs text-gray-400 font-medium px-2 py-1 bg-white rounded-full border border-gray-200">Gemini</span>
             </div>
 
             <div className="mt-3">
@@ -198,65 +197,69 @@ export default function SettingsModal({
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 placeholder="Vlož Gemini API Key…"
-                className="w-full rounded-2xl border border-black/10 bg-black/[0.02] px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#5aaeff]/40 transition"
+                className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-sky-500/40 focus:border-sky-500 transition-all"
               />
-              <div className="mt-2 text-xs text-black/45">
-                Ak necháš prázdne, použije sa demo kľúč. (Na produkciu odporúčam vlastný.)
-              </div>
+              <p className="mt-2 text-xs text-gray-500 leading-relaxed">
+                Ak necháš prázdne, použije sa demo kľúč. Na produkciu odporúčam vlastný.
+              </p>
             </div>
           </section>
 
           {/* SECTION: 3D MASCOT (BETA) */}
-          <section className="rounded-2xl border border-black/5 bg-gradient-to-r from-indigo-50 to-purple-50 p-4">
+          <section className="rounded-2xl border border-indigo-200/60 bg-gradient-to-r from-indigo-50 to-purple-50 p-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-bold tracking-widest text-indigo-900/60">3D MASKOT (BETA)</div>
-                <div className="text-sm font-semibold text-indigo-900 mt-1">Prof. StarLink v 3D</div>
+                <div className="text-xs font-bold tracking-widest text-indigo-600/70 uppercase">3D Maskot (Beta)</div>
+                <div className="text-sm font-semibold text-indigo-900 mt-0.5">Prof. StarLink v 3D</div>
               </div>
               
               <button
                 onClick={() => setEnable3D(!enable3D)}
-                className={`relative w-12 h-7 rounded-full transition-colors duration-300 ${
-                  enable3D ? 'bg-indigo-600' : 'bg-black/10'
+                className={`relative w-14 h-8 rounded-full transition-colors duration-200 motion-reduce:transition-none ${
+                  enable3D ? 'bg-indigo-600' : 'bg-gray-300'
                 }`}
+                aria-label={enable3D ? "Vypnúť 3D" : "Zapnúť 3D"}
               >
                 <div 
-                  className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
-                    enable3D ? 'translate-x-5' : 'translate-x-0'
+                  className={`absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-200 motion-reduce:transition-none ${
+                    enable3D ? 'translate-x-6' : 'translate-x-0'
                   }`} 
                 />
               </button>
             </div>
-            <div className="mt-2 text-xs text-indigo-900/50">
+            <p className="mt-2 text-xs text-indigo-800/60">
               Viac efektov, môže viac žrať batériu. Vyžaduje reštart apky.
-            </div>
+            </p>
           </section>
 
           {/* SECTION: DANGER ZONE */}
-          <section className="rounded-2xl border border-red-200 bg-red-50 p-4">
-            <div className="text-xs font-bold tracking-widest text-red-700/70">NEBEZPEČNÁ ZÓNA</div>
+          <section className="rounded-2xl border-2 border-red-200 bg-red-50 p-4">
+            <div className="text-xs font-bold tracking-widest text-red-600 uppercase">⚠️ Nebezpečná zóna</div>
             <div className="text-sm font-semibold text-red-900 mt-1">Vymaže všetko lokálne v zariadení</div>
-            <div className="text-xs text-red-900/60 mt-2">
-              Zmaže chat, profil, nastavenia a súhlas. Nedá sa vrátiť späť.
-            </div>
+            <p className="text-xs text-red-800/70 mt-2 leading-relaxed">
+              Zmaže chat, profil, nastavenia a súhlas. Táto akcia sa nedá vrátiť späť!
+            </p>
 
             <button
               onClick={onDeleteAll}
-              className="mt-4 w-full rounded-2xl bg-red-600 text-white py-3 font-extrabold shadow-[0_12px_30px_rgba(220,38,38,0.25)] active:scale-[0.99] transition-all hover:bg-red-700"
+              className="mt-4 w-full rounded-2xl bg-red-600 text-white py-3.5 font-bold shadow-lg shadow-red-600/25 active:scale-[0.98] transition-all hover:bg-red-700 motion-reduce:transition-none"
             >
               🗑️ Vymazať všetky dáta
             </button>
           </section>
 
-          {/* Spacer for sticky bar */}
-          <div className="h-20" />
+          {/* Bottom spacer for sticky bar */}
+          <div className="h-4" />
         </div>
 
         {/* Sticky Bottom Bar */}
-        <div className="sticky bottom-0 border-t border-black/5 bg-white/90 backdrop-blur px-6 py-4 pb-[max(16px,env(safe-area-inset-bottom))]">
+        <div 
+          className="shrink-0 border-t border-gray-100 bg-white/95 backdrop-blur-sm px-5 py-4"
+          style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+        >
           <button
             onClick={handleSave}
-            className="w-full rounded-2xl bg-gradient-to-r from-[#5b6dff] via-[#21c6ff] to-[#ffb357] py-4 font-extrabold text-white shadow-[0_18px_45px_rgba(0,0,0,0.20)] active:scale-[0.99] transition-all"
+            className="w-full rounded-2xl bg-gradient-to-r from-indigo-600 via-sky-500 to-amber-500 py-4 font-extrabold text-white shadow-xl shadow-indigo-500/25 active:scale-[0.98] transition-transform motion-reduce:transition-none"
           >
             Uložiť zmeny
           </button>
