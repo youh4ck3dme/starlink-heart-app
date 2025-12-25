@@ -6,7 +6,7 @@ import { Heart } from '../types';
 import { generateCosmicResponse, getStarryTip, generateCosmicHint, generateParentGuide } from '../services/geminiService';
 import { hasParentConsent, setParentConsent, clearAllAppData } from '../services/consentService';
 import ParentNotice from './ParentNotice';
-import MascotRenderer from './mascot/MascotRenderer';
+import MascotRenderer, { MascotMode } from './mascot/MascotRenderer';
 import ChatView from './chat/ChatView';
 import CameraModal from './camera/CameraModal';
 import { useVoiceMode } from '../hooks/useVoiceMode';
@@ -162,7 +162,7 @@ const DashboardScreen = ({
                  {/* Compact Mascot */}
                  <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.3)] bg-gradient-to-b from-indigo-500/30 to-purple-600/30 backdrop-blur-md">
                     <MascotRenderer 
-                        mode={(localStorage.getItem('mascotMode') as 'image' | 'rive' | 'spline3d') || 'rive'} 
+                        mode={mascotMode} 
                         className="w-full h-full" 
                     />
                  </div>
@@ -261,6 +261,16 @@ const StarlinkHeartApp: React.FC = () => {
     const [hintLoadingId, setHintLoadingId] = useState<string | null>(null);
     const [parentGuideLoadingId, setParentGuideLoadingId] = useState<string | null>(null);
     const [activeParentGuide, setActiveParentGuide] = useState<string | null>(null);
+
+    // Mascot Mode State
+    const [mascotMode, setMascotMode] = useState<MascotMode>(() => {
+        return (localStorage.getItem('mascotMode') as MascotMode) || 'rive';
+    });
+
+    // Effect to persist mascot mode changes
+    useEffect(() => {
+        localStorage.setItem('mascotMode', mascotMode);
+    }, [mascotMode]);
 
     // Parent Consent (Kids Compliance)
     const [showParentNotice, setShowParentNotice] = useState(false);
@@ -800,12 +810,9 @@ const StarlinkHeartApp: React.FC = () => {
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 <button
-                                    onClick={() => {
-                                        localStorage.setItem('mascotMode', 'image');
-                                        window.dispatchEvent(new Event('mascotModeChanged'));
-                                    }}
+                                    onClick={() => setMascotMode('image')}
                                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                                        localStorage.getItem('mascotMode') === 'image' 
+                                        mascotMode === 'image' 
                                             ? 'bg-indigo-600 text-white shadow-lg' 
                                             : 'bg-white/60 text-indigo-700 hover:bg-white'
                                     }`}
@@ -813,12 +820,9 @@ const StarlinkHeartApp: React.FC = () => {
                                     🖼️ Statický
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        localStorage.setItem('mascotMode', 'rive');
-                                        window.dispatchEvent(new Event('mascotModeChanged'));
-                                    }}
+                                    onClick={() => setMascotMode('rive')}
                                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                                        (localStorage.getItem('mascotMode') || 'rive') === 'rive' 
+                                        mascotMode === 'rive' 
                                             ? 'bg-indigo-600 text-white shadow-lg' 
                                             : 'bg-white/60 text-indigo-700 hover:bg-white'
                                     }`}
@@ -826,12 +830,9 @@ const StarlinkHeartApp: React.FC = () => {
                                     🎬 Animovaný
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        localStorage.setItem('mascotMode', 'spline3d');
-                                        window.dispatchEvent(new Event('mascotModeChanged'));
-                                    }}
+                                    onClick={() => setMascotMode('spline3d')}
                                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                                        localStorage.getItem('mascotMode') === 'spline3d' 
+                                        mascotMode === 'spline3d' 
                                             ? 'bg-indigo-600 text-white shadow-lg' 
                                             : 'bg-white/60 text-indigo-700 hover:bg-white'
                                     }`}
@@ -841,9 +842,9 @@ const StarlinkHeartApp: React.FC = () => {
                                 </button>
                             </div>
                             <p className="mt-2 text-xs text-indigo-700/70">
-                                {localStorage.getItem('mascotMode') === 'spline3d' 
+                                {mascotMode === 'spline3d' 
                                     ? '3D režim stiahne extra 4MB pri zapnutí (premium funkcia).'
-                                    : localStorage.getItem('mascotMode') === 'image'
+                                    : mascotMode === 'image'
                                         ? 'Najrýchlejší režim - statický obrázok.'
                                         : 'Animovaný mascot - optimálny pomer výkon/kvalita.'}
                             </p>
