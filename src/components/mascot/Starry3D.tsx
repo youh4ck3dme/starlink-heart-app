@@ -1,74 +1,79 @@
-import { useState, useEffect, Suspense, lazy } from 'react';
-
-const ReactSpline = lazy(() => import('@splinetool/react-spline'));
-
-// Import image to ensure correct hashing/path in build
+import { useEffect, useState } from "react";
 import fallbackImage from '../../assets/welcome-hero.png';
 
-const SPLINE_SCENE_URL = "PASTE_YOUR_SPLINE_URL_HERE";
-
-interface Starry3DProps {
+type Props = {
+  enabled: boolean;
+  scene: string;
   className?: string;
-}
+};
 
-export default function Starry3D({ className = "" }: Starry3DProps) {
-  const [is3DEnabled, setIs3DEnabled] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
+export default function Starry3D({ enabled, scene, className }: Props) {
+  const [Spline, setSpline] = useState<React.ComponentType<any> | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Check user preference and system settings
   useEffect(() => {
-    // 1. Check system reduced motion
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mediaQuery.matches);
+    if (!enabled) return;
     
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    mediaQuery.addEventListener('change', handler);
+    // Don't load if scene is placeholder
+    if (scene === "PASTE_YOUR_SPLINE_URL_HERE" || !scene) {
+      setError("3D scéna nie je nakonfigurovaná");
+      return;
+    }
+    
+    let cancelled = false;
+    setIsLoading(true);
 
-    // 2. Check localStorage setting
-    const storedSetting = localStorage.getItem('enable3DMascot');
-    setIs3DEnabled(storedSetting === 'true');
+    import("@splinetool/react-spline")
+      .then((mod) => {
+        if (cancelled) return;
+        setSpline(() => mod.default);
+        setIsLoading(false);
+      })
+      .catch((e) => {
+        if (cancelled) return;
+        setError(e instanceof Error ? e.message : "Zlyhalo načítanie 3D");
+        setIsLoading(false);
+      });
 
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [enabled, scene]);
 
-  // Determine if we should show 3D
-  const shouldRender3D = is3DEnabled && !prefersReducedMotion && !hasError && SPLINE_SCENE_URL !== "PASTE_YOUR_SPLINE_URL_HERE";
-
-  return (
-    <div className={`relative ${className}`}>
-      {shouldRender3D ? (
-        <div className="w-full h-full relative">
-          {isLoading && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-transparent z-10">
-              <div className="w-8 h-8 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin mb-2" />
-              <span className="text-xs text-indigo-500 font-medium">Načítavam Starry...</span>
-            </div>
-          )}
-          
-          <Suspense fallback={null}>
-            <ReactSpline 
-              scene={SPLINE_SCENE_URL}
-              onLoad={() => setIsLoading(false)}
-              onError={() => {
-                setHasError(true);
-                setIsLoading(false);
-              }}
-              style={{
-                width: '100%',
-                height: '100%',
-              }}
-            />
-          </Suspense>
-        </div>
-      ) : (
+  // Not enabled - return null (MascotRenderer will handle fallback)
+  if (!enabled) return null;
+  
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className={`${className} flex flex-col items-center justify-center`}>
+        <div className="w-8 h-8 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin mb-2" />
+        <span className="text-xs text-indigo-500 font-medium">Načítavam 3D (~4 MB)...</span>
+      </div>
+    );
+  }
+  
+  // Error state - show fallback image
+  if (error) {
+    return (
+      <div className={`${className} flex flex-col items-center justify-center`}>
         <img 
           src={fallbackImage} 
-          alt="Prof. StarLink" 
-          className="w-full h-full object-contain drop-shadow-xl"
+          alt="Starry" 
+          className="w-full h-full object-contain opacity-50"
         />
-      )}
+        <span className="text-xs text-red-400 mt-2">{error}</span>
+      </div>
+    );
+  }
+  
+  // Spline not loaded yet
+  if (!Spline) return null;
+
+  return (
+    <div className={className} style={{ width: "100%", height: "100%" }}>
+      <Spline scene={scene} style={{ width: "100%", height: "100%" }} />
     </div>
   );
 }
