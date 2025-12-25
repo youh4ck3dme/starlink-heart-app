@@ -98,17 +98,44 @@ export default function SettingsModal({
                     key={a.id}
                     onClick={() => setSelectedAvatar(a.id)}
                     className={[
-                      "relative rounded-2xl p-3 text-left transition",
+                      "group relative rounded-2xl p-3 text-left",
                       "border bg-white",
+                      "transition-transform duration-200",
+                      "will-change-transform",
+                      "hover:-translate-y-[2px] active:translate-y-0 active:scale-[0.98]",
+                      "motion-reduce:transform-none motion-reduce:transition-none",
                       active
                         ? "border-[#5aaeff] ring-2 ring-[#5aaeff]/35 shadow-[0_10px_30px_rgba(90,174,255,0.25)]"
                         : "border-black/5 hover:border-black/10 hover:bg-black/[0.02]",
                     ].join(" ")}
                   >
-                    <div className="text-2xl">{a.emoji}</div>
-                    <div className="mt-2 text-sm font-extrabold">{a.label}</div>
+                    {/* Sparkle aura iba keď je active */}
                     {active && (
-                      <div className="absolute right-2 top-2 h-6 w-6 rounded-full bg-[#5aaeff] text-white flex items-center justify-center text-xs">
+                      <div
+                        className={[
+                          "pointer-events-none absolute -inset-[10px] rounded-[26px]",
+                          "motion-reduce:hidden",
+                        ].join(" ")}
+                        aria-hidden
+                      >
+                        {/* rotating conic sparkle */}
+                        <div className="absolute inset-0 rounded-[26px] blur-[10px] opacity-60 animate-sh-sparkleRotate bg-[conic-gradient(from_180deg,rgba(33,198,255,0.0),rgba(33,198,255,0.45),rgba(255,179,87,0.35),rgba(91,109,255,0.45),rgba(33,198,255,0.0))]" />
+                        {/* pulse halo */}
+                        <div className="absolute inset-0 rounded-[26px] blur-[16px] opacity-40 animate-sh-sparklePulse bg-[radial-gradient(circle_at_35%_30%,rgba(90,174,255,0.55),transparent_60%)]" />
+                        {/* twinkle dots */}
+                        <div className="absolute left-3 top-4 h-1.5 w-1.5 rounded-full bg-white/80 animate-sh-twinkle" />
+                        <div className="absolute right-5 bottom-4 h-1 w-1 rounded-full bg-white/70 animate-sh-twinkle [animation-delay:.25s]" />
+                        <div className="absolute right-8 top-6 h-1.5 w-1.5 rounded-full bg-white/60 animate-sh-twinkle [animation-delay:.55s]" />
+                      </div>
+                    )}
+
+                    <div className="text-2xl transition-transform duration-200 group-hover:scale-[1.06] motion-reduce:transform-none">
+                      {a.emoji}
+                    </div>
+                    <div className="mt-2 text-sm font-extrabold">{a.label}</div>
+
+                    {active && (
+                      <div className="absolute right-2 top-2 h-6 w-6 rounded-full bg-[#5aaeff] text-white flex items-center justify-center text-xs shadow">
                         ✓
                       </div>
                     )}

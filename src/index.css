@@ -180,3 +180,24 @@ html, body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ===== SETTINGS SPARKLE ANIMATIONS ===== */
+
+@keyframes sh-sparkle-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes sh-sparkle-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.98); }
+  50% { opacity: 0.75; transform: scale(1.02); }
+}
+
+@keyframes sh-twinkle {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  50% { opacity: 0.9; transform: translateY(-2px); }
+}
+
+.animate-sh-sparkleRotate { animation: sh-sparkle-rotate 10s linear infinite; }
+.animate-sh-sparklePulse { animation: sh-sparkle-pulse 1.9s ease-in-out infinite; }
+.animate-sh-twinkle { animation: sh-twinkle 1.4s ease-in-out infinite; }
