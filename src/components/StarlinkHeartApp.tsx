@@ -687,7 +687,7 @@ const StarlinkHeartApp: React.FC = () => {
                             <h2 className="text-2xl font-black text-gray-800 mb-1">Kadet</h2>
                             <p className="text-gray-500 text-sm mb-6">Prieskumník Vesmíru 🚀</p>
 
-                            <div className="grid grid-cols-2 gap-4 w-full mb-6">
+                            <div className="grid grid-cols-2 gap-8 w-full mb-6">
                                 <div className="bg-yellow-50 rounded-2xl p-4 text-center border border-yellow-200">
                                     <div className="text-3xl mb-1">💎</div>
                                     <div className="font-bold text-2xl text-yellow-800">{gemCount}</div>
