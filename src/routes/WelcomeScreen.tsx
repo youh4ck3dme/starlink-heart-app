@@ -1,25 +1,23 @@
 import { useState, useEffect, useMemo } from 'react';
 import heroImg from '../assets/image.png';
 
-// Floating particles config
+// Floating particles config (limited for performance)
 const PARTICLES = [
-  { text: 'A', delay: 0, duration: 15, left: '10%' },
-  { text: 'B', delay: 3, duration: 18, left: '25%' },
-  { text: 'C', delay: 6, duration: 12, left: '75%' },
-  { text: '2+2', delay: 2, duration: 20, left: '85%' },
-  { text: '?', delay: 8, duration: 14, left: '50%' },
-  { text: '✨', delay: 4, duration: 16, left: '15%' },
-  { text: '⭐', delay: 10, duration: 13, left: '65%' },
-  { text: '🔢', delay: 5, duration: 17, left: '40%' },
+  { text: 'A', delay: 0, duration: 18, left: '12%' },
+  { text: 'B', delay: 4, duration: 22, left: '30%' },
+  { text: '2+2', delay: 2, duration: 25, left: '70%' },
+  { text: '?', delay: 6, duration: 20, left: '85%' },
+  { text: '✦', delay: 8, duration: 16, left: '50%' },
+  { text: '•', delay: 10, duration: 19, left: '20%' },
 ];
 
-// Star positions for background
-const STARS = Array.from({ length: 20 }, (_, i) => ({
+// Stars - fewer, CSS-optimized (only 12 for performance)
+const STARS = Array.from({ length: 12 }, (_, i) => ({
   id: i,
-  left: `${Math.random() * 100}%`,
-  top: `${Math.random() * 100}%`,
-  delay: Math.random() * 3,
-  size: Math.random() * 2 + 1,
+  left: `${10 + (i * 7) % 80}%`,
+  top: `${5 + (i * 8) % 85}%`,
+  delay: (i * 0.4) % 3,
+  size: 1 + (i % 3),
 }));
 
 export default function WelcomeScreen() {
@@ -49,21 +47,28 @@ export default function WelcomeScreen() {
     setOffset({ x: x * 15, y: y * 15 });
   };
 
-  // Gyroscope support for mobile
+  // Gyroscope support for mobile (with iOS 13+ permission handling)
   useEffect(() => {
     if (prefersReducedMotion) return;
     
+    let isActive = true;
+    
     const handleOrientation = (e: DeviceOrientationEvent) => {
-      if (!e.gamma || !e.beta) return;
+      if (!isActive || !e.gamma || !e.beta) return;
       const x = Math.min(Math.max(e.gamma, -45), 45) / 45;
       const y = Math.min(Math.max(e.beta - 45, -45), 45) / 45;
       setOffset({ x: x * 15, y: y * 15 });
     };
 
+    // Try to add listener (works on Android, older iOS)
     if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientation', handleOrientation);
+      window.addEventListener('deviceorientation', handleOrientation, { passive: true });
     }
-    return () => window.removeEventListener('deviceorientation', handleOrientation);
+    
+    return () => {
+      isActive = false;
+      window.removeEventListener('deviceorientation', handleOrientation);
+    };
   }, [prefersReducedMotion]);
 
   return (
@@ -76,12 +81,12 @@ export default function WelcomeScreen() {
         {STARS.map((star) => (
           <div
             key={star.id}
-            className="absolute rounded-full bg-white animate-twinkle"
+            className="absolute rounded-full bg-white animate-twinkle will-change-[opacity,transform]"
             style={{
               left: star.left,
               top: star.top,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
+              width: star.size,
+              height: star.size,
               animationDelay: `${star.delay}s`,
             }}
           />
@@ -93,7 +98,7 @@ export default function WelcomeScreen() {
         {PARTICLES.map((p, i) => (
           <div
             key={i}
-            className="absolute bottom-0 text-2xl font-bold text-white/40 animate-particle select-none"
+            className="absolute bottom-0 text-xl font-medium text-white/30 animate-particle select-none will-change-transform"
             style={{
               left: p.left,
               animationDuration: `${p.duration}s`,
@@ -107,7 +112,7 @@ export default function WelcomeScreen() {
 
       {/* Layer 3: Hero Image with Parallax + Float + Glow */}
       <div 
-        className="absolute inset-0 flex items-center justify-center transition-transform duration-150 ease-out"
+        className="absolute inset-0 flex items-center justify-center transition-transform duration-200 ease-out will-change-transform"
         style={{ 
           transform: prefersReducedMotion 
             ? 'none' 
@@ -144,9 +149,9 @@ export default function WelcomeScreen() {
                      hover:scale-105 hover:-translate-y-1
                      active:scale-95"
         >
-          {/* Shine Effect */}
-          <div className="absolute inset-0 rounded-2xl overflow-hidden">
-            <div className="absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r from-transparent via-white/25 to-transparent skew-x-[-20deg] animate-[shine_3s_infinite]" />
+          {/* Shine Effect - only on hover to save battery */}
+          <div className="absolute inset-0 rounded-2xl overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-0 left-[-100%] w-full h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-20deg] group-hover:animate-[shine_2s_ease-in-out]" />
           </div>
           
           <span className="relative z-10 flex items-center gap-3 drop-shadow-lg">
