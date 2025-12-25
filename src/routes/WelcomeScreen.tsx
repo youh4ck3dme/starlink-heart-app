@@ -62,8 +62,8 @@ export default function WelcomeScreen() {
       setOffset({ x: x * 15, y: y * 15 });
     };
 
-    // Try to add listener (works on Android, older iOS)
-    if (window.DeviceOrientationEvent) {
+    // Try to add listener (works on Android, older iOS) - requires Secure Context
+    if (window.isSecureContext && window.DeviceOrientationEvent) {
       window.addEventListener('deviceorientation', handleOrientation, { passive: true });
     }
     

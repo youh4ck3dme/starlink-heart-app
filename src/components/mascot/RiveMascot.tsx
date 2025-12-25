@@ -10,7 +10,7 @@ type Props = {
 
 export default function RiveMascot({
   className,
-  stateMachine = "main",
+  stateMachine,
   src = "/animations/starry.riv",
 }: Props) {
   const { RiveComponent, rive } = useRive({
