@@ -14,5 +14,16 @@ export default defineConfig(({ mode }) => {
       // This ensures your code using process.env.API_KEY works in the browser
       'process.env': env
     },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+            'firebase-vendor': ['firebase/app', 'firebase/firestore', 'firebase/storage'],
+            'genai-vendor': ['@google/genai'],
+          },
+        },
+      },
+    },
   };
 });

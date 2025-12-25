@@ -4,6 +4,8 @@ import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, u
 import { ref, uploadBytes, getDownloadURL } from '../services/localService';
 import { Heart } from '../types';
 import { generateCosmicResponse, getStarryTip, generateCosmicHint, generateParentGuide } from '../services/geminiService';
+import { hasParentConsent, setParentConsent } from '../services/consentService';
+import ParentNotice from './ParentNotice';
 
 // Define Avatars with Names
 const AVATAR_OPTIONS = [
@@ -269,6 +271,11 @@ const StarlinkHeartApp: React.FC = () => {
     const [parentGuideLoadingId, setParentGuideLoadingId] = useState<string | null>(null);
     const [activeParentGuide, setActiveParentGuide] = useState<string | null>(null);
 
+    // Parent Consent (Kids Compliance)
+    const [showParentNotice, setShowParentNotice] = useState(false);
+    const [hasConsent, setHasConsent] = useState(() => hasParentConsent());
+    const [pendingMessage, setPendingMessage] = useState<{msg: string, file: File | null} | null>(null);
+
     // Refs
     const fileInputRef = useRef<HTMLInputElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -418,6 +425,13 @@ const StarlinkHeartApp: React.FC = () => {
         const msg = newMessage;
         const file = imageFile;
 
+        // --- Consent Gate: Check before first AI interaction ---
+        if (!hasConsent) {
+            setPendingMessage({ msg, file });
+            setShowParentNotice(true);
+            return;
+        }
+
         setIsSending(true);
         setNewMessage('');
         setImageFile(null);
@@ -440,6 +454,35 @@ const StarlinkHeartApp: React.FC = () => {
         } finally {
             setIsSending(false);
         }
+    };
+
+    // Parent Consent Handlers
+    const handleConsentAccept = async () => {
+        setParentConsent(true);
+        setHasConsent(true);
+        setShowParentNotice(false);
+        
+        // Send the pending message now
+        if (pendingMessage) {
+            setIsSending(true);
+            setNewMessage('');
+            setImageFile(null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            
+            try {
+                await sendMessage(pendingMessage.msg, pendingMessage.file);
+            } catch (error) {
+                console.error("Send failed:", String(error));
+            } finally {
+                setIsSending(false);
+                setPendingMessage(null);
+            }
+        }
+    };
+
+    const handleConsentCancel = () => {
+        setShowParentNotice(false);
+        setPendingMessage(null);
     };
 
     // Feature Handlers
@@ -791,6 +834,14 @@ const StarlinkHeartApp: React.FC = () => {
                 )}</div>
 
             {/* --- MODALS --- */}
+
+            {/* Parent Notice Modal (Kids Compliance) */}
+            {showParentNotice && (
+                <ParentNotice 
+                    onAccept={handleConsentAccept}
+                    onCancel={handleConsentCancel}
+                />
+            )}
 
             {/* Parent Guide Modal - Professional Report Style */}
             {activeParentGuide && (

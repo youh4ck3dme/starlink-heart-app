@@ -26,12 +26,12 @@
 
 | # | Step | Outcome | Files Changed |
 |---|------|---------|---------------|
-| 1 | **Add input safety filter** | Block profanity/PII before AI call | `src/services/safetyFilter.ts` (new), `geminiService.ts` |
-| 2 | **Add Parent Notice modal** | First-launch consent for kids compliance | `src/components/ParentNotice.tsx` (new), `StarlinkHeartApp.tsx` |
-| 3 | **Add Delete Data button** | Settings → "Vymazať dáta" clears localStorage | `StarlinkHeartApp.tsx` (Settings section) |
-| 4 | **Extract ChatView component** | Reduce monolith by ~300 lines | `src/components/chat/ChatView.tsx` (new) |
-| 5 | **Extract CameraModal component** | Reduce monolith by ~100 lines | `src/components/camera/CameraModal.tsx` (new) |
-| 6 | **Add basic error boundary** | Graceful crash handling for kids | `src/components/ErrorBoundary.tsx` (new), `main.tsx` |
+| 1 | ✅ **Add input safety filter** | Block profanity/PII before AI call | `src/services/safetyFilter.ts` (new), `geminiService.ts` |
+| 2 | ✅ **Add Parent Notice modal** | First-launch consent for kids compliance | `src/services/consentService.ts` (new), `src/components/ParentNotice.tsx` (new), `StarlinkHeartApp.tsx` |
+| 3 | 🔲 **Add Delete Data button** | Settings → "Vymazať dáta" clears localStorage | `StarlinkHeartApp.tsx` (Settings section) |
+| 4 | 🔲 **Extract ChatView component** | Reduce monolith by ~300 lines | `src/components/chat/ChatView.tsx` (new) |
+| 5 | 🔲 **Extract CameraModal component** | Reduce monolith by ~100 lines | `src/components/camera/CameraModal.tsx` (new) |
+| 6 | 🔲 **Add basic error boundary** | Graceful crash handling for kids | `src/components/ErrorBoundary.tsx` (new), `main.tsx` |
 
 ---
 
