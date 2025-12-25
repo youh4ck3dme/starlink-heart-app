@@ -17,17 +17,14 @@ const __dirname = dirname(__filename);
 // Config
 const SOURCE_IMAGE = join(__dirname, '../public/android-chrome-512x512.png');
 const OUTPUT_DIR = join(__dirname, '../public/icons');
-// Use neutral/transparent background if source has it, or keep existing logic.
-// Since user says this IS the pattern, we likely just want to resize it.
-const THEME_COLOR = '#0b1226';
-const BG_COLOR = '#eaf3ff';
+const THEME_COLOR = '#0b1226'; // Keep for manifest if needed, but not for image generation
 
 // Ensure output directory exists
 if (!existsSync(OUTPUT_DIR)) {
   mkdirSync(OUTPUT_DIR, { recursive: true });
 }
 
-console.log('🎨 Starting icon generation...\n');
+console.log('🎨 Starting icon generation (Strict Resize Mode)...\n');
 
 /**
  * Generate favicon sizes
@@ -39,7 +36,7 @@ async function generateFavicons() {
   
   for (const size of sizes) {
     await sharp(SOURCE_IMAGE)
-      .resize(size, size, { fit: 'contain', background: BG_COLOR })
+      .resize(size, size, { fit: 'contain', background: 'transparent' })
       .png()
       .toFile(join(OUTPUT_DIR, `favicon-${size}x${size}.png`));
     console.log(`  ✓ favicon-${size}x${size}.png`);
@@ -47,7 +44,7 @@ async function generateFavicons() {
   
   // Generate multi-size favicon.ico (using 32x32 as base)
   await sharp(SOURCE_IMAGE)
-    .resize(32, 32, { fit: 'contain', background: BG_COLOR })
+    .resize(32, 32, { fit: 'contain', background: 'transparent' })
     .png()
     .toFile(join(OUTPUT_DIR, 'favicon.ico'));
   console.log('  ✓ favicon.ico');
@@ -62,27 +59,21 @@ async function generatePWAIcons() {
   const sizes = [192, 512];
   
   for (const size of sizes) {
-    // ANY purpose - no padding
+    // ANY purpose - Standard resize
     await sharp(SOURCE_IMAGE)
       .resize(size, size, { fit: 'contain', background: 'transparent' })
       .png()
       .toFile(join(OUTPUT_DIR, `icon-${size}x${size}.png`));
     console.log(`  ✓ icon-${size}x${size}.png (any)`);
     
-    // MASKABLE purpose - 15% padding for safe zone
-    const paddedSize = Math.round(size * 0.7); // 70% of target size
+    // MASKABLE purpose - Resize only (User requested "this is the pattern")
+    // Use 'cover' to ensure it fills the square if aspect ratio matches, or contain if not.
+    // Assuming source is square as per filename.
     await sharp(SOURCE_IMAGE)
-      .resize(paddedSize, paddedSize, { fit: 'contain', background: 'transparent' })
-      .extend({
-        top: Math.round((size - paddedSize) / 2),
-        bottom: Math.round((size - paddedSize) / 2),
-        left: Math.round((size - paddedSize) / 2),
-        right: Math.round((size - paddedSize) / 2),
-        background: BG_COLOR
-      })
+      .resize(size, size, { fit: 'contain', background: 'transparent' }) // using contain to be safe, or just copy?
       .png()
       .toFile(join(OUTPUT_DIR, `icon-${size}x${size}-maskable.png`));
-    console.log(`  ✓ icon-${size}x${size}-maskable.png (maskable)`);
+    console.log(`  ✓ icon-${size}x${size}-maskable.png (maskable - direct resize)`);
   }
 }
 
@@ -95,8 +86,11 @@ async function generateAppleIcons() {
   const appleSizes = [180, 167, 152];
   
   for (const size of appleSizes) {
+    // Apple icons usually don't support transparency well (black background), 
+    // but if source is PNG with transparency, we keep it or add a background?
+    // User said "badly generated", implying we changed it too much. Let's keep transparent/exact.
     await sharp(SOURCE_IMAGE)
-      .resize(size, size, { fit: 'contain', background: BG_COLOR })
+      .resize(size, size, { fit: 'contain', background: 'transparent' })
       .png()
       .toFile(join(OUTPUT_DIR, `apple-touch-icon-${size}x${size}.png`));
     console.log(`  ✓ apple-touch-icon-${size}x${size}.png`);
@@ -104,7 +98,7 @@ async function generateAppleIcons() {
   
   // Default apple-touch-icon
   await sharp(SOURCE_IMAGE)
-    .resize(180, 180, { fit: 'contain', background: BG_COLOR })
+    .resize(180, 180, { fit: 'contain', background: 'transparent' })
     .png()
     .toFile(join(OUTPUT_DIR, 'apple-touch-icon.png'));
   console.log('  ✓ apple-touch-icon.png (180x180)');
@@ -118,14 +112,10 @@ async function generatePlayStoreAssets() {
   
   // App icon 512x512 (required for Play Store)
   await sharp(SOURCE_IMAGE)
-    .resize(512, 512, { fit: 'contain', background: BG_COLOR })
+    .resize(512, 512, { fit: 'contain', background: 'transparent' })
     .png()
     .toFile(join(OUTPUT_DIR, 'playstore-icon-512x512.png'));
   console.log('  ✓ playstore-icon-512x512.png');
-  
-  console.log('\n📝 For Play Store, you also need:');
-  console.log('   - Feature graphic: 1024x500 (create manually)');
-  console.log('   - Screenshots: 2-8 images (create from app)');
 }
 
 /**
