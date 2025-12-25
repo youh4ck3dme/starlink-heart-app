@@ -4,6 +4,14 @@ import App from './App';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import './index.css';
 
+// 🔧 DEV MODE: Set 999 gems and unlock all items for testing
+if (import.meta.env.DEV) {
+  localStorage.setItem('starryGems', '999');
+  localStorage.setItem('unlockedAvatars', JSON.stringify(['✨', '🚀', '🤖', '🧠', '💡']));
+  localStorage.setItem('unlockedBackgrounds', JSON.stringify(['sky', 'space', 'mars', 'galaxy']));
+  console.log('🔧 DEV MODE: Gems = 999, All avatars & backgrounds unlocked');
+}
+
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ErrorBoundary>
