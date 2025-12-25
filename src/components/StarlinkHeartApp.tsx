@@ -7,6 +7,7 @@ import { generateCosmicResponse, getStarryTip, generateCosmicHint, generateParen
 import { hasParentConsent, setParentConsent, clearAllAppData } from '../services/consentService';
 import ParentNotice from './ParentNotice';
 import Starry3D from './mascot/Starry3D';
+import ChatView from './chat/ChatView';
 
 // Define Avatars with Names
 const AVATAR_OPTIONS = [
@@ -64,6 +65,8 @@ const processHeartDoc = (doc: QueryDocumentSnapshot): Heart => {
 
 // --- Helper Components for cleaner code ---
 
+// Helper Components for cleaner code
+// FormatText is used in ParentGuideModal
 const FormatText = ({ text }: { text: string }) => {
     if (!text) return null;
     
@@ -97,6 +100,7 @@ const FormatText = ({ text }: { text: string }) => {
     );
 };
 
+// StarryAvatarDisplay is now integrated inside ChatView but used here for Dashboards
 const StarryAvatarDisplay = ({ 
     avatar, 
     isThinking = false, 
@@ -674,172 +678,36 @@ const StarlinkHeartApp: React.FC = () => {
                     />
                 )}
 
-                {/* Chat Area */}
+                /* --- CHAT VIEW --- */
                 {viewMode === 'chat' && (
-                <main ref={chatContainerRef} className="flex-grow overflow-y-auto p-4 space-y-6 pb-32">
-                    {!isLoading && hasMore && (
-                        <div className="flex justify-center py-2">
-                             <button onClick={handleLoadMore} disabled={isLoadingMore} className="text-xs font-medium px-4 py-2 bg-black/10 rounded-full hover:bg-black/20 transition">
-                                {isLoadingMore ? '⏳' : 'Načítať históriu'}
-                             </button>
-                        </div>
-                    )}
-                    
-                    {hearts.map((heart, idx) => {
-                        const isLast = idx === hearts.length - 1;
-                        const showHintBtn = heart.aiResponse && !heart.hintRequested && !heart.isHint;
-                        
-                        return (
-                            <div key={heart.id || heart.localId} className="flex flex-col gap-2">
-                                {/* User Message */}
-                                {heart.message || heart.imageURL ? (
-                                    <div className="flex justify-end animate-fade-in-up">
-                                        <div className={`relative max-w-[85%] rounded-2xl rounded-tr-sm p-3 shadow-sm text-sm md:text-base ${heart.status === 'failed' ? 'bg-red-500 text-white' : 'bg-white text-gray-800'}`}>
-                                            {heart.imageURL && (
-                                                <div className="mb-2 rounded-lg overflow-hidden">
-                                                    <img src={heart.imageURL} alt="Úloha" className="w-full h-auto object-cover max-h-60" />
-                                                </div>
-                                            )}
-                                            {heart.message && <p>{heart.message}</p>}
-                                            <span className="text-[10px] opacity-50 block text-right mt-1">{heart.timestamp instanceof Date ? heart.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''}</span>
-                                        </div>
-                                    </div>
-                                ) : null}
-
-                                {/* AI Response */}
-                                {heart.aiResponse && (
-                                    <div className={`flex gap-3 animate-pop-in ${heart.isHint ? 'pl-4' : ''}`}>
-                                        <div className="shrink-0 flex flex-col items-center gap-1">
-                                            {/* Static avatar in chat history, animated if needed but keeping it simple for history */}
-                                            <div className="text-2xl drop-shadow-md">{heart.isHint ? '💡' : starryAvatar}</div>
-                                            {heart.isHint && <div className="h-full w-0.5 bg-yellow-300 rounded-full"></div>}
-                                        </div>
-                                        
-                                        <div className={`relative max-w-[90%] rounded-2xl rounded-tl-sm p-4 shadow-sm text-sm md:text-base leading-relaxed ${heart.isHint ? 'bg-yellow-50 border border-yellow-200 text-yellow-900' : `${appBackground.glass} backdrop-blur-md border border-white/20 shadow-lg`}`}>
-                                            {heart.isHint && <div className="text-xs font-bold text-yellow-600 uppercase tracking-wide mb-1">Super Nápoveda</div>}
-                                            <div className={appBackground.id === 'sky' || heart.isHint ? 'text-gray-800' : 'text-gray-100'}>
-                                                <FormatText text={heart.aiResponse.textResponse} />
-                                            </div>
-
-                                            {/* Action Buttons inside Bubble */}
-                                            <div className="flex flex-wrap gap-2 mt-3">
-                                                {showHintBtn && (
-                                                    <button 
-                                                        onClick={() => handleGetHint(heart.id!, hearts.slice(0, idx + 1))}
-                                                        disabled={!!hintLoadingId}
-                                                        className="text-xs font-bold bg-yellow-400/20 hover:bg-yellow-400/40 text-yellow-700 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1"
-                                                    >
-                                                        {hintLoadingId === heart.id ? 'Thinking...' : '🤔 Potrebujem nápovedu'}
-                                                    </button>
-                                                )}
-                                                {!heart.isHint && (
-                                                    <button 
-                                                        onClick={() => handleParentGuide(heart.id!, hearts.slice(Math.max(0, idx - 1), idx + 1))}
-                                                        disabled={parentGuideLoadingId === heart.id}
-                                                        className="text-xs font-bold bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1"
-                                                    >
-                                                        {parentGuideLoadingId === heart.id ? 'Prekladám...' : '👨‍👩‍👧 Rodičovský prekladač'}
-                                                    </button>
-                                                )}
-                                            </div>
-
-                                            {/* Visual Aids */}
-                                            {heart.aiResponse.visualAids?.length > 0 && (
-                                                <div className="flex gap-2 mt-3 pt-2 border-t border-black/5">
-                                                    {heart.aiResponse.visualAids.map((v: string, i: number) => (
-                                                        <span key={i} className="text-2xl hover:scale-125 transition-transform cursor-default">{v}</span>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        );
-                    })}
-                    
-                    {isSending && (
-                        <div className="flex gap-3 animate-pulse">
-                             <div className="shrink-0">
-                                <StarryAvatarDisplay avatar={starryAvatar} isThinking={true} size="text-2xl" />
-                             </div>
-                             <div className="bg-white/50 rounded-2xl p-3 flex gap-1 items-center">
-                                 <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce"></div>
-                                 <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                                 <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                             </div>
-                        </div>
-                    )}
-                    <div ref={messagesEndRef} />
-                </main>
+                <ChatView 
+                    hearts={hearts}
+                    starryAvatar={starryAvatar}
+                    appBackground={appBackground}
+                    isLoading={isLoading}
+                    hasMore={hasMore}
+                    isLoadingMore={isLoadingMore}
+                    isSending={isSending}
+                    hintLoadingId={hintLoadingId}
+                    parentGuideLoadingId={parentGuideLoadingId}
+                    newMessage={newMessage}
+                    setNewMessage={setNewMessage}
+                    imageFile={imageFile}
+                    setImageFile={setImageFile}
+                    imagePreviewUrl={imagePreviewUrl}
+                    isTeacherCloneMode={isTeacherCloneMode}
+                    setIsTeacherCloneMode={setIsTeacherCloneMode}
+                    chatContainerRef={chatContainerRef}
+                    messagesEndRef={messagesEndRef}
+                    fileInputRef={fileInputRef}
+                    onLoadMore={handleLoadMore}
+                    onSubmit={handleSubmit}
+                    onOpenCamera={handleOpenCamera}
+                    onGetHint={handleGetHint}
+                    onParentGuide={handleParentGuide}
+                />
                 )}
-
-                {/* Input Area - Glassmorphic Bottom Bar (Only in Chat) */}
-                {viewMode === 'chat' && (
-                <footer className="shrink-0 p-4">
-                    <div className={`${appBackground.glass} backdrop-blur-xl rounded-[2rem] shadow-2xl p-2 border border-white/40 transition-all duration-300 ${isTeacherCloneMode ? 'ring-2 ring-indigo-500 shadow-indigo-500/20' : ''}`}>
-                        
-                        {/* Mode Toggle & File Preview */}
-                        <div className="flex items-center justify-between px-3 mb-1">
-                            {imageFile ? (
-                                <div className="flex items-center gap-2 bg-sky-100 text-sky-800 px-2 py-1 rounded-lg text-xs border border-sky-200 shadow-sm animate-pop-in">
-                                    {imagePreviewUrl && (
-                                        <img src={imagePreviewUrl} alt="Preview" className="w-8 h-8 rounded-md object-cover border border-white/50" />
-                                    )}
-                                    <span className="max-w-[100px] truncate font-medium">{imageFile.name}</span>
-                                    <button onClick={() => setImageFile(null)} className="font-bold text-sky-600 hover:text-red-500 text-lg leading-none px-1">&times;</button>
-                                </div>
-                            ) : <div></div>}
-                            
-                            <div className="flex items-center gap-2">
-                                <span className={`text-xs font-bold transition-colors ${isTeacherCloneMode ? 'text-sky-600' : 'text-gray-400 group-hover:text-gray-600'}`}>
-                                {isTeacherCloneMode ? 'Starlink Kouč' : 'Hravý Starlink'}
-                            </span>
-                                <button 
-                                    onClick={() => setIsTeacherCloneMode(!isTeacherCloneMode)}
-                                    className={`w-10 h-6 rounded-full flex items-center p-1 transition-colors duration-300 ${isTeacherCloneMode ? 'bg-indigo-600' : 'bg-gray-300'}`}
-                                >
-                                    <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isTeacherCloneMode ? 'translate-x-4' : ''}`}></div>
-                                </button>
-                            </div>
-                        </div>
-
-                        <form onSubmit={handleSubmit} className="flex items-end gap-2">
-                            <div className="flex-1 bg-white/60 hover:bg-white/80 transition-colors rounded-[1.5rem] flex items-center px-2">
-                                <button type="button" onClick={handleOpenCamera} className="p-2 text-gray-500 hover:text-sky-600 transition-colors">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                                </button>
-                                <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2 text-gray-500 hover:text-sky-600 transition-colors">
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                                </button>
-                                <input 
-                                    type="file" 
-                                    ref={fileInputRef} 
-                                    className="hidden" 
-                                    accept="image/*" 
-                                    onChange={(e) => e.target.files && setImageFile(e.target.files[0])} 
-                                />
-                                <textarea
-                                    value={newMessage}
-                                    onChange={(e) => setNewMessage(e.target.value)}
-                                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } }}
-                                    placeholder={isTeacherCloneMode ? "Režim Učiteľa: Pošli úlohu..." : "Spýtaj sa Starryho..."}
-                                    className="flex-1 bg-transparent border-none focus:ring-0 py-3 px-2 text-gray-800 placeholder-gray-500 resize-none max-h-24"
-                                    rows={1}
-                                />
-                            </div>
-                            
-                            <button 
-                                type="submit" 
-                                disabled={isSending || (!newMessage.trim() && !imageFile)}
-                                className={`h-12 w-12 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-95 text-white ${isSending ? 'bg-gray-400' : (isTeacherCloneMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-sky-500 hover:bg-sky-600')}`}
-                            >
-                                <svg className="w-6 h-6 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                            </button>
-                        </form>
-                    </div>
-                </footer>
-                )}</div>
+</div>
 
             {/* --- MODALS --- */}
 
