@@ -139,7 +139,8 @@ const DashboardScreen = ({
     isCoachMode, 
     avatar, 
     gems,
-    textColor
+    textColor,
+    mascotMode
 }: { 
     onNewMission: () => void, 
     onProfile: () => void, 
@@ -148,7 +149,8 @@ const DashboardScreen = ({
     isCoachMode: boolean,
     avatar: string,
     gems: number,
-    textColor: string
+    textColor: string,
+    mascotMode: MascotMode
 }) => {
     return (
         <div className="flex flex-col h-full animate-fade-in-up p-6 overflow-y-auto">
@@ -596,6 +598,7 @@ const StarlinkHeartApp: React.FC = () => {
                         avatar={starryAvatar}
                         gems={gemCount}
                         textColor={appBackground.textColor}
+                        mascotMode={mascotMode}
                     />
                 )}
 
