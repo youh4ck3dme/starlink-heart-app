@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import RiveMascot from './RiveMascot';
+import RiveMascotNew from './RiveMascotNew';
 import SplineMascot from './SplineMascot';
 
 type MascotRendererProps = {
@@ -62,7 +62,7 @@ const MascotRenderer: React.FC<MascotRendererProps> = ({
   return (
     <MascotErrorBoundary fallback={fallback}>
       {riveSrc ? (
-        <RiveMascot
+        <RiveMascotNew
           src={riveSrc}
           fallbackEmoji={fallbackEmoji}
           label={label}
