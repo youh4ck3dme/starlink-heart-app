@@ -33,3 +33,11 @@ dist-ssr
 # Test Coverage
 coverage/
 junit.xml
+
+# Playwright
+playwright-report/
+test-results/
+
+# Build cache
+tsconfig.tsbuildinfo
+*.tsbuildinfo
