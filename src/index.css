@@ -2,13 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body, #root {
+/* ===== GLOBAL MOBILE-FIRST LAYOUT ===== */
+
+:root {
+  /* Safe area fallbacks */
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  
+  /* App gradient colors */
+  --bg-gradient-start: #eaf3ff;
+  --bg-gradient-end: #ffffff;
+}
+
+html {
   height: 100%;
-  margin: 0;
-  padding: 0;
+  /* Prevent iOS bounce/overscroll showing white */
+  background: var(--bg-gradient-start);
 }
 
 body {
   min-height: 100svh;
-  background: linear-gradient(180deg, #eaf3ff 0%, #ffffff 70%);
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  /* Consistent gradient background */
+  background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 70%);
+  background-attachment: fixed;
+  /* Smooth font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100svh;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== SAFE AREA UTILITIES ===== */
+
+.safe-area-top {
+  padding-top: max(1rem, var(--sat));
+}
+
+.safe-area-bottom {
+  padding-bottom: max(1rem, var(--sab));
+}
+
+.safe-area-x {
+  padding-left: max(1rem, var(--sal));
+  padding-right: max(1rem, var(--sar));
+}
+
+.safe-area-all {
+  padding-top: max(1rem, var(--sat));
+  padding-bottom: max(1rem, var(--sab));
+  padding-left: max(1rem, var(--sal));
+  padding-right: max(1rem, var(--sar));
+}
+
+/* ===== APP CONTAINER ===== */
+
+.app-container {
+  width: 100%;
+  max-width: 480px; /* Optimal mobile width */
+  margin: 0 auto;
+  padding-left: max(1rem, var(--sal));
+  padding-right: max(1rem, var(--sar));
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    max-width: 640px;
+  }
+}
+
+/* ===== PREVENT LAYOUT SHIFT ===== */
+
+html, body {
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
 }
