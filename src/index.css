@@ -19,19 +19,14 @@
   --bg-dark: #060819;
 }
 
-html {
+html, body, #root {
   height: 100%;
-  /* Dark background to prevent white gaps */
-  background: var(--bg-dark);
 }
 
 body {
-  min-height: 100svh;
-  height: 100%;
   margin: 0;
-  padding: 0;
-  /* Dark background - no white gaps */
-  background: var(--bg-dark);
+  /* Dark background to prevent white gaps */
+  background: #060819;
   /* Smooth font rendering */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -39,7 +34,6 @@ body {
 
 #root {
   min-height: 100svh;
-  height: 100%;
   display: flex;
   flex-direction: column;
 }

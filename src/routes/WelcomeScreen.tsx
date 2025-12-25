@@ -73,7 +73,7 @@ export default function WelcomeScreen() {
 
   return (
     <div 
-      className="relative min-h-[100svh] w-full overflow-hidden bg-gradient-to-b from-slate-950 via-slate-900 to-indigo-950"
+      className="relative min-h-[100svh] w-full overflow-hidden bg-[#060819] text-white"
       onPointerMove={handlePointerMove}
     >
       {/* Layer 1: Animated Stars Background */}
