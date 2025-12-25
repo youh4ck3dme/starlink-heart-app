@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 /* ===== GLOBAL MOBILE-FIRST LAYOUT ===== */
+/* DO NOT remove d/svh handling (prevents mobile white gaps) */
 
 :root {
   /* Safe area fallbacks */
@@ -15,27 +16,42 @@
   --bg-gradient-start: #eaf3ff;
   --bg-gradient-end: #ffffff;
   
-  /* Dark theme */
+  /* Dark theme - primary app background */
   --bg-dark: #060819;
 }
 
-html, body, #root {
+/* 
+ * Modern viewport height handling:
+ * 1. dvh = dynamic viewport height (accounts for mobile browser chrome)
+ * 2. svh = small viewport height (fallback for older browsers)
+ * 3. 100% = final fallback for legacy browsers
+ */
+html {
   height: 100%;
+  height: 100svh;
+  height: 100dvh;
 }
 
 body {
   margin: 0;
-  /* Dark background to prevent white gaps */
-  background: #060819;
+  min-height: 100%;
+  min-height: 100svh;
+  min-height: 100dvh;
+  /* Dark background to prevent white gaps on ANY screen */
+  background: var(--bg-dark);
   /* Smooth font rendering */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
+  min-height: 100%;
   min-height: 100svh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
+  /* Ensure root also has dark bg as backup */
+  background: var(--bg-dark);
 }
 
 /* ===== SAFE AREA UTILITIES ===== */
