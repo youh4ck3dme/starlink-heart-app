@@ -1,0 +1,330 @@
+diff --git a/index.html b/index.html
+index 5605707..c1c378d 100755
+--- a/index.html
++++ b/index.html
+@@ -2,16 +2,33 @@
+ <html lang="sk">
+   <head>
+     <meta charset="UTF-8" />
+-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+     
+-    <!-- PWA -->
+-    <link rel="manifest" href="/manifest.json" />
+-    <meta name="theme-color" content="#3b82f6" />
++    <!-- Favicons -->
++    <link rel="icon" type="image/x-icon" href="/icons/favicon.ico" />
++    <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
++    <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
++    <link rel="icon" type="image/png" sizes="48x48" href="/icons/favicon-48x48.png" />
++    
++    <!-- Apple Touch Icons -->
++    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
++    <link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-touch-icon-152x152.png" />
++    <link rel="apple-touch-icon" sizes="167x167" href="/icons/apple-touch-icon-167x167.png" />
++    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon-180x180.png" />
++    
++    <!-- PWA Manifest -->
++    <link rel="manifest" href="/manifest.webmanifest" />
++    <meta name="theme-color" content="#0b1226" />
++    <meta name="background-color" content="#eaf3ff" />
++    
++    <!-- iOS PWA -->
+     <meta name="apple-mobile-web-app-capable" content="yes" />
+     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+     <meta name="apple-mobile-web-app-title" content="Starlink" />
+     
++    <!-- Meta -->
++    <meta name="description" content="AI tutor pre slovenské deti - matematika, slovenčina, angličtina" />
++    
+     <title>Starlink Heart</title>
+   </head>
+   <body>
+diff --git a/package.json b/package.json
+index b4e45af..8f5847d 100755
+--- a/package.json
++++ b/package.json
+@@ -6,7 +6,8 @@
+   "scripts": {
+     "dev": "vite",
+     "build": "tsc -b && vite build",
+-    "preview": "vite preview"
++    "preview": "vite preview",
++    "icons:generate": "node scripts/generate-icons.mjs"
+   },
+   "dependencies": {
+     "@google/genai": "^1.34.0",
+@@ -21,6 +22,7 @@
+     "@vitejs/plugin-react": "^4.3.1",
+     "autoprefixer": "^10.4.23",
+     "postcss": "^8.5.6",
++    "sharp": "^0.33.5",
+     "tailwindcss": "^3.4.4",
+     "typescript": "^5.5.3",
+     "vite": "^5.3.4"
+diff --git a/public/icons/apple-touch-icon-152x152.png b/public/icons/apple-touch-icon-152x152.png
+new file mode 100644
+index 0000000..373ea6c
+Binary files /dev/null and b/public/icons/apple-touch-icon-152x152.png differ
+diff --git a/public/icons/apple-touch-icon-167x167.png b/public/icons/apple-touch-icon-167x167.png
+new file mode 100644
+index 0000000..d80eb1e
+Binary files /dev/null and b/public/icons/apple-touch-icon-167x167.png differ
+diff --git a/public/icons/apple-touch-icon-180x180.png b/public/icons/apple-touch-icon-180x180.png
+new file mode 100644
+index 0000000..e1f2aea
+Binary files /dev/null and b/public/icons/apple-touch-icon-180x180.png differ
+diff --git a/public/icons/apple-touch-icon.png b/public/icons/apple-touch-icon.png
+new file mode 100644
+index 0000000..e1f2aea
+Binary files /dev/null and b/public/icons/apple-touch-icon.png differ
+diff --git a/public/icons/favicon-16x16.png b/public/icons/favicon-16x16.png
+new file mode 100644
+index 0000000..16f3931
+Binary files /dev/null and b/public/icons/favicon-16x16.png differ
+diff --git a/public/icons/favicon-32x32.png b/public/icons/favicon-32x32.png
+new file mode 100644
+index 0000000..e231003
+Binary files /dev/null and b/public/icons/favicon-32x32.png differ
+diff --git a/public/icons/favicon-48x48.png b/public/icons/favicon-48x48.png
+new file mode 100644
+index 0000000..93b4a8c
+Binary files /dev/null and b/public/icons/favicon-48x48.png differ
+diff --git a/public/icons/favicon.ico b/public/icons/favicon.ico
+new file mode 100644
+index 0000000..e231003
+Binary files /dev/null and b/public/icons/favicon.ico differ
+diff --git a/public/icons/icon-192x192-maskable.png b/public/icons/icon-192x192-maskable.png
+new file mode 100644
+index 0000000..000fb0f
+Binary files /dev/null and b/public/icons/icon-192x192-maskable.png differ
+diff --git a/public/icons/icon-192x192.png b/public/icons/icon-192x192.png
+new file mode 100644
+index 0000000..c934a26
+Binary files /dev/null and b/public/icons/icon-192x192.png differ
+diff --git a/public/icons/icon-512x512-maskable.png b/public/icons/icon-512x512-maskable.png
+new file mode 100644
+index 0000000..415adfc
+Binary files /dev/null and b/public/icons/icon-512x512-maskable.png differ
+diff --git a/public/icons/icon-512x512.png b/public/icons/icon-512x512.png
+new file mode 100644
+index 0000000..df2696f
+Binary files /dev/null and b/public/icons/icon-512x512.png differ
+diff --git a/public/icons/playstore-icon-512x512.png b/public/icons/playstore-icon-512x512.png
+new file mode 100644
+index 0000000..f2b23dc
+Binary files /dev/null and b/public/icons/playstore-icon-512x512.png differ
+diff --git a/public/manifest.webmanifest b/public/manifest.webmanifest
+new file mode 100644
+index 0000000..bc43120
+--- /dev/null
++++ b/public/manifest.webmanifest
+@@ -0,0 +1,49 @@
++{
++  "name": "Starlink Heart",
++  "short_name": "Starlink",
++  "description": "AI tutor pre slovenské deti - matematika, slovenčina, angličtina",
++  "start_url": "/",
++  "scope": "/",
++  "display": "standalone",
++  "background_color": "#eaf3ff",
++  "theme_color": "#0b1226",
++  "orientation": "portrait",
++  "icons": [
++    {
++      "src": "/icons/icon-192x192.png",
++      "sizes": "192x192",
++      "type": "image/png",
++      "purpose": "any"
++    },
++    {
++      "src": "/icons/icon-512x512.png",
++      "sizes": "512x512",
++      "type": "image/png",
++      "purpose": "any"
++    },
++    {
++      "src": "/icons/icon-192x192-maskable.png",
++      "sizes": "192x192",
++      "type": "image/png",
++      "purpose": "maskable"
++    },
++    {
++      "src": "/icons/icon-512x512-maskable.png",
++      "sizes": "512x512",
++      "type": "image/png",
++      "purpose": "maskable"
++    }
++  ],
++  "categories": ["education", "kids"],
++  "lang": "sk-SK",
++  "dir": "ltr",
++  "shortcuts": [
++    {
++      "name": "Domov",
++      "short_name": "Domov",
++      "description": "Hlavná obrazovka",
++      "url": "/home",
++      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
++    }
++  ]
++}
+diff --git a/scripts/generate-icons.mjs b/scripts/generate-icons.mjs
+new file mode 100644
+index 0000000..54eb412
+--- /dev/null
++++ b/scripts/generate-icons.mjs
+@@ -0,0 +1,153 @@
++#!/usr/bin/env node
++/**
++ * Icon Generator Script
++ * Generates all required icons for PWA, browsers, iOS, and Android
++ * 
++ * Usage: npm run icons:generate
++ */
++
++import sharp from 'sharp';
++import { existsSync, mkdirSync } from 'fs';
++import { join, dirname } from 'path';
++import { fileURLToPath } from 'url';
++
++const __filename = fileURLToPath(import.meta.url);
++const __dirname = dirname(__filename);
++
++// Config
++const SOURCE_IMAGE = join(__dirname, '../src/assets/image.png');
++const OUTPUT_DIR = join(__dirname, '../public/icons');
++const THEME_COLOR = '#0b1226';
++const BG_COLOR = '#eaf3ff';
++
++// Ensure output directory exists
++if (!existsSync(OUTPUT_DIR)) {
++  mkdirSync(OUTPUT_DIR, { recursive: true });
++}
++
++console.log('🎨 Starting icon generation...\n');
++
++/**
++ * Generate favicon sizes
++ */
++async function generateFavicons() {
++  console.log('📱 Generating favicons...');
++  
++  const sizes = [16, 32, 48];
++  
++  for (const size of sizes) {
++    await sharp(SOURCE_IMAGE)
++      .resize(size, size, { fit: 'contain', background: BG_COLOR })
++      .png()
++      .toFile(join(OUTPUT_DIR, `favicon-${size}x${size}.png`));
++    console.log(`  ✓ favicon-${size}x${size}.png`);
++  }
++  
++  // Generate multi-size favicon.ico (using 32x32 as base)
++  await sharp(SOURCE_IMAGE)
++    .resize(32, 32, { fit: 'contain', background: BG_COLOR })
++    .png()
++    .toFile(join(OUTPUT_DIR, 'favicon.ico'));
++  console.log('  ✓ favicon.ico');
++}
++
++/**
++ * Generate PWA icons (maskable + any)
++ */
++async function generatePWAIcons() {
++  console.log('\n🌐 Generating PWA icons...');
++  
++  const sizes = [192, 512];
++  
++  for (const size of sizes) {
++    // ANY purpose - no padding
++    await sharp(SOURCE_IMAGE)
++      .resize(size, size, { fit: 'contain', background: 'transparent' })
++      .png()
++      .toFile(join(OUTPUT_DIR, `icon-${size}x${size}.png`));
++    console.log(`  ✓ icon-${size}x${size}.png (any)`);
++    
++    // MASKABLE purpose - 15% padding for safe zone
++    const paddedSize = Math.round(size * 0.7); // 70% of target size
++    await sharp(SOURCE_IMAGE)
++      .resize(paddedSize, paddedSize, { fit: 'contain', background: 'transparent' })
++      .extend({
++        top: Math.round((size - paddedSize) / 2),
++        bottom: Math.round((size - paddedSize) / 2),
++        left: Math.round((size - paddedSize) / 2),
++        right: Math.round((size - paddedSize) / 2),
++        background: BG_COLOR
++      })
++      .png()
++      .toFile(join(OUTPUT_DIR, `icon-${size}x${size}-maskable.png`));
++    console.log(`  ✓ icon-${size}x${size}-maskable.png (maskable)`);
++  }
++}
++
++/**
++ * Generate Apple Touch Icons
++ */
++async function generateAppleIcons() {
++  console.log('\n🍎 Generating Apple touch icons...');
++  
++  const appleSizes = [180, 167, 152];
++  
++  for (const size of appleSizes) {
++    await sharp(SOURCE_IMAGE)
++      .resize(size, size, { fit: 'contain', background: BG_COLOR })
++      .png()
++      .toFile(join(OUTPUT_DIR, `apple-touch-icon-${size}x${size}.png`));
++    console.log(`  ✓ apple-touch-icon-${size}x${size}.png`);
++  }
++  
++  // Default apple-touch-icon
++  await sharp(SOURCE_IMAGE)
++    .resize(180, 180, { fit: 'contain', background: BG_COLOR })
++    .png()
++    .toFile(join(OUTPUT_DIR, 'apple-touch-icon.png'));
++  console.log('  ✓ apple-touch-icon.png (180x180)');
++}
++
++/**
++ * Generate Play Store assets (reference sizes)
++ */
++async function generatePlayStoreAssets() {
++  console.log('\n🤖 Generating Play Store reference assets...');
++  
++  // App icon 512x512 (required for Play Store)
++  await sharp(SOURCE_IMAGE)
++    .resize(512, 512, { fit: 'contain', background: BG_COLOR })
++    .png()
++    .toFile(join(OUTPUT_DIR, 'playstore-icon-512x512.png'));
++  console.log('  ✓ playstore-icon-512x512.png');
++  
++  console.log('\n📝 For Play Store, you also need:');
++  console.log('   - Feature graphic: 1024x500 (create manually)');
++  console.log('   - Screenshots: 2-8 images (create from app)');
++}
++
++/**
++ * Main execution
++ */
++async function main() {
++  try {
++    if (!existsSync(SOURCE_IMAGE)) {
++      console.error(`❌ Source image not found: ${SOURCE_IMAGE}`);
++      process.exit(1);
++    }
++    
++    await generateFavicons();
++    await generatePWAIcons();
++    await generateAppleIcons();
++    await generatePlayStoreAssets();
++    
++    console.log('\n✅ All icons generated successfully!');
++    console.log(`📁 Output directory: ${OUTPUT_DIR}\n`);
++    
++  } catch (error) {
++    console.error('❌ Error generating icons:', error);
++    process.exit(1);
++  }
++}
++
++main();

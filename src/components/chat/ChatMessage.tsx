@@ -52,8 +52,9 @@ export default function ChatMessage({
     parentGuideLoadingId,
     onGetHint,
     onParentGuide,
-    allHearts
-}: ChatMessageProps) {
+    allHearts,
+    voiceMode // Receive voiceMode
+}: ChatMessageProps & { voiceMode?: any }) {
     const showHintBtn = heart.aiResponse && !heart.hintRequested && !heart.isHint;
 
     return (
@@ -88,6 +89,21 @@ export default function ChatMessage({
                         <div className={appBackground.id === 'sky' || heart.isHint ? 'text-gray-800' : 'text-gray-100'}>
                             <FormatText text={heart.aiResponse.textResponse} />
                         </div>
+
+                        {/* Speaker Button (TTS) */}
+                        {voiceMode?.isEnabled && voiceMode?.isSupported && (
+                            <button 
+                                onClick={() => voiceMode.isSpeaking ? voiceMode.stopSpeaking() : voiceMode.speak(heart.aiResponse?.textResponse || "")}
+                                className="absolute top-2 right-2 text-gray-400 hover:text-indigo-500 transition-colors p-1"
+                                title="Prečítať nahlas"
+                            >
+                                {voiceMode.isSpeaking ? (
+                                    <span className="animate-pulse text-indigo-500">⏹</span>
+                                ) : (
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+                                )}
+                            </button>
+                        )}
 
                         {/* Action Buttons */}
                         <div className="flex flex-wrap gap-2 mt-3">

@@ -8,6 +8,7 @@ import { hasParentConsent, setParentConsent, clearAllAppData } from '../services
 import ParentNotice from './ParentNotice';
 import Starry3D from './mascot/Starry3D';
 import ChatView from './chat/ChatView';
+import { useVoiceMode } from '../hooks/useVoiceMode';
 
 // Define Avatars with Names
 const AVATAR_OPTIONS = [
@@ -241,6 +242,8 @@ const DashboardScreen = ({
 };
 
 const StarlinkHeartApp: React.FC = () => {
+    // Hooks
+    const voiceMode = useVoiceMode();
     // State
     const [hearts, setHearts] = useState<Heart[]>([]);
     const [newMessage, setNewMessage] = useState('');
@@ -705,6 +708,7 @@ const StarlinkHeartApp: React.FC = () => {
                     onOpenCamera={handleOpenCamera}
                     onGetHint={handleGetHint}
                     onParentGuide={handleParentGuide}
+                    voiceMode={voiceMode}
                 />
                 )}
 </div>

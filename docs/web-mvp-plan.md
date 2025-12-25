@@ -44,3 +44,9 @@
 - `src/services/geminiService.ts` (MODIFY, add import + filter call)
 
 **Rationale:** Cheapest compliance win - prevents kids from accidentally sending PII to AI.
+
+---
+
+## D) Features (Beta)
+
+- **Hlasový režim:** Implementované diktovanie (STT) a čítanie (TTS) pomocou Web Speech API. Dostupné v nastaveniach ako "Beta".

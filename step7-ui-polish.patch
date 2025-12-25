@@ -1,0 +1,126 @@
+diff --git a/src/index.css b/src/index.css
+index acffb0d..4235bf5 100644
+--- a/src/index.css
++++ b/src/index.css
+@@ -2,13 +2,87 @@
+ @tailwind components;
+ @tailwind utilities;
+ 
+-html, body, #root {
++/* ===== GLOBAL MOBILE-FIRST LAYOUT ===== */
++
++:root {
++  /* Safe area fallbacks */
++  --sat: env(safe-area-inset-top, 0px);
++  --sar: env(safe-area-inset-right, 0px);
++  --sab: env(safe-area-inset-bottom, 0px);
++  --sal: env(safe-area-inset-left, 0px);
++  
++  /* App gradient colors */
++  --bg-gradient-start: #eaf3ff;
++  --bg-gradient-end: #ffffff;
++}
++
++html {
++  height: 100%;
++  /* Prevent iOS bounce/overscroll showing white */
++  background: var(--bg-gradient-start);
++}
++
++body {
++  min-height: 100svh;
+   height: 100%;
+   margin: 0;
+   padding: 0;
++  /* Consistent gradient background */
++  background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 70%);
++  background-attachment: fixed;
++  /* Smooth font rendering */
++  -webkit-font-smoothing: antialiased;
++  -moz-osx-font-smoothing: grayscale;
+ }
+ 
+-body {
++#root {
+   min-height: 100svh;
+-  background: linear-gradient(180deg, #eaf3ff 0%, #ffffff 70%);
++  height: 100%;
++  display: flex;
++  flex-direction: column;
++}
++
++/* ===== SAFE AREA UTILITIES ===== */
++
++.safe-area-top {
++  padding-top: max(1rem, var(--sat));
++}
++
++.safe-area-bottom {
++  padding-bottom: max(1rem, var(--sab));
++}
++
++.safe-area-x {
++  padding-left: max(1rem, var(--sal));
++  padding-right: max(1rem, var(--sar));
++}
++
++.safe-area-all {
++  padding-top: max(1rem, var(--sat));
++  padding-bottom: max(1rem, var(--sab));
++  padding-left: max(1rem, var(--sal));
++  padding-right: max(1rem, var(--sar));
++}
++
++/* ===== APP CONTAINER ===== */
++
++.app-container {
++  width: 100%;
++  max-width: 480px; /* Optimal mobile width */
++  margin: 0 auto;
++  padding-left: max(1rem, var(--sal));
++  padding-right: max(1rem, var(--sar));
++}
++
++@media (min-width: 768px) {
++  .app-container {
++    max-width: 640px;
++  }
++}
++
++/* ===== PREVENT LAYOUT SHIFT ===== */
++
++html, body {
++  overflow-x: hidden;
++  overscroll-behavior-y: none;
+ }
+diff --git a/src/routes/Home.tsx b/src/routes/Home.tsx
+index 844f4ac..97fa250 100644
+--- a/src/routes/Home.tsx
++++ b/src/routes/Home.tsx
+@@ -1,23 +1,13 @@
+ import StarlinkHeartApp from '../components/StarlinkHeartApp';
+-import { Link } from 'react-router-dom';
+ 
+ export default function Home() {
+   return (
+-    <div className="relative min-h-screen">
++    <div className="flex-1 min-h-[100svh] flex flex-col">
+       {/* 
+-        StarlinkHeartApp handles its own layout, but we wrap it to ensure it takes full height. 
+-        We also render a "Back to Welcome" button if needed, but the App has its own UI.
+-        For now, let's render the App directly.
++        Main app wrapper with proper mobile layout.
++        StarlinkHeartApp handles its own internal layout.
+       */}
+       <StarlinkHeartApp />
+-      
+-      {/* 
+-         Optional: Absolute positioning back button if the App UI allows it. 
+-         Given StarlinkHeartApp has a header in 'chat' mode and dashboard mode, 
+-         placing a fixed back button might overlap. 
+-         Let's stick to just rendering the App for now as the "Home" experience.
+-         Users can use browser back button or we can add a specific "Exit" button later.
+-      */}
+     </div>
+   );
+ }

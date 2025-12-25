@@ -79,8 +79,9 @@ export default function ChatView({
     onSubmit,
     onOpenCamera,
     onGetHint,
-    onParentGuide
-}: ChatViewProps) {
+    onParentGuide,
+    voiceMode // Pass the entire hook return value object
+}: ChatViewProps & { voiceMode: any }) {
     return (
         <>
             {/* Message List */}
@@ -110,6 +111,7 @@ export default function ChatView({
                         onGetHint={onGetHint}
                         onParentGuide={onParentGuide}
                         allHearts={hearts}
+                        voiceMode={voiceMode}
                     />
                 ))}
                 
@@ -143,6 +145,7 @@ export default function ChatView({
                 fileInputRef={fileInputRef}
                 onSubmit={onSubmit}
                 onOpenCamera={onOpenCamera}
+                voiceMode={voiceMode}
             />
         </>
     );

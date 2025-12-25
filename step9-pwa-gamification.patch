@@ -1,0 +1,313 @@
+diff --git a/index.html b/index.html
+index b75b293..5605707 100755
+--- a/index.html
++++ b/index.html
+@@ -1,9 +1,17 @@
+ <!doctype html>
+-<html lang="en">
++<html lang="sk">
+   <head>
+     <meta charset="UTF-8" />
+     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
++    
++    <!-- PWA -->
++    <link rel="manifest" href="/manifest.json" />
++    <meta name="theme-color" content="#3b82f6" />
++    <meta name="apple-mobile-web-app-capable" content="yes" />
++    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
++    <meta name="apple-mobile-web-app-title" content="Starlink" />
++    
+     <title>Starlink Heart</title>
+   </head>
+   <body>
+diff --git a/public/manifest.json b/public/manifest.json
+new file mode 100644
+index 0000000..da0f129
+--- /dev/null
++++ b/public/manifest.json
+@@ -0,0 +1,36 @@
++{
++  "name": "Starlink Heart",
++  "short_name": "Starlink",
++  "description": "AI tutor pre slovenské deti - matematika, slovenčina, angličtina",
++  "start_url": "/",
++  "display": "standalone",
++  "background_color": "#0f172a",
++  "theme_color": "#3b82f6",
++  "orientation": "portrait",
++  "icons": [
++    {
++      "src": "/icon-192.png",
++      "sizes": "192x192",
++      "type": "image/png",
++      "purpose": "any maskable"
++    },
++    {
++      "src": "/icon-512.png",
++      "sizes": "512x512",
++      "type": "image/png",
++      "purpose": "any maskable"
++    }
++  ],
++  "categories": ["education", "kids"],
++  "lang": "sk-SK",
++  "dir": "ltr",
++  "shortcuts": [
++    {
++      "name": "Domov",
++      "short_name": "Domov",
++      "description": "Hlavná obrazovka",
++      "url": "/home",
++      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
++    }
++  ]
++}
+diff --git a/src/components/common/XPBar.tsx b/src/components/common/XPBar.tsx
+new file mode 100644
+index 0000000..21e5d09
+--- /dev/null
++++ b/src/components/common/XPBar.tsx
+@@ -0,0 +1,84 @@
++import { useEffect, useState } from 'react';
++import { getPlayerStats, type PlayerStats } from '../../services/xpService';
++
++export default function XPBar() {
++  const [stats, setStats] = useState<PlayerStats | null>(null);
++  const [showLevelUp, setShowLevelUp] = useState(false);
++
++  useEffect(() => {
++    // Load initial stats
++    setStats(getPlayerStats());
++
++    // Listen for XP updates
++    const handleXPUpdate = () => {
++      const newStats = getPlayerStats();
++      const oldStats = stats;
++      
++      if (oldStats && newStats.level > oldStats.level) {
++        setShowLevelUp(true);
++        setTimeout(() => setShowLevelUp(false), 3000);
++      }
++      
++      setStats(newStats);
++    };
++
++    window.addEventListener('xp-updated', handleXPUpdate);
++    return () => window.removeEventListener('xp-updated', handleXPUpdate);
++  }, [stats]);
++
++  if (!stats) return null;
++
++  return (
++    <>
++      {/* XP Bar - Top Right */}
++      <div className="fixed top-4 right-4 z-50 flex items-center gap-3 bg-gradient-to-r from-indigo-600/90 to-purple-600/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-white/20">
++        {/* Level Badge */}
++        <div className="flex items-center gap-2">
++          <div className="w-8 h-8 rounded-full bg-yellow-400 flex items-center justify-center font-black text-sm text-indigo-900">
++            {stats.level}
++          </div>
++          <div className="hidden sm:block">
++            <div className="text-xs text-white/70 leading-none">Level {stats.level}</div>
++            <div className="text-[10px] text-white/50 leading-none mt-0.5">{stats.title}</div>
++          </div>
++        </div>
++
++        {/* Progress Bar */}
++        <div className="w-32 sm:w-40 h-2 bg-white/20 rounded-full overflow-hidden">
++          <div 
++            className="h-full bg-gradient-to-r from-yellow-400 to-orange-400 transition-all duration-500 ease-out"
++            style={{ width: `${stats.progress}%` }}
++          />
++        </div>
++
++        {/* XP Text */}
++        <div className="text-xs font-bold text-white">
++          {stats.xpToNextLevel} XP
++        </div>
++
++        {/* Streak Fire */}
++        {stats.streak > 0 && (
++          <div className="text-lg">
++            🔥 <span className="text-xs font-bold text-orange-300">{stats.streak}</span>
++          </div>
++        )}
++      </div>
++
++      {/* Level Up Modal */}
++      {showLevelUp && (
++        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in-up">
++          <div className="bg-gradient-to-br from-yellow-400 via-orange-500 to-pink-500 p-1 rounded-3xl animate-glow">
++            <div className="bg-slate-900 rounded-3xl px-12 py-8 text-center">
++              <div className="text-6xl mb-4 animate-bounce">🎉</div>
++              <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 mb-2">
++                LEVEL UP!
++              </h2>
++              <p className="text-2xl font-bold text-white mb-1">Level {stats.level}</p>
++              <p className="text-sm text-white/60">{stats.title}</p>
++            </div>
++          </div>
++        </div>
++      )}
++    </>
++  );
++}
+diff --git a/src/services/xpService.ts b/src/services/xpService.ts
+new file mode 100644
+index 0000000..ba3d009
+--- /dev/null
++++ b/src/services/xpService.ts
+@@ -0,0 +1,151 @@
++/**
++ * XP Gamification Service
++ * 
++ * Simple localStorage-based XP and leveling system for kids.
++ * Keeps them motivated and engaged.
++ */
++
++const XP_KEY = 'starlink_xp';
++const LEVEL_KEY = 'starlink_level';
++const STREAK_KEY = 'starlink_streak';
++const LAST_ACTIVITY_KEY = 'starlink_last_activity';
++
++// XP required for each level (exponential growth)
++const XP_PER_LEVEL = [
++  0,    // Level 1
++  50,   // Level 2
++  150,  // Level 3
++  300,  // Level 4
++  500,  // Level 5
++  750,  // Level 6
++  1050, // Level 7
++  1400, // Level 8
++  1800, // Level 9
++  2250, // Level 10
++];
++
++export interface PlayerStats {
++  xp: number;
++  level: number;
++  streak: number;
++  xpToNextLevel: number;
++  progress: number; // 0-100
++  title: string;
++}
++
++/**
++ * Get current player stats
++ */
++export function getPlayerStats(): PlayerStats {
++  const xp = parseInt(localStorage.getItem(XP_KEY) || '0');
++  const level = parseInt(localStorage.getItem(LEVEL_KEY) || '1');
++  
++  const currentLevelXp = XP_PER_LEVEL[level - 1] || 0;
++  const nextLevelXp = XP_PER_LEVEL[level] || XP_PER_LEVEL[XP_PER_LEVEL.length - 1];
++  const xpInLevel = xp - currentLevelXp;
++  const xpNeeded = nextLevelXp - currentLevelXp;
++  
++  const progress = Math.min(100, Math.round((xpInLevel / xpNeeded) * 100));
++  const xpToNextLevel = nextLevelXp - xp;
++  
++  const streak = parseInt(localStorage.getItem(STREAK_KEY) || '0');
++  
++  return {
++    xp,
++    level,
++    streak,
++    xpToNextLevel: Math.max(0, xpToNextLevel),
++    progress,
++    title: getLevelTitle(level),
++  };
++}
++
++/**
++ * Award XP and check for level up
++ */
++export function awardXP(amount: number): { leveledUp: boolean; newLevel: number; totalXP: number } {
++  const stats = getPlayerStats();
++  const newXP = stats.xp + amount;
++  
++  localStorage.setItem(XP_KEY, newXP.toString());
++  
++  // Check for level up
++  let newLevel = stats.level;
++  while (newLevel < XP_PER_LEVEL.length && newXP >= XP_PER_LEVEL[newLevel]) {
++    newLevel++;
++  }
++  
++  const leveledUp = newLevel > stats.level;
++  
++  if (leveledUp) {
++    localStorage.setItem(LEVEL_KEY, newLevel.toString());
++  }
++  
++  // Update streak
++  updateStreak();
++  
++  return { leveledUp, newLevel, totalXP: newXP };
++}
++
++/**
++ * Update daily streak
++ */
++function updateStreak(): void {
++  const lastActivity = localStorage.getItem(LAST_ACTIVITY_KEY);
++  const today = new Date().toDateString();
++  
++  if (!lastActivity) {
++    // First activity
++    localStorage.setItem(STREAK_KEY, '1');
++    localStorage.setItem(LAST_ACTIVITY_KEY, today);
++    return;
++  }
++  
++  const lastDate = new Date(lastActivity);
++  const todayDate = new Date(today);
++  const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
++  
++  if (diffDays === 0) {
++    // Same day, no change
++    return;
++  } else if (diffDays === 1) {
++    // Consecutive day, increment streak
++    const currentStreak = parseInt(localStorage.getItem(STREAK_KEY) || '0');
++    localStorage.setItem(STREAK_KEY, (currentStreak + 1).toString());
++  } else {
++    // Streak broken, reset
++    localStorage.setItem(STREAK_KEY, '1');
++  }
++  
++  localStorage.setItem(LAST_ACTIVITY_KEY, today);
++}
++
++/**
++ * Get level title (Slovak kid-friendly titles)
++ */
++function getLevelTitle(level: number): string {
++  const titles = [
++    'Kozmický Nováčik',    // Level 1
++    'Hviezdny Študent',     // Level 2
++    'Galaktický Prieskumník', // Level 3
++    'Planetárny Majster',   // Level 4
++    'Vesmírny Génius',      // Level 5
++    'Supernova Talent',     // Level 6
++    'Čierna Diera Múdrosti', // Level 7
++    'Kvazárový Expert',     // Level 8
++    'Galaxový Profesor',    // Level 9
++    'Vesmírny Maestro',     // Level 10
++  ];
++  
++  return titles[level - 1] || titles[titles.length - 1];
++}
++
++/**
++ * Reset all progress (for testing or user request)
++ */
++export function resetProgress(): void {
++  localStorage.removeItem(XP_KEY);
++  localStorage.removeItem(LEVEL_KEY);
++  localStorage.removeItem(STREAK_KEY);
++  localStorage.removeItem(LAST_ACTIVITY_KEY);
++}

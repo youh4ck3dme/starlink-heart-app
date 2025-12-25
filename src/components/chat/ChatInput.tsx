@@ -27,8 +27,9 @@ export default function ChatInput({
     appBackground,
     fileInputRef,
     onSubmit,
-    onOpenCamera
-}: ChatInputProps) {
+    onOpenCamera,
+    voiceMode
+}: ChatInputProps & { voiceMode: any }) {
     return (
         <footer className="shrink-0 p-4">
             <div className={`${appBackground.glass} backdrop-blur-xl rounded-[2rem] shadow-2xl p-2 border border-white/40 transition-all duration-300 ${isTeacherCloneMode ? 'ring-2 ring-indigo-500 shadow-indigo-500/20' : ''}`}>
@@ -66,6 +67,17 @@ export default function ChatInput({
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                         </button>
+                        {/* Mic Button */}
+                        {voiceMode.isEnabled && voiceMode.isSupported && (
+                            <button 
+                                type="button" 
+                                onClick={voiceMode.isListening ? voiceMode.stopListening : () => voiceMode.startListening(setNewMessage)} 
+                                className={`p-2 transition-colors ${voiceMode.isListening ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-sky-600'}`}
+                                title="Diktovať správu"
+                            >
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+                            </button>
+                        )}
                         <button type="button" onClick={() => fileInputRef.current?.click()} className="p-2 text-gray-500 hover:text-sky-600 transition-colors">
                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -82,7 +94,7 @@ export default function ChatInput({
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); onSubmit(e); } }}
-                            placeholder={isTeacherCloneMode ? "Režim Učiteľa: Pošli úlohu..." : "Spýtaj sa Starryho..."}
+                            placeholder={voiceMode.isListening ? "Počúvam..." : (isTeacherCloneMode ? "Režim Učiteľa: Pošli úlohu..." : "Spýtaj sa Starryho...")}
                             className="flex-1 bg-transparent border-none focus:ring-0 py-3 px-2 text-gray-800 placeholder-gray-500 resize-none max-h-24"
                             rows={1}
                         />
