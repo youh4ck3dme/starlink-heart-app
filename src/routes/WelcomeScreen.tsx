@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import heroImg from '../assets/image.png';
+import Starry3D from '../components/mascot/Starry3D';
 
 // Floating particles config (limited for performance)
 const PARTICLES = [
@@ -123,12 +124,10 @@ export default function WelcomeScreen() {
           {/* Glow behind image */}
           <div className="absolute inset-[-20%] rounded-full bg-blue-500/20 blur-3xl animate-glow" />
           
-          {/* Hero Image */}
-          <img 
-            src={heroImg} 
-            alt="Starlink Heart" 
-            className="relative z-10 w-full h-full object-contain drop-shadow-2xl"
-          />
+          {/* Hero Image / 3D Mascot */}
+          <div className="relative w-full h-full z-10">
+            <Starry3D className="w-full h-full" />
+          </div>
         </div>
       </div>
 

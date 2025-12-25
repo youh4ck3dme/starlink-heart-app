@@ -11,6 +11,7 @@ interface SettingsModalProps {
   initialAvatar?: string;
   initialTheme?: string;
   initialApiKey?: string;
+  initial3DEnabled?: boolean;
 }
 
 const AVATARS = [
@@ -41,13 +42,21 @@ export default function SettingsModal({
   initialAvatar = "iskra",
   initialTheme = "light",
   initialApiKey = "",
+  initial3DEnabled = false,
 }: SettingsModalProps) {
   const [selectedAvatar, setSelectedAvatar] = useState(initialAvatar);
   const [theme, setTheme] = useState(initialTheme);
   const [apiKey, setApiKey] = useState(initialApiKey);
+  const [enable3D, setEnable3D] = useState(() => localStorage.getItem('enable3DMascot') === 'true');
 
   const handleSave = () => {
     onSave({ selectedAvatar, theme, apiKey });
+    // Save 3D setting directly to localStorage
+    localStorage.setItem('enable3DMascot', String(enable3D));
+    // Reload to apply changes cleanly if changed
+    if (localStorage.getItem('enable3DMascot') !== String(initial3DEnabled)) {
+      window.location.reload();
+    }
     onClose();
   };
 
@@ -194,6 +203,32 @@ export default function SettingsModal({
               <div className="mt-2 text-xs text-black/45">
                 Ak necháš prázdne, použije sa demo kľúč. (Na produkciu odporúčam vlastný.)
               </div>
+            </div>
+          </section>
+
+          {/* SECTION: 3D MASCOT (BETA) */}
+          <section className="rounded-2xl border border-black/5 bg-gradient-to-r from-indigo-50 to-purple-50 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-xs font-bold tracking-widest text-indigo-900/60">3D MASKOT (BETA)</div>
+                <div className="text-sm font-semibold text-indigo-900 mt-1">Prof. StarLink v 3D</div>
+              </div>
+              
+              <button
+                onClick={() => setEnable3D(!enable3D)}
+                className={`relative w-12 h-7 rounded-full transition-colors duration-300 ${
+                  enable3D ? 'bg-indigo-600' : 'bg-black/10'
+                }`}
+              >
+                <div 
+                  className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
+                    enable3D ? 'translate-x-5' : 'translate-x-0'
+                  }`} 
+                />
+              </button>
+            </div>
+            <div className="mt-2 text-xs text-indigo-900/50">
+              Viac efektov, môže viac žrať batériu. Vyžaduje reštart apky.
             </div>
           </section>
 

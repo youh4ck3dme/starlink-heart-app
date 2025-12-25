@@ -6,6 +6,7 @@ import { Heart } from '../types';
 import { generateCosmicResponse, getStarryTip, generateCosmicHint, generateParentGuide } from '../services/geminiService';
 import { hasParentConsent, setParentConsent, clearAllAppData } from '../services/consentService';
 import ParentNotice from './ParentNotice';
+import Starry3D from './mascot/Starry3D';
 
 // Define Avatars with Names
 const AVATAR_OPTIONS = [
@@ -176,6 +177,12 @@ const DashboardScreen = ({
                     <span className="text-2xl">{avatar}</span>
                     <span className={`font-bold ${textColor}`}>Kadet</span>
                  </div>
+                 
+                 {/* Compact Mascot */}
+                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.3)] bg-gradient-to-b from-indigo-500/30 to-purple-600/30 backdrop-blur-md">
+                    <Starry3D className="w-full h-full" />
+                 </div>
+
                  <div className="flex items-center gap-1.5 bg-yellow-400/20 px-3 py-1.5 rounded-full border border-yellow-400/30">
                     <span className="text-xl">💎</span>
                     <span className={`font-bold ${textColor === 'text-white' ? 'text-yellow-200' : 'text-yellow-700'}`}>{gems}</span>
