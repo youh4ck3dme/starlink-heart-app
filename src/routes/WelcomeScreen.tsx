@@ -112,7 +112,7 @@ export default function WelcomeScreen() {
         ))}
       </div>
 
-      {/* Layer 3: Full-Screen Hero Background Image */}
+      {/* Layer 3: Hero Image - DISABLED for background testing
       <div 
         className="absolute inset-0 transition-transform duration-200 ease-out will-change-transform"
         style={{ 
@@ -127,9 +127,9 @@ export default function WelcomeScreen() {
           className="w-full h-full object-cover object-center"
           loading="eager"
         />
-        {/* Subtle glow overlay */}
         <div className="absolute inset-0 bg-blue-500/10 mix-blend-overlay pointer-events-none" />
       </div>
+      */}
 
       {/* Layer 4: Gradient Overlay (bottom fade) */}
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent pointer-events-none" />

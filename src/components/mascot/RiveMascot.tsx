@@ -19,9 +19,13 @@ export default function RiveMascot({
     autoplay: true,
   });
 
-  // If Rive fails to load, show nothing (will fallback gracefully)
+  // If Rive fails to load, show fallback emoji
   if (!RiveComponent) {
-    return null;
+    return (
+      <div className={className} style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <span style={{ fontSize: "3rem" }}>✨</span>
+      </div>
+    );
   }
 
   return (

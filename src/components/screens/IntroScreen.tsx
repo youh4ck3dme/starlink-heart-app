@@ -9,7 +9,7 @@ interface IntroScreenProps {
 
 const IntroScreen: React.FC<IntroScreenProps> = ({ onStart, avatar, textColor }) => {
     return (
-        <div className="flex flex-col items-center justify-center h-full animate-fade-in-up text-center p-6 pb-20">
+        <div className="flex flex-col items-center justify-center min-h-full h-full animate-fade-in-up text-center p-6">
             <div className="mb-8">
                 <StarryAvatarDisplay avatar={avatar} isExcited={true} size="text-[8rem]" />
             </div>

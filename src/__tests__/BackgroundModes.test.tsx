@@ -317,13 +317,15 @@ describe('Mascot Modes', () => {
         localStorage.setItem('hasStarted', 'true');
     });
 
-    it('renders mascot with default mode', async () => {
+    it('renders with avatar display on dashboard', async () => {
         render(<StarlinkHeartApp />);
         fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
         
         await waitFor(() => {
-            const mascot = screen.getByTestId('mascot-renderer');
-            expect(mascot).toBeInTheDocument();
+            // Dashboard should show avatar emoji, not mascot-renderer
+            // (MascotRenderer was replaced with avatar display in top bar)
+            const avatars = screen.getAllByText('✨');
+            expect(avatars.length).toBeGreaterThanOrEqual(1);
         });
     });
 

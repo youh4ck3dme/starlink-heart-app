@@ -34,12 +34,9 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
                     <span className={`font-bold ${textColor}`}>Kadet</span>
                  </div>
                  
-                 {/* Compact Mascot */}
-                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.3)] bg-gradient-to-b from-indigo-500/30 to-purple-600/30 backdrop-blur-md">
-                    <MascotRenderer 
-                        mode={mascotMode} 
-                        className="w-full h-full" 
-                    />
+                 {/* Compact Avatar Display - shows selected avatar */}
+                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.3)] bg-gradient-to-b from-indigo-500/30 to-purple-600/30 backdrop-blur-md flex items-center justify-center">
+                    <span className="text-2xl">{avatar}</span>
                  </div>
 
                  <div className="flex items-center gap-1.5 bg-yellow-400/20 px-3 py-1.5 rounded-full border border-yellow-400/30">
