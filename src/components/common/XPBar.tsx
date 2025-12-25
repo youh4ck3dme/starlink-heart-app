@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { getPlayerStats, type PlayerStats } from '../../services/xpService';
 import ProfileModal from './ProfileModal';
 
@@ -11,19 +11,28 @@ export default function XPBar() {
   const prevLevelRef = useRef<number>(0);
 
   useEffect(() => {
+    // Prevent state updates after component unmounts (fixes infinite loop in StrictMode)
+    let isMounted = true;
+    
     // Load initial stats
     const initialStats = getPlayerStats();
-    setStats(initialStats);
-    prevLevelRef.current = initialStats.level;
+    if (isMounted) {
+      setStats(initialStats);
+      prevLevelRef.current = initialStats.level;
+    }
 
-    // Listen for XP updates
+    // Listen for XP updates - handler is stable and won't cause re-renders
     const handleXPUpdate = () => {
+      if (!isMounted) return; // Guard against updates after unmount
+      
       const newStats = getPlayerStats();
       
       // Check for level up using ref to avoid dependency cycle
       if (newStats.level > prevLevelRef.current) {
         setShowLevelUp(true);
-        setTimeout(() => setShowLevelUp(false), 3000);
+        setTimeout(() => {
+          if (isMounted) setShowLevelUp(false);
+        }, 3000);
       }
       
       prevLevelRef.current = newStats.level;
@@ -31,8 +40,13 @@ export default function XPBar() {
     };
 
     window.addEventListener('xp-updated', handleXPUpdate);
-    return () => window.removeEventListener('xp-updated', handleXPUpdate);
-  }, []); // Empty dependency array prevents infinite loop
+    
+    // Cleanup: remove listener and mark as unmounted
+    return () => {
+      isMounted = false;
+      window.removeEventListener('xp-updated', handleXPUpdate);
+    };
+  }, []); // Empty dependency array - runs once on mount
 
   if (!stats) return null;
 

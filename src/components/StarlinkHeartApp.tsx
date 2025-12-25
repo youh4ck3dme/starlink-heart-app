@@ -533,7 +533,7 @@ const StarlinkHeartApp: React.FC = () => {
     return (
         <>
             {/* Main Layout Container */}
-            <div className={`flex flex-col h-full h-[100dvh] transition-colors duration-700 ${appBackground.className} ${appBackground.textColor}`}>
+            <div className={`flex flex-col min-h-dvh transition-colors duration-700 ${appBackground.className} ${appBackground.textColor}`}>
                 
                 {/* Header - Glassmorphic (Only in Chat) */}
                 {viewMode === 'chat' && (
@@ -586,7 +586,7 @@ const StarlinkHeartApp: React.FC = () => {
                     />
                 )}
 
-                /* --- CHAT VIEW --- */
+                {/* --- CHAT VIEW --- */}
                 {viewMode === 'chat' && (
                 <ChatView 
                     hearts={hearts}
@@ -754,6 +754,40 @@ const StarlinkHeartApp: React.FC = () => {
                                     </button>
                                 );
                             })}
+                        </div>
+
+                        {/* Voice Mode Toggle */}
+                        <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <div className="text-xs font-bold tracking-wider text-emerald-700 uppercase flex items-center gap-2">
+                                        🎤 Hlasový režim
+                                    </div>
+                                    <div className="text-sm font-medium text-emerald-900 mt-0.5">
+                                        {voiceMode.isSupported ? 'Diktovanie a čítanie' : 'Nepodporované'}
+                                    </div>
+                                </div>
+                                {voiceMode.isSupported && (
+                                    <button
+                                        onClick={() => voiceMode.toggleVoiceMode(!voiceMode.isEnabled)}
+                                        className={`relative w-14 h-8 rounded-full transition-colors duration-200 ${
+                                            voiceMode.isEnabled ? 'bg-emerald-600' : 'bg-gray-300'
+                                        }`}
+                                        aria-label={voiceMode.isEnabled ? "Vypnúť hlasový režim" : "Zapnúť hlasový režim"}
+                                    >
+                                        <div 
+                                            className={`absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-200 ${
+                                                voiceMode.isEnabled ? 'translate-x-6' : 'translate-x-0'
+                                            }`} 
+                                        />
+                                    </button>
+                                )}
+                            </div>
+                            <p className="mt-2 text-xs text-emerald-700/70">
+                                {voiceMode.isSupported 
+                                    ? 'Hovor do mikrofónu a Starlink ti bude odpovedať nahlas.' 
+                                    : 'Tvoj prehliadač nepodporuje hlasové funkcie.'}
+                            </p>
                         </div>
 
                         {/* Custom API Key Section */}

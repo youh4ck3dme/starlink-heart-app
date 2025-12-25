@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
-import heroImg from '../assets/image.png';
-import Starry3D from '../components/mascot/Starry3D';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import heroImg from '../assets/welcome-hero.webp';
 
 // Floating particles config (limited for performance)
 const PARTICLES = [
@@ -22,6 +22,7 @@ const STARS = Array.from({ length: 12 }, (_, i) => ({
 }));
 
 export default function WelcomeScreen() {
+  const navigate = useNavigate();
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
@@ -74,7 +75,7 @@ export default function WelcomeScreen() {
 
   return (
     <div 
-      className="relative min-h-[100svh] w-full overflow-hidden bg-[#060819] text-white"
+      className="relative min-h-dvh w-full overflow-hidden bg-[#060819] text-white"
       onPointerMove={handlePointerMove}
     >
       {/* Layer 1: Animated Stars Background */}
@@ -111,35 +112,38 @@ export default function WelcomeScreen() {
         ))}
       </div>
 
-      {/* Layer 3: Hero Image with Parallax + Float + Glow */}
+      {/* Layer 3: Full-Screen Hero Background Image */}
       <div 
-        className="absolute inset-0 flex items-center justify-center transition-transform duration-200 ease-out will-change-transform"
+        className="absolute inset-0 transition-transform duration-200 ease-out will-change-transform"
         style={{ 
           transform: prefersReducedMotion 
             ? 'none' 
-            : `translate3d(${offset.x}px, ${offset.y}px, 0)` 
+            : `translate3d(${offset.x}px, ${offset.y}px, 0) scale(1.05)` 
         }}
       >
-        <div className="relative w-[80%] max-w-[400px] aspect-square animate-float">
-          {/* Glow behind image */}
-          <div className="absolute inset-[-20%] rounded-full bg-blue-500/20 blur-3xl animate-glow" />
-          
-          {/* Hero Image / 3D Mascot */}
-          <div className="relative w-full h-full z-10">
-            <Starry3D className="w-full h-full" />
-          </div>
-        </div>
+        <img 
+          src={heroImg}
+          alt="Starlink Heart Hero"
+          className="w-full h-full object-cover object-center"
+          loading="eager"
+        />
+        {/* Subtle glow overlay */}
+        <div className="absolute inset-0 bg-blue-500/10 mix-blend-overlay pointer-events-none" />
       </div>
 
       {/* Layer 4: Gradient Overlay (bottom fade) */}
       <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent pointer-events-none" />
 
       {/* Layer 5: Content */}
-      <div className="relative z-20 min-h-[100svh] flex flex-col items-center justify-end safe-area-bottom px-6 pb-8 sm:pb-12">
+      <div className="relative z-20 min-h-dvh flex flex-col items-center justify-end safe-area-bottom px-6 pb-8 sm:pb-12">
         
         {/* CTA Button with Glow */}
         <button 
-          onClick={() => window.location.href = '/home'}
+          onClick={() => {
+            // Mark user as started to persist navigation state
+            localStorage.setItem('hasStarted', 'true');
+            navigate('/home');
+          }}
           className="group relative w-full max-w-[300px] flex items-center justify-center px-8 py-5 
                      bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 
                      text-white font-black text-xl tracking-wider uppercase
