@@ -1,5 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Heart } from "../types";
+import { checkInputSafety, getSafetyBlockMessage } from "./safetyFilter";
 
 const getApiKey = () => {
     return localStorage.getItem('custom_api_key') || process.env.API_KEY;
@@ -49,6 +50,17 @@ const handleApiError = (error: unknown) => {
 };
 
 export const generateCosmicResponse = async (prompt: string, conversationHistory: Heart[], imageFile?: File, isTeacherCloneMode: boolean = false): Promise<{ textResponse: string; visualAids: string[] }> => {
+    // --- Safety Filter: Check input before processing ---
+    const safetyCheck = checkInputSafety(prompt);
+    if (safetyCheck.blocked) {
+        return { 
+            textResponse: getSafetyBlockMessage(safetyCheck.reason || 'unknown'), 
+            visualAids: ['🛡️', '💙'] 
+        };
+    }
+    // Use filtered prompt (PII removed if detected)
+    const safePrompt = safetyCheck.filtered;
+
     // Initialize AI with the environment variable directly as per new standards
     const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
@@ -57,7 +69,7 @@ export const generateCosmicResponse = async (prompt: string, conversationHistory
             h.aiResponse ? `AI (Kouč): ${h.aiResponse.textResponse}` : `Dieťa: ${h.message}`
         ).join('\n');
 
-        const fullPrompt = historyContext ? `História konverzácie:\n${historyContext}\n\nAktuálna otázka: ${prompt}` : prompt;
+        const fullPrompt = historyContext ? `História konverzácie:\n${historyContext}\n\nAktuálna otázka: ${safePrompt}` : safePrompt;
 
         const parts: any[] = [{ text: fullPrompt }];
 
