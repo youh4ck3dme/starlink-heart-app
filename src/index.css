@@ -2,12 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-html, body {
+html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
 }
 
-#root {
-  min-height: 100vh;
+body {
+  min-height: 100svh;
+  background: linear-gradient(180deg, #eaf3ff 0%, #ffffff 70%);
 }

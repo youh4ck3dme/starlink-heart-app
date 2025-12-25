@@ -68,7 +68,6 @@ export default function WelcomeScreen() {
         {/* Premium CTA Button */}
         <button 
           onClick={() => {
-            localStorage.setItem('hasStarted', '1');
             window.location.href = '/home';
           }}
           className="group relative w-full max-w-[280px] flex items-center justify-center px-8 py-5 
