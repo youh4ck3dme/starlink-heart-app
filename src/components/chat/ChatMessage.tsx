@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Heart } from '../../types';
 
 // FormatText helper - handles [[...]], **...**, *...* syntax
@@ -43,7 +43,8 @@ interface ChatMessageProps {
     allHearts: Heart[];
 }
 
-export default function ChatMessage({
+// Memoize to prevent re-renders when other messages update
+export default memo(function ChatMessage({
     heart,
     index,
     starryAvatar,
@@ -140,4 +141,5 @@ export default function ChatMessage({
             )}
         </div>
     );
-}
+});
+

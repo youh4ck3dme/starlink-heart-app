@@ -1,4 +1,4 @@
-import React, { RefObject } from 'react';
+import React, { RefObject, useMemo, useCallback } from 'react';
 import { Heart } from '../../types';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
@@ -76,7 +76,8 @@ export default function ChatView({
                     </div>
                 )}
                 
-                {hearts.map((heart, idx) => (
+                {/* Memoized message list to prevent unnecessary re-renders */}
+                {useMemo(() => hearts.map((heart, idx) => (
                     <ChatMessage
                         key={heart.id || heart.localId}
                         heart={heart}
@@ -91,7 +92,7 @@ export default function ChatView({
                         allHearts={hearts}
                         voiceMode={voiceMode}
                     />
-                ))}
+                )), [hearts, starryAvatar, appBackground, hintLoadingId, parentGuideLoadingId, onGetHint, onParentGuide, voiceMode])}
                 
                 {/* Sending indicator */}
                 {isSending && (
