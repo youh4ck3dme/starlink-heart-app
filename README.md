@@ -1,40 +1,61 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Starlink Heart - AI Tutor App
 
-# Starlink Heart - AI EdTech Homework Helper
+## 🚀 Quick Start
 
-Aplikácia, ktorá pomáha deťom s domácimi úlohami pomocou umelej inteligencie (Gemini AI).
+```bash
+npm install
+npm run dev      # Development server (http://localhost:5173)
+npm run build    # Production build
+npm run test     # Run tests
+npm run coverage # Test coverage report
+```
 
-## Ako spustiť aplikáciu lokálne
+## 📁 Project Structure
 
-1. **Inštalácia závislostí:**
-   ```bash
-   npm install
-   ```
-   *Poznámka: Ak narazíte na problémy s verziou `google-genai`, spustite `npm install` znova, konflikt sme vyriešili.*
+```
+src/
+├── components/
+│   ├── screens/           # IntroScreen, DashboardScreen
+│   ├── chat/              # ChatView, ChatInput, ChatMessage
+│   ├── common/            # StarryAvatarDisplay, ErrorBoundary
+│   ├── mascot/            # MascotRenderer, RiveMascot, Starry3D
+│   ├── layout/            # Header, LiveStarryBackground
+│   └── StarlinkHeartApp.tsx  # Main app component
+├── services/
+│   ├── geminiService.ts   # Google Gemini AI integration
+│   ├── localService.ts    # Firebase mock for local dev
+│   └── consentService.ts  # Parent consent handling
+├── hooks/
+│   └── useVoiceMode.ts    # Speech recognition hook
+├── routes/
+│   └── WelcomeScreen.tsx  # Landing page
+├── __tests__/             # Unit tests (Vitest)
+└── types.ts               # TypeScript types
+```
 
-2. **Spustenie aplikácie:**
-   ```bash
-   npm run dev
-   ```
-   Aplikácia pobeží na `http://localhost:5173`.
+## 🧪 Testing
 
-## Funkcie
+- **Framework:** Vitest + React Testing Library
+- **Coverage:** ~70%
+- **Test files:** 15 (132 tests)
 
-### 🏠 Lokálna Databáza (Zero Config)
-Aplikácia je nakonfigurovaná na **lokálny režim**.
-- Všetky správy a obrázky sa ukladajú **iba vo vašom prehliadači** (LocalStorage & IndexedDB).
-- Nie je potrebné nastavovať Firebase ani cloudové služby.
-- Dáta ostanú zachované aj po obnovení stránky.
+### Key Test Files:
+- `BackgroundModes.test.tsx` - Background/avatar switching
+- `VisualFallbacks.test.tsx` - Empty canvas/fallback detection
+- `CoolFeatures.test.tsx` - Gem shop, voice mode, PWA
 
-### 🔑 Vlastný API Kľúč
-Aplikácia má prednastavený demo kľúč. Pre produkčné použitie alebo ak narazíte na limity:
-1. Kliknite na **ozubené koliesko** (Nastavenia) v aplikácii.
-2. Zadajte svoj **Gemini API Key** do poľa "Vlastný API Kľúč".
-3. Kliknite "Uložiť". Aplikácia bude odteraz používať váš kľúč.
+## ⚠️ Known Issues to Check
 
-### 🧠 Režimy
-- **Hravý Starlink:** Zábavný sprievodca pre bežné otázky.
-- **Teacher Clone:** Špeciálny režim pre vysvetľovanie učiva (Hejného metóda, Montessori).
-- **Rodičovský prekladač:** Preloží školské zadanie do "reči dospelých" a poradí rodičom, ako pomôcť.
+1. **MascotRenderer** - May show empty canvas if Rive/Spline fails
+2. **WelcomeScreen** - Hero image currently disabled for testing
+3. **Large chunks** - physics.js and spline-vendor.js exceed 600kB
+
+## 🔧 Tech Stack
+
+- React 18 + TypeScript
+- Vite (build tool)
+- Tailwind CSS
+- Firebase (Firestore, Storage)
+- Google Gemini AI
+- Rive animations
+- Spline 3D (optional)

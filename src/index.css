@@ -2,19 +2,279 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .animate-fade-in-up {
-    animation: fadeInUp 0.8s ease-out forwards;
+/* ===== GLOBAL MOBILE-FIRST LAYOUT ===== */
+/* DO NOT remove d/svh handling (prevents mobile white gaps) */
+
+:root {
+  /* Safe area fallbacks */
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  
+  /* App gradient colors */
+  --bg-gradient-start: #eaf3ff;
+  --bg-gradient-end: #ffffff;
+  
+  /* Dark theme - primary app background */
+  --bg-dark: #060819;
+}
+
+/* 
+ * Modern viewport height handling:
+ * 1. dvh = dynamic viewport height (accounts for mobile browser chrome)
+ * 2. svh = small viewport height (fallback for older browsers)
+ * 3. 100% = final fallback for legacy browsers
+ */
+html {
+  height: 100%;
+  height: 100svh;
+  height: 100dvh;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  min-height: 100svh;
+  min-height: 100dvh;
+  /* Dark background to prevent white gaps on ANY screen */
+  background: var(--bg-dark);
+  /* Smooth font rendering */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100%;
+  min-height: 100svh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  /* Ensure root also has dark bg as backup */
+  background: var(--bg-dark);
+}
+
+/* ===== SAFE AREA UTILITIES ===== */
+
+.safe-area-top {
+  padding-top: max(1rem, var(--sat));
+}
+
+.safe-area-bottom {
+  padding-bottom: max(1rem, var(--sab));
+}
+
+.safe-area-x {
+  padding-left: max(1rem, var(--sal));
+  padding-right: max(1rem, var(--sar));
+}
+
+.safe-area-all {
+  padding-top: max(1rem, var(--sat));
+  padding-bottom: max(1rem, var(--sab));
+  padding-left: max(1rem, var(--sal));
+  padding-right: max(1rem, var(--sar));
+}
+
+/* ===== APP CONTAINER ===== */
+
+.app-container {
+  width: 100%;
+  max-width: 480px; /* Optimal mobile width */
+  margin: 0 auto;
+  padding-left: max(1rem, var(--sal));
+  padding-right: max(1rem, var(--sar));
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    max-width: 640px;
   }
 }
 
-@keyframes fadeInUp {
-  from {
+/* ===== PREVENT LAYOUT SHIFT ===== */
+
+html, body {
+  overflow-x: hidden;
+  overscroll-behavior-y: none;
+}
+
+/* ===== THEME BACKGROUNDS ===== */
+
+/* Deep Space - Dark starry gradient */
+.bg-deep-space {
+  background: linear-gradient(135deg, #0b1226 0%, #1a1a3e 30%, #0d1b2a 60%, #060819 100%);
+  background-attachment: fixed;
+}
+
+/* Mars Sunset - Warm orange/red tones */
+.bg-mars-sunset {
+  background: linear-gradient(180deg, #1a0a0a 0%, #3d1c1c 25%, #8b3a3a 50%, #c85a17 75%, #ff6b35 100%);
+  background-attachment: fixed;
+}
+
+/* Galaxy Swirl - Purple/pink cosmic gradient */
+.bg-galaxy-swirl {
+  background: linear-gradient(135deg, #0f0c29 0%, #302b63 35%, #24243e 65%, #1a0033 100%);
+  background-attachment: fixed;
+}
+
+/* ===== WELCOME SCREEN ANIMATIONS ===== */
+
+/* Slow floating effect for hero */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Comet Animation */
+@keyframes shooting-star {
+  0% {
+    transform: translateX(0) translateY(0) rotate(-45deg) scale(0);
     opacity: 0;
-    transform: translateY(20px);
   }
-  to {
+  10% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(-50px) translateY(50px) rotate(-45deg) scale(1);
   }
+  20% {
+    opacity: 0;
+    transform: translateX(-300px) translateY(300px) rotate(-45deg) scale(0.5);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(0) translateY(0) rotate(-45deg) scale(0);
+  }
+}
+
+.animate-comet {
+  animation: shooting-star 8s ease-in-out infinite;
+  animation-delay: 2s; /* Start after a brief pause */
+}
+
+/* Gentle glow pulse */
+@keyframes glow-pulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 
+                0 0 60px rgba(59, 130, 246, 0.1);
+  }
+  50% { 
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.5), 
+                0 0 100px rgba(59, 130, 246, 0.2);
+  }
+}
+
+.animate-glow {
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+/* Particle drift (floating letters) */
+@keyframes particle-drift {
+  0% { 
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% { opacity: 0.7; }
+  90% { opacity: 0.7; }
+  100% { 
+    transform: translateY(-100vh) translateX(50px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-particle {
+  animation: particle-drift linear infinite;
+}
+
+/* Shine sweep effect */
+@keyframes shine {
+  0% { left: -100%; }
+  50%, 100% { left: 200%; }
+}
+
+/* Fade in up animation */
+@keyframes fade-in-up {
+  0% { 
+    opacity: 0; 
+    transform: translateY(30px); 
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+}
+
+/* Twinkle for stars */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.animate-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+/* ===== REDUCED MOTION ===== */
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-glow,
+  .animate-particle,
+  .animate-twinkle,
+  .animate-fade-in-up {
+    animation: none !important;
+  }
+  
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== SETTINGS SPARKLE ANIMATIONS ===== */
+
+@keyframes sh-sparkle-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes sh-sparkle-pulse {
+  0%, 100% { opacity: 0.35; transform: scale(0.98); }
+  50% { opacity: 0.75; transform: scale(1.02); }
+}
+
+@keyframes sh-twinkle {
+  0%, 100% { opacity: 0.25; transform: translateY(0); }
+  50% { opacity: 0.9; transform: translateY(-2px); }
+}
+
+.animate-sh-sparkleRotate { animation: sh-sparkle-rotate 10s linear infinite; }
+.animate-sh-sparklePulse { animation: sh-sparkle-pulse 1.9s ease-in-out infinite; }
+.animate-sh-twinkle { animation: sh-twinkle 1.4s ease-in-out infinite; }
+
+/* ===== VOICE RECORDING MODAL ANIMATIONS ===== */
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+
+@keyframes scale-in {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.animate-wave {
+  animation: wave 0.6s ease-in-out infinite;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
 }

@@ -1,13 +1,34 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
 import App from './App';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+// 🔧 DEV MODE: Set 999 gems and unlock all items for testing
+if (import.meta.env.DEV) {
+  localStorage.setItem('starryGems', '999');
+  localStorage.setItem('unlockedAvatars', JSON.stringify(['✨', '🚀', '🤖', '🧠', '💡']));
+  localStorage.setItem('unlockedBackgrounds', JSON.stringify(['sky', 'space', 'mars', 'galaxy']));
+  console.log('🔧 DEV MODE: Gems = 999, All avatars & backgrounds unlocked');
+}
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <ErrorBoundary>
       <App />
-    </BrowserRouter>
-  </React.StrictMode>
+    </ErrorBoundary>
+  </React.StrictMode>,
 );
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('SW registered:', registration.scope);
+      })
+      .catch((error) => {
+        console.log('SW registration failed:', error);
+      });
+  });
+}

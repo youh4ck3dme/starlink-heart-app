@@ -1,27 +1,17 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import StarlinkHeartApp from '../components/StarlinkHeartApp'; // Integrating the existing app
+import StarlinkHeartApp from '../components/StarlinkHeartApp';
+import XPBar from '../components/common/XPBar';
 
-const Home: React.FC = () => {
-  const navigate = useNavigate();
-
+export default function Home() {
   return (
-    <div className="relative h-screen flex flex-col">
-      {/* Back Button Overlay */}
-      <div className="absolute top-4 left-4 z-50">
-        <button 
-          onClick={() => navigate('/')}
-          className="bg-black/20 hover:bg-black/40 text-white/50 hover:text-white px-4 py-2 rounded-full backdrop-blur-sm transition-all text-sm font-medium border border-white/10"
-        >
-          ← Späť na hlavnú
-        </button>
-      </div>
-
-      {/* We render the actual app here so functionality isn't lost, 
-          but technically this serves as the "Home" page requested. */}
+    <div className="flex-1 min-h-dvh w-full flex flex-col bg-[#060819]">
+      {/* XP Bar Overlay */}
+      <XPBar />
+      
+      {/* 
+        Main app wrapper with proper mobile layout.
+        StarlinkHeartApp handles its own internal layout.
+      */}
       <StarlinkHeartApp />
     </div>
   );
-};
-
-export default Home;
+}
