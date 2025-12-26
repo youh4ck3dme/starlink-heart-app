@@ -106,6 +106,7 @@ const FormatText = ({ text }: { text: string }) => {
 
 
 import StarryAvatarDisplay from './common/StarryAvatarDisplay';
+import XPBar from './common/XPBar';
 
 // IntroScreen and DashboardScreen are now imported from ./screens/
 
@@ -485,6 +486,9 @@ const StarlinkHeartApp: React.FC = () => {
                     <LiveStarryBackground />
                 )}
 
+                {/* XP Bar - Visible only after Intro */}
+                {viewMode !== 'intro' && <XPBar />}
+
                 {/* Header - Unified Glassmorphic Component */}
                 {viewMode === 'chat' && (
                     <Header
@@ -622,7 +626,7 @@ const StarlinkHeartApp: React.FC = () => {
                                 </div>
                             </div>
 
-                            <button onClick={() => setShowProfileModal(false)} className="w-full bg-gray-900 text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition-colors">
+                            <button onClick={() => setShowProfileModal(false)} data-testid="close-profile-btn" className="w-full bg-gray-900 text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition-colors">
                                 Zatvoriť
                             </button>
                         </div>
@@ -650,7 +654,7 @@ const StarlinkHeartApp: React.FC = () => {
             {showCustomizeModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in-up">
                     <div className="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-                        <button onClick={() => setShowCustomizeModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-2xl">&times;</button>
+                        <button onClick={() => setShowCustomizeModal(false)} data-testid="close-settings-btn" className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-2xl">&times;</button>
                         
                         <h3 className="text-lg font-bold text-gray-800 mb-6 text-center">Vzhľad a Téma</h3>
                         

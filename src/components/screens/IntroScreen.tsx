@@ -1,48 +1,52 @@
-import React from 'react';
-import StarryAvatarDisplay from '../common/StarryAvatarDisplay';
+import React, { useRef, useState, useEffect } from 'react';
+import starryVideo from './starry.mp4';
 
 interface IntroScreenProps {
     onStart: () => void;
-    avatar: string;
-    textColor: string;
+    avatar: string; // Kept for compatibility but unused
+    textColor: string; // Kept for compatibility but unused
 }
 
-const IntroScreen: React.FC<IntroScreenProps> = ({ onStart, avatar, textColor }) => {
+const IntroScreen: React.FC<IntroScreenProps> = ({ onStart }) => {
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const [isVideoEnded, setIsVideoEnded] = useState(false);
+
+    const handleVideoEnd = () => {
+        setIsVideoEnded(true);
+        if (videoRef.current) {
+            videoRef.current.pause(); // Ensure it stops
+        }
+    };
+
+    // Fallback: If video takes too long to load or fails, show button after 5s?
+    // Or just let it be.
+
     return (
-        <div className="flex flex-col items-center justify-center min-h-[100dvh] w-full animate-fade-in-up text-center p-6 relative overflow-hidden">
+        <div className="relative w-full h-[100dvh] overflow-hidden bg-black flex flex-col items-center justify-center">
             
-            {/* Main Content Container - Centered */}
-            <div className="flex flex-col items-center max-w-lg w-full z-10">
-                <div className="mb-6 relative">
-                    <div className="absolute inset-0 bg-blue-500/20 blur-3xl rounded-full"></div>
-                    <StarryAvatarDisplay avatar={avatar} isExcited={true} size="text-[7rem] md:text-[9rem]" />
-                </div>
-                
-                <h1 className="text-5xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-tr from-sky-400 via-blue-500 to-purple-500 mb-2 drop-shadow-sm font-display tracking-tight leading-tight">
-                    Starlink Heart
-                </h1>
-                
-                <p className={`text-lg md:text-2xl mb-10 max-w-md leading-relaxed ${textColor} font-medium opacity-90`}>
-                    Tvoj osobný vesmírny sprievodca.
-                </p>
+            {/* Video Background */}
+            <video
+                ref={videoRef}
+                src={starryVideo}
+                className="absolute inset-0 w-full h-full object-cover"
+                autoPlay
+                muted
+                playsInline
+                loop={false}
+                onEnded={handleVideoEnd}
+            />
 
-                {/* Features Grid - Clean & Glassmorphic */}
-                <div className="grid grid-cols-3 gap-4 w-full mb-12 px-4">
-                    {[
-                        { icon: "🤖", title: "AI Kamarát", desc: "Vždy pomôže" },
-                        { icon: "💎", title: "Zbieraj XP", desc: "Hraj a rasti" },
-                        { icon: "🎨", title: "Tvoj Štýl", desc: "Prispôsob si" }
-                    ].map((feature, idx) => (
-                        <div key={idx} className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-4 flex flex-col items-center transition-all hover:scale-105 duration-300 hover:bg-white/10 shadow-lg">
-                            <span className="text-3xl mb-2 filter drop-shadow-md">{feature.icon}</span>
-                            <span className={`font-bold text-sm ${textColor} tracking-wide`}>{feature.title}</span>
-                        </div>
-                    ))}
-                </div>
-
+            {/* Start Button - Appears only after video ends */}
+            <div 
+                className={`relative z-20 transition-all duration-1000 ease-out transform ${
+                    isVideoEnded 
+                        ? 'opacity-100 translate-y-0 scale-100' 
+                        : 'opacity-0 translate-y-10 scale-95 pointer-events-none'
+                }`}
+            >
                 <button 
                     onClick={onStart}
-                    className="group relative w-full md:w-auto min-w-[280px] px-8 py-6 bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 rounded-full shadow-[0_0_40px_rgba(250,204,21,0.6)] border border-yellow-200 transition-all hover:scale-105 hover:shadow-[0_0_60px_rgba(250,204,21,0.8)] active:scale-95"
+                    className="group relative w-full md:w-auto min-w-[280px] px-8 py-6 bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 rounded-full shadow-[0_0_10px_rgba(250,204,21,0.3)] border border-yellow-200 transition-all hover:scale-105 hover:shadow-[0_0_25px_rgba(250,204,21,0.5)] active:scale-95 neon-snake-border"
                 >
                     <div className="absolute inset-0 bg-white/20 rounded-full blur-sm"></div>
                     <span className="relative flex items-center justify-center gap-3">
@@ -51,6 +55,8 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onStart, avatar, textColor })
                     </span>
                 </button>
             </div>
+
+            {/* Optional "Skip" hint if needed, usually hidden for immersive intro */}
         </div>
     );
 };

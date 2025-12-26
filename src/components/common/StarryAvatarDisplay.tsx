@@ -17,22 +17,26 @@ const StarryAvatarDisplay = ({
     const isImageAvatar = ['⭐', '☄️', '🤖'].includes(avatar); 
     
     let avatarImageSrc = '';
-    if (avatar === '⭐') avatarImageSrc = "/src/assets/avatars/starry.png";
+    // Use the animated APNG for Starry!
+    if (avatar === '⭐') avatarImageSrc = "/src/assets/star_bounce256.apng";
     else if (avatar === '☄️') avatarImageSrc = "/src/assets/avatars/comet.png";
     else if (avatar === '🤖') avatarImageSrc = "/src/assets/avatars/robo.png";
 
     // Calculate pixel size based on text size class for image
     const pixelSize = size.includes('text-[') ? size.match(/text-\[(.*?)\]/)?.[1] : 
                       size === 'text-6xl' ? '60px' : 
-                      size === 'text-[8rem]' || size === 'text-[7rem]' ? '120px' : '32px';
+                      size === 'text-[8rem]' || size === 'text-[7rem]' || size === 'text-[9rem]' ? '128px' : '32px';
+                      
+    // Disable CSS bounce for Starry because the APNG itself is bouncing
+    const shouldAnimateCss = (isThinking || isFloating) && avatar !== '⭐';
 
     return (
         <div className={`relative flex items-center justify-center ${size} transition-all duration-300`}>
-            <div className={`relative z-10 transition-transform duration-500 ${isExcited ? 'scale-125 rotate-[360deg]' : 'scale-100'} ${isThinking || isFloating ? 'animate-bounce' : ''}`}>
+            <div className={`relative z-10 transition-transform duration-500 ${isExcited ? 'scale-125 rotate-[360deg]' : 'scale-100'} ${shouldAnimateCss ? 'animate-bounce' : ''}`}>
                 {isImageAvatar ? (
                     <img 
                         src={avatarImageSrc}
-                        alt="3D Avatar" 
+                        alt={avatar === '⭐' ? "Starry Mascot" : "Avatar"} 
                         className="object-contain drop-shadow-lg"
                         style={{ width: pixelSize, height: pixelSize }}
                     />

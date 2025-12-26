@@ -2,7 +2,7 @@
 
 ## 📋 MISSION BRIEFING
 
-You are auditing **Starlink Heart** - an AI-powered educational app for Slovak children (8-9 years old). 
+You are auditing **Starlink Heart** - an AI-powered educational app for Slovak children (8-9 years old).
 This is a React/TypeScript PWA with game-like UI, Google Gemini AI integration, and multiple visual themes.
 
 **Your mission:** Find ALL bugs, anomalies, and issues. Fix them. Add tests. Make it bulletproof.
@@ -37,22 +37,26 @@ This is a React/TypeScript PWA with game-like UI, Google Gemini AI integration, 
 ## ⚠️ KNOWN CRITICAL ISSUES TO VERIFY
 
 ### Issue 1: Empty Canvas / Gray Square
+
 - **Location:** MascotRenderer, RiveMascot, DashboardScreen
 - **Symptom:** Gray canvas instead of avatar/mascot
 - **Root cause:** Rive animation fails to load, no proper fallback
 - **Status:** SUPPOSEDLY FIXED - verify it works!
 
 ### Issue 2: Hero Image Disabled
+
 - **Location:** WelcomeScreen.tsx line 115-132
 - **Status:** Commented out for testing
 - **Action:** Verify backgrounds work, then re-enable
 
 ### Issue 3: Background Not Changing
+
 - **Location:** BACKGROUND_OPTIONS in StarlinkHeartApp.tsx
 - **Symptom:** Only one background visible
 - **Action:** Verify all 4 backgrounds (sky, space, mars, galaxy) work
 
 ### Issue 4: Large Bundle Size
+
 - **Files:** spline-vendor.js (2MB), physics.js (2MB)
 - **Action:** Implement dynamic imports or remove unused code
 
@@ -61,6 +65,7 @@ This is a React/TypeScript PWA with game-like UI, Google Gemini AI integration, 
 ## 🔍 AUDIT CHECKLIST
 
 ### Phase 1: Build Verification
+
 ```bash
 npm install
 npm run build
@@ -76,6 +81,7 @@ npm run coverage
 ### Phase 2: Code Quality Scan
 
 #### A. Find Dead Code
+
 ```bash
 # Search for unused imports
 grep -r "import.*from" src/ | grep -v "node_modules"
@@ -89,12 +95,14 @@ npx eslint src/ --report-unused-disable-directives
 - [ ] No console.log in production code
 
 #### B. TypeScript Strictness
+
 - [ ] No `any` types (search: `": any"`)
 - [ ] No `// @ts-ignore` comments
 - [ ] No implicit any in function parameters
 - [ ] All promises properly handled
 
 #### C. React Best Practices
+
 - [ ] No missing keys in lists
 - [ ] No memory leaks in useEffect (cleanup functions)
 - [ ] No direct DOM manipulation
@@ -105,6 +113,7 @@ npx eslint src/ --report-unused-disable-directives
 #### Test Each Component:
 
 **MascotRenderer:**
+
 ```tsx
 // Should NEVER return null or empty canvas
 // Must always show visible content
@@ -114,12 +123,14 @@ npx eslint src/ --report-unused-disable-directives
 ```
 
 **StarryAvatarDisplay:**
+
 ```tsx
 // Must show the emoji avatar
 <StarryAvatarDisplay avatar="🚀" />  // → Must show 🚀
 ```
 
 **Background Themes:**
+
 ```tsx
 // All 4 must apply different CSS classes
 bg-sky-50        // Light blue
@@ -133,11 +144,13 @@ bg-galaxy-swirl  // Purple gradient
 Current: ~70% coverage
 
 ✅ Well Covered:
+
 - ChatMessage
 - ChatInput
 - ParentNotice
 
 ❌ Needs More Tests:
+
 - StarlinkHeartApp.tsx (main component, complex state)
 - geminiService.ts (AI responses)
 - useVoiceMode.ts (speech recognition)
@@ -172,14 +185,14 @@ For each issue found, document like this:
 
 ## ✅ SUCCESS CRITERIA
 
-| Metric | Target |
-|--------|--------|
-| Build | ✅ No errors |
-| Tests | ✅ All pass (132+) |
-| Coverage | ≥75% |
-| TypeScript | ✅ Strict mode pass |
-| Visual bugs | 0 |
-| Console errors | 0 |
+| Metric         | Target              |
+| -------------- | ------------------- |
+| Build          | ✅ No errors        |
+| Tests          | ✅ All pass (132+)  |
+| Coverage       | ≥75%               |
+| TypeScript     | ✅ Strict mode pass |
+| Visual bugs    | 0                   |
+| Console errors | 0                   |
 
 ---
 
