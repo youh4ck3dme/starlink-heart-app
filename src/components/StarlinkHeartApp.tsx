@@ -681,7 +681,14 @@ const StarlinkHeartApp: React.FC = () => {
                                             'hover:bg-gray-50 border border-transparent hover:border-gray-100'
                                         }`}
                                     >
-                                        <span className={`text-3xl mb-1 ${!isUnlocked ? 'grayscale' : ''}`}>{option.emoji}</span>
+                                        <div className={`mb-1 ${!isUnlocked ? 'grayscale opacity-50' : ''}`}>
+                                            <StarryAvatarDisplay 
+                                                avatar={option.emoji} 
+                                                size="text-4xl" 
+                                                isFloating={isSelected} // Animate if selected (gentle bounce)
+                                                isExcited={false}
+                                            />
+                                        </div>
                                         <span className="text-xs font-bold text-gray-600">{option.name}</span>
                                         
                                         {/* Price or Lock indicator */}
@@ -693,7 +700,7 @@ const StarlinkHeartApp: React.FC = () => {
                                             </div>
                                         )}
                                         {isSelected && isUnlocked && (
-                                            <div className="absolute -top-1 -right-1 bg-sky-500 text-white rounded-full p-1 shadow-md">
+                                            <div className="absolute -top-1 -right-1 bg-sky-500 text-white rounded-full p-1 shadow-md z-10">
                                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                                             </div>
                                         )}

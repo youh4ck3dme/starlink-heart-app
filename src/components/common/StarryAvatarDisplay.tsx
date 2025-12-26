@@ -4,11 +4,13 @@ const StarryAvatarDisplay = ({
     avatar, 
     isThinking = false, 
     isExcited = false, 
+    isFloating = false,
     size = "text-3xl" 
 }: { 
     avatar: string; 
     isThinking?: boolean; 
     isExcited?: boolean; 
+    isFloating?: boolean;
     size?: string; 
 }) => {
     // If avatar is one of the new 3D avatars, render the image
@@ -26,7 +28,7 @@ const StarryAvatarDisplay = ({
 
     return (
         <div className={`relative flex items-center justify-center ${size} transition-all duration-300`}>
-            <div className={`relative z-10 transition-transform duration-500 ${isExcited ? 'scale-125 rotate-[360deg]' : 'scale-100'} ${isThinking ? 'animate-bounce' : ''}`}>
+            <div className={`relative z-10 transition-transform duration-500 ${isExcited ? 'scale-125 rotate-[360deg]' : 'scale-100'} ${isThinking || isFloating ? 'animate-bounce' : ''}`}>
                 {isImageAvatar ? (
                     <img 
                         src={avatarImageSrc}
