@@ -148,11 +148,11 @@ export class EdupageClient {
       const params = new URLSearchParams();
       params.append('username', username);
       params.append('password', password);
-    
+  
       const response = await this.client.post(`${this.baseUrl}/login/`, params, {
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
       });
-    
+  
       return response.status === 200;
     } catch (error) {
       console.error('EduPage Login Error:', error);
@@ -469,11 +469,11 @@ export default defineConfig({
 
 ## 🔑 Dôležité poznámky
 
-| Položka | Popis |
-|---------|-------|
-| **EBUID** | Jedinečný ID študenta z URL EduPage |
-| **Škola** | Zmeň `baseUrl` na tvoju školu |
-| **Cookies** | Backend musí bežať na serveri |
+| Položka             | Popis                                           |
+| -------------------- | ----------------------------------------------- |
+| **EBUID**      | Jedinečný ID študenta z URL EduPage          |
+| **Škola**     | Zmeň `baseUrl` na tvoju školu               |
+| **Cookies**    | Backend musí bežať na serveri                |
 | **Token Flow** | Známky vyžadujú extrakciu eqap/eqacs tokenov |
 
 ---

@@ -11,6 +11,7 @@
 ## 🚀 Funkcie
 
 ### ✅ Hotové (MVP)
+
 - **AI Chat** – Gemini AI asistent pre domáce úlohy
 - **Gamifikácia** – XP, levely, denné misie, odznaky
 - **Prispôsobenie** – Avatary (Starry, Comet, Robot), pozadia
@@ -20,6 +21,7 @@
 - **PWA Ready** – Manifest, ikony, offline-first design
 
 ### 🎨 UI/UX
+
 - Premium glassmorphism dizajn
 - Parallax efekty na Welcome Screen
 - Animované "educational particles" (2+2, A, B, C...)
@@ -30,29 +32,29 @@
 
 ## 🛠️ Tech Stack
 
-| Kategória | Technológia |
-|-----------|-------------|
-| **Framework** | React 18 + TypeScript |
-| **Build** | Vite 5 |
-| **Styling** | Tailwind CSS |
-| **Animácie** | Framer Motion |
-| **AI** | Google Gemini AI (@google/genai) |
-| **3D** | Spline + Rive |
-| **Routing** | React Router v7 |
-| **Testing** | Vitest + React Testing Library |
-| **Icons** | Lucide React |
+| Kategória          | Technológia                     |
+| ------------------- | -------------------------------- |
+| **Framework** | React 18 + TypeScript            |
+| **Build**     | Vite 5                           |
+| **Styling**   | Tailwind CSS                     |
+| **Animácie** | Framer Motion                    |
+| **AI**        | Google Gemini AI (@google/genai) |
+| **3D**        | Spline + Rive                    |
+| **Routing**   | React Router v7                  |
+| **Testing**   | Vitest + React Testing Library   |
+| **Icons**     | Lucide React                     |
 
 ---
 
 ## 📊 Stav Projektu
 
-| Metrika | Hodnota |
-|---------|---------|
-| **Hotovosť** | ~85% |
-| **Testy** | 142 passing (18 súborov) |
-| **Build** | ✅ Úspešný |
-| **Bundle size** | ~8.5 MB (images + libs) |
-| **Image optimization** | WebP (83% úspora) |
+| Metrika                      | Hodnota                   |
+| ---------------------------- | ------------------------- |
+| **Hotovosť**          | ~85%                      |
+| **Testy**              | 142 passing (18 súborov) |
+| **Build**              | ✅ Úspešný             |
+| **Bundle size**        | ~8.5 MB (images + libs)   |
+| **Image optimization** | WebP (83% úspora)        |
 
 ---
 

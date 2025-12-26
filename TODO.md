@@ -100,14 +100,14 @@
 
 ## 📋 TESTY POTREBNÉ PRE RELEASE
 
-### Aktuálne: 161 testov ✅
-### Odporúčané minimum: 150-200 testov ✅ SPLNENÉ
+### Aktuálne: 216 testov ✅ (108% cieľa!)
+### Odporúčané minimum: 150-200 testov ✅ PREKROČENÉ
 
 | Oblasť | Aktuálne | Cieľ | Priorita |
 |--------|----------|------|----------|
-| Unit testy | 161 | 160 | ⭐⭐⭐ ✅ |
+| Unit testy | 216 | 160 | ⭐⭐⭐ ✅ |
 | E2E testy | 7 | 10-15 | ⭐⭐⭐ |
-| Accessibility testy | ~ | 5-10 | ⭐⭐ |
+| Accessibility testy | ✅ | 5-10 | ⭐⭐ ✅ |
 | Performance testy | 0 | 3-5 | ⭐ |
 
 ### Chýbajúce testy (priorita):
