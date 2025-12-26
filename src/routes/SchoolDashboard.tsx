@@ -58,9 +58,9 @@ const TimetableCard = ({ theme }: { theme: 'green' | 'pink' }) => {
   ];
 
   return (
-    <div className={`rounded-2xl border ${accent} backdrop-blur-xl p-4`}>
+    <div className={`rounded-2xl border ${accent} backdrop-blur-xl p-4`} role="region" aria-label="Dnešný rozvrh">
       <div className="flex items-center gap-2 mb-4">
-        <Calendar className={`w-5 h-5 ${textAccent}`} />
+        <Calendar className={`w-5 h-5 ${textAccent}`} aria-hidden="true" />
         <h3 className="font-bold text-white">Dnešný rozvrh</h3>
       </div>
       <div className="space-y-2">
@@ -113,9 +113,9 @@ const GradesCard = ({ theme }: { theme: 'green' | 'pink' }) => {
   };
 
   return (
-    <div className={`rounded-2xl border ${accent} backdrop-blur-xl p-4`}>
+    <div className={`rounded-2xl border ${accent} backdrop-blur-xl p-4`} role="region" aria-label="Posledné známky">
       <div className="flex items-center gap-2 mb-4">
-        <Award className={`w-5 h-5 ${textAccent}`} />
+        <Award className={`w-5 h-5 ${textAccent}`} aria-hidden="true" />
         <h3 className="font-bold text-white">Posledné známky</h3>
       </div>
       <div className="grid grid-cols-2 gap-2">
@@ -147,9 +147,9 @@ const NoticesCard = ({ theme }: { theme: 'green' | 'pink' }) => {
   ];
 
   return (
-    <div className={`rounded-2xl border ${accent} backdrop-blur-xl p-4`}>
+    <div className={`rounded-2xl border ${accent} backdrop-blur-xl p-4`} role="region" aria-label="Oznamy">
       <div className="flex items-center gap-2 mb-4">
-        <Bell className={`w-5 h-5 ${textAccent}`} />
+        <Bell className={`w-5 h-5 ${textAccent}`} aria-hidden="true" />
         <h3 className="font-bold text-white">Oznamy</h3>
       </div>
       <div className="space-y-2">
@@ -213,8 +213,9 @@ export default function SchoolDashboard() {
           <button 
             onClick={() => navigate('/home')}
             className={`p-2 rounded-full ${buttonAccent} border transition-colors`}
+            aria-label="Späť na hlavnú stránku"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5" aria-hidden="true" />
           </button>
           
           <h1 className={`font-black text-xl tracking-wider ${accentColor}`}>
