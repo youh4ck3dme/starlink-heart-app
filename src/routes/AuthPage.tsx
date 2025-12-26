@@ -11,7 +11,7 @@ import { useToast } from "../hooks/use-toast";
 import { useAuth } from "../hooks/useAuth";
 
 // Use existing mascot image as logo
-import logoImage from "../assets/welcome-hero.png";
+import logoImage from "../assets/logo_3d.png";
 
 const loginSchema = z.object({
   email: z.string().email("Zadaj platný email"),

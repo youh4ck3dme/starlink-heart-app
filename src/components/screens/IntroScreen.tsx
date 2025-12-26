@@ -1,5 +1,5 @@
 import React from 'react';
-import introBg from '../../assets/intro-bg.jpg';
+import introBg from '../../assets/intro-bg.png';
 
 interface IntroScreenProps {
     onStart: () => void;

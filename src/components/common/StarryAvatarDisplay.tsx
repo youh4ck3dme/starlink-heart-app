@@ -1,6 +1,6 @@
 import starApng from '../../assets/star_bounce256.apng';
-import cometImg from '../../assets/avatars/cometa_3d.png';
-import roboImg from '../../assets/avatars/robo_3d.png';
+import cometImg from '../../assets/avatars/comet_4k.png';
+import roboImg from '../../assets/avatars/robot_4k.png';
 
 const StarryAvatarDisplay = ({ 
     avatar, 
