@@ -1,9 +1,9 @@
 # Starlink Heart 🌟💙
 
-> Vzdelávacia AI aplikácia pre deti (8-9 rokov) s gamifikáciou a prémiovým UI.
+> Vzdelávacia AI aplikácia pre deti (8-9 rokov) s gamifikáciou, prémiovým UI a integráciou EduPage.
 
 ![Version](https://img.shields.io/badge/version-0.1.0-blue)
-![Tests](https://img.shields.io/badge/tests-142%20passing-green)
+![Tests](https://img.shields.io/badge/tests-216%20passing-green)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen)
 
 ---
@@ -15,10 +15,11 @@
 - **AI Chat** – Gemini AI asistent pre domáce úlohy
 - **Gamifikácia** – XP, levely, denné misie, odznaky
 - **Prispôsobenie** – Avatary (Starry, Comet, Robot), pozadia
-- **School Dashboard** – Rozvrh, známky, oznamy (Matrix téma)
+- **School Dashboard** – Demo rozvrh, známky, oznamy (Matrix téma)
+- **EduPage Integrácia** – Reálne známky a oznamy zo ZŠ Kostoľany
 - **Témy** – Zelená (chlapci) / Ružová (dievčatá)
 - **Accessibility** – Aria-labels, reduced motion support
-- **PWA Ready** – Manifest, ikony, offline-first design
+- **PWA Ready** – Manifest, ikony, offline-first design, Service Worker
 
 ### 🎨 UI/UX
 
@@ -32,75 +33,162 @@
 
 ## 🛠️ Tech Stack
 
-| Kategória          | Technológia                     |
-| ------------------- | -------------------------------- |
-| **Framework** | React 18 + TypeScript            |
-| **Build**     | Vite 5                           |
-| **Styling**   | Tailwind CSS                     |
-| **Animácie** | Framer Motion                    |
-| **AI**        | Google Gemini AI (@google/genai) |
-| **3D**        | Spline + Rive                    |
-| **Routing**   | React Router v7                  |
-| **Testing**   | Vitest + React Testing Library   |
-| **Icons**     | Lucide React                     |
+| Kategória          | Technológia                      |
+| ------------------ | -------------------------------- |
+| **Framework**      | React 18 + TypeScript            |
+| **Build**          | Vite 5                           |
+| **Styling**        | Tailwind CSS                     |
+| **Animácie**       | Framer Motion                    |
+| **AI**             | Google Gemini AI (@google/genai) |
+| **3D**             | Spline + Rive                    |
+| **Routing**        | React Router v7                  |
+| **Testing**        | Vitest + React Testing Library + Playwright |
+| **Icons**          | Lucide React                     |
+| **Backend**        | Express (EduPage proxy)          |
 
 ---
 
 ## 📊 Stav Projektu
 
-| Metrika                      | Hodnota                   |
-| ---------------------------- | ------------------------- |
-| **Hotovosť**          | ~85%                      |
-| **Testy**              | 142 passing (18 súborov) |
-| **Build**              | ✅ Úspešný             |
+| Metrika                | Hodnota                   |
+| ---------------------- | ------------------------- |
+| **Hotovosť**           | ~95%                      |
+| **Unit testy**         | 216 passing (24 súborov)  |
+| **E2E testy**          | 7 (Playwright)            |
+| **Build**              | ✅ Úspešný                |
 | **Bundle size**        | ~8.5 MB (images + libs)   |
-| **Image optimization** | WebP (83% úspora)        |
+| **Image optimization** | WebP (83% úspora)         |
 
 ---
 
 ## 🏃 Spustenie
 
+### Základný dev server (frontend only)
 ```bash
-# Inštalácia
 npm install
-
-# Development
 npm run dev
+```
 
-# Build
-npm run build
+### S EduPage backendom (full stack)
+```bash
+npm install
+npm run dev:full
+```
 
-# Testy
-npm test
-
-# Preview produkcie
-npm run preview
+### Jednotlivé príkazy
+```bash
+npm run dev          # Frontend dev server
+npm run server       # Backend EduPage proxy
+npm run build        # Production build
+npm run test         # Unit testy
+npm run test:e2e     # E2E testy (Playwright)
+npm run preview      # Preview produkcie
 ```
 
 ---
 
-## 📁 Štruktúra
+## 📁 Štruktúra Projektu
 
 ```
 src/
-├── routes/           # Stránky (Welcome, Home, Auth, Dashboard)
-├── components/       # UI komponenty
-│   ├── chat/         # Chat komponenty
-│   ├── common/       # Zdieľané komponenty
-│   ├── gamification/ # XP, misie, levely
-│   ├── layout/       # Header, Footer
-│   ├── mascot/       # 3D/Rive maskot
-│   └── ui/           # Primitívne UI elementy
-├── hooks/            # Custom hooks (haptics, voice, toast)
-├── services/         # API služby (Gemini, localStorage)
-└── assets/           # Obrázky (WebP optimalizované)
+├── routes/               # Stránky
+│   ├── WelcomeScreen.tsx # Úvodná obrazovka
+│   ├── Home.tsx          # Hlavný dashboard
+│   ├── SchoolDashboard.tsx # Demo školský dashboard
+│   ├── SchoolPage.tsx    # EduPage integrácia (/school)
+│   ├── AuthPage.tsx      # Prihlásenie
+│   ├── PrivacyPolicy.tsx # Zásady súkromia
+│   └── NotFound.tsx      # 404 stránka
+├── components/           # UI komponenty
+│   ├── chat/             # Chat komponenty
+│   ├── common/           # Zdieľané komponenty
+│   ├── gamification/     # XP, misie, levely
+│   ├── layout/           # Header, Footer
+│   ├── mascot/           # 3D/Rive maskot
+│   └── ui/               # Primitívne UI elementy
+├── core/                 # Abstraktné typy a factory
+│   ├── types/
+│   │   └── schoolSystem.ts  # ISchoolSystemClient interface
+│   └── services/
+│       └── schoolSystemFactory.ts
+├── features/             # Feature-based moduly
+│   └── edupage/
+│       ├── services/
+│       │   └── edupageClient.ts
+│       └── hooks/
+│           └── useEdupage.ts
+├── hooks/                # Custom hooks (haptics, voice, toast)
+├── services/             # API služby (Gemini, localStorage)
+├── server/               # Express backend
+│   └── index.ts          # EduPage proxy server
+└── assets/               # Obrázky (WebP optimalizované)
 ```
 
 ---
 
-## 🎯 Play Store Release
+## 🏫 EduPage Integrácia
 
-Viď [TODO.md](./TODO.md) pre kompletný checklist čo treba pred vydaním na Google Play.
+### Podporovaná škola
+**ZŠ Kostoľany** – https://zskostolany.edupage.org
+
+### Ako používať
+1. Spusti backend: `npm run server`
+2. Spusti frontend: `npm run dev`
+3. Otvor `/school` route
+4. Prihlás sa EduPage údajmi
+5. Zobrazí sa dashboard so známkami a oznamami
+
+### Rozšíriteľnosť
+Architektúra podporuje pridanie ďalších systémov:
+- Bakalári
+- iŽiak
+- Ďalšie...
+
+Viď `minedu.md` pre kompletnú dokumentáciu.
+
+---
+
+## 🎯 Play Store Checklist
+
+### Hotové ✅
+- [x] HTTPS hosting (Vercel)
+- [x] manifest.json kompletný
+- [x] Service Worker pre offline
+- [x] Privacy Policy stránka
+- [x] App ikony (všetky veľkosti)
+
+### Potrebné ⏳
+- [ ] TWA/Capacitor setup
+- [ ] Store listing (screenshots, popis)
+- [ ] Age rating (PEGI/ESRB)
+- [ ] Podpísanie APK
+
+---
+
+## 📋 Testy
+
+### Unit testy (216)
+```bash
+npm run test
+```
+
+### E2E testy (Playwright)
+```bash
+npm run test:e2e
+```
+
+### Pokryté oblasti
+- ✅ All routes (WelcomeScreen, Home, SchoolDashboard, etc.)
+- ✅ Components (Chat, Header, Modals)
+- ✅ Hooks (useHaptics, useToast, useEdupage)
+- ✅ Gamification (XP, Missions, Levels)
+- ✅ Accessibility (aria-labels, keyboard nav)
+
+---
+
+## 📄 Licencia
+
+Proprietárny software. Všetky práva vyhradené.
 
 ---
 
@@ -110,6 +198,4 @@ Viď [TODO.md](./TODO.md) pre kompletný checklist čo treba pred vydaním na Go
 
 ---
 
-## 📄 Licencia
-
-Proprietárny software. Všetky práva vyhradené.
+*Posledná aktualizácia: 26.12.2024*
