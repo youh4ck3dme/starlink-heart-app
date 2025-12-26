@@ -8,6 +8,8 @@ interface DashboardScreenProps {
     onProfile: () => void;
     onCenter: () => void;
     onCoachToggle: () => void;
+    onSchoolDashboard: () => void;
+    onEduPage: () => void;
     onGemEarned?: (amount: number) => void;
     isCoachMode: boolean;
     avatar: string;
@@ -21,6 +23,8 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
     onProfile,
     onCenter,
     onCoachToggle,
+    onSchoolDashboard,
+    onEduPage,
     onGemEarned,
     isCoachMode,
     avatar,
@@ -40,8 +44,8 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
             />
 
             {/* Mascot Area */}
-            <div className={`w-full flex-1 flex flex-col items-center justify-center min-h-[280px] transition-all duration-700`}>
-                <div className="relative w-full max-w-sm aspect-square flex items-center justify-center">
+            <div className={`w-full flex-1 flex flex-col items-center justify-center min-h-[200px] transition-all duration-700`}>
+                <div className="relative w-full max-w-xs aspect-square flex items-center justify-center">
                     <MascotRenderer 
                          mode={mascotMode}
                          className="w-full h-full"
@@ -51,46 +55,68 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
 
             {/* Daily Missions */}
             {onGemEarned && (
-                <div className="w-full max-w-sm mb-6">
+                <div className="w-full max-w-sm mb-4">
                     <DailyMissionsCard onGemEarned={onGemEarned} />
                 </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="w-full max-w-sm grid grid-cols-2 gap-4 z-20">
+            {/* Action Buttons - Main CTA */}
+            <div className="w-full max-w-sm space-y-3 z-20">
                 <button 
                     onClick={onNewMission}
                     data-testid="start-mission-btn"
-                    className="col-span-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white p-5 rounded-3xl shadow-xl transform transition-all active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden"
+                    className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white p-4 rounded-2xl shadow-xl transform transition-all active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden"
                 >
-                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 rounded-3xl"></div>
-                    <span className="text-3xl group-hover:rotate-12 transition-transform duration-300">🚀</span>
-                    <span className="font-black text-xl tracking-wide uppercase">Nová Misia</span>
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 rounded-2xl"></div>
+                    <span className="text-2xl group-hover:rotate-12 transition-transform duration-300">🚀</span>
+                    <span className="font-black text-lg tracking-wide uppercase">Nová Misia</span>
                 </button>
 
-                <button 
-                    onClick={onCoachToggle}
-                    className={`p-4 rounded-2xl shadow-lg border-2 transition-all active:scale-95 flex flex-col items-center gap-1 ${
-                        isCoachMode 
-                            ? 'bg-emerald-100 border-emerald-400 text-emerald-800' 
-                            : 'bg-white/90 border-white text-gray-600 hover:bg-white'
-                    }`}
-                >
-                    <span className="text-2xl">🎓</span>
-                    <span className="font-bold text-xs uppercase">{isCoachMode ? 'Kouč: ON' : 'Kouč: OFF'}</span>
-                </button>
+                {/* Quick Actions Grid */}
+                <div className="grid grid-cols-4 gap-2">
+                    <button 
+                        onClick={onSchoolDashboard}
+                        data-testid="school-dashboard-btn"
+                        className="bg-emerald-500/90 hover:bg-emerald-500 p-3 rounded-xl shadow-lg transition-all active:scale-95 flex flex-col items-center gap-1 text-white"
+                    >
+                        <span className="text-xl">📚</span>
+                        <span className="font-bold text-[10px] uppercase">Škola</span>
+                    </button>
 
-                <button 
-                    onClick={onCenter}
-                    data-testid="open-settings-btn"
-                    className="bg-white/90 hover:bg-white p-4 rounded-2xl shadow-lg border-2 border-white transition-all active:scale-95 flex flex-col items-center gap-1 text-gray-600"
-                >
-                    <span className="text-2xl">⚙️</span>
-                    <span className="font-bold text-xs uppercase">Centrum</span>
-                </button>
+                    <button 
+                        onClick={onEduPage}
+                        data-testid="edupage-btn"
+                        className="bg-purple-500/90 hover:bg-purple-500 p-3 rounded-xl shadow-lg transition-all active:scale-95 flex flex-col items-center gap-1 text-white"
+                    >
+                        <span className="text-xl">🎓</span>
+                        <span className="font-bold text-[10px] uppercase">EduPage</span>
+                    </button>
+
+                    <button 
+                        onClick={onCoachToggle}
+                        className={`p-3 rounded-xl shadow-lg transition-all active:scale-95 flex flex-col items-center gap-1 ${
+                            isCoachMode 
+                                ? 'bg-amber-400 text-amber-900' 
+                                : 'bg-white/90 text-gray-600 hover:bg-white'
+                        }`}
+                    >
+                        <span className="text-xl">🧠</span>
+                        <span className="font-bold text-[10px] uppercase">{isCoachMode ? 'ON' : 'Kouč'}</span>
+                    </button>
+
+                    <button 
+                        onClick={onCenter}
+                        data-testid="open-settings-btn"
+                        className="bg-white/90 hover:bg-white p-3 rounded-xl shadow-lg transition-all active:scale-95 flex flex-col items-center gap-1 text-gray-600"
+                    >
+                        <span className="text-xl">⚙️</span>
+                        <span className="font-bold text-[10px] uppercase">Menu</span>
+                    </button>
+                </div>
             </div>
         </div>
     );
 };
 
 export default DashboardScreen;
+

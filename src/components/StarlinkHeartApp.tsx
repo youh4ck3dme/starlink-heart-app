@@ -577,6 +577,14 @@ const StarlinkHeartApp: React.FC = () => {
                             gems={gemCount}
                             textColor={appBackground.textColor}
                             mascotMode={mascotMode}
+                            onSchoolDashboard={() => {
+                                haptics.lightTap();
+                                window.location.href = '/dashboard';
+                            }}
+                            onEduPage={() => {
+                                haptics.lightTap();
+                                window.location.href = '/school';
+                            }}
                             onGemEarned={(amount) => {
                                 haptics.successVibrate();
                                 setGemCount(prev => {

@@ -105,6 +105,8 @@ describe('MascotRenderer Fallback Tests', () => {
                     onProfile={() => {}}
                     onCenter={() => {}}
                     onCoachToggle={() => {}}
+                    onSchoolDashboard={() => {}}
+                    onEduPage={() => {}}
                     isCoachMode={false}
                     avatar="🚀"
                     gems={100}
