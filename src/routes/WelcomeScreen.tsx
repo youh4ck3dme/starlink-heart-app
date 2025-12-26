@@ -7,7 +7,7 @@ export default function WelcomeScreen() {
   const navigate = useNavigate();
 
   return (
-    <CosmicBackground variant="mirrorNebula" intensity={0.9} animate className="min-h-screen">
+    <CosmicBackground variant="default" intensity={0.9} className="min-h-screen">
       <header className="pt-6 px-6 flex items-center justify-between text-white/90">
         <div className="text-xl font-bold drop-shadow">Starlink Heart</div>
         <div className="flex items-center gap-3">
@@ -24,9 +24,10 @@ export default function WelcomeScreen() {
 
       <main className="mt-4">
         <GalaxyRoadmap onEnter={(id) => {
-            console.log('enter', id);
+            console.log('Navigating to home with planet:', id);
             localStorage.setItem('hasStarted', 'true');
-            navigate('/home');
+            // Ensure navigation happens in the next tick to prevent event bubbling issues
+            setTimeout(() => navigate('/home'), 100);
         }} />
       </main>
     </CosmicBackground>

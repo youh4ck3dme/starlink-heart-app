@@ -1,145 +1,130 @@
-import React, { useEffect, useMemo, useRef } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import { StarTwinkle } from '../effects/StarTwinkle';
+import React, { useState, useEffect } from 'react';
+import { motion, useSpring, useMotionValue, useTransform } from 'framer-motion';
+// Original static asset
+import cosmicBg from '../../assets/cosmic.webp';
 
-export type CosmicVariant = 'mirrorNebula' | 'portalStarforge';
+// Import our luxury layers (kept in reserve as requested)
+import layerBase from '../../assets/layers/layer_a_base_nebula.webp';
+import layerStars from '../../assets/layers/layer_b_starfield.webp';
+import layerGlass from '../../assets/layers/layer_c_glass.webp';
+import layerComets from '../../assets/layers/layer_d_comets.webp';
 
-interface Props {
-  variant?: CosmicVariant;
-  intensity?: number; // 0..1 – sila efektov
-  animate?: boolean;
-  className?: string;
-  children?: React.ReactNode;
+export type CosmicVariant = 'default' | 'luxury';
+
+interface CosmicBackgroundProps {
+    children?: React.ReactNode;
+    className?: string;
+    variant?: CosmicVariant;
+    intensity?: number;
+    showComets?: boolean;
+    // Keeping 'animate' in props to prevent build errors from legacy usage, though unused
+    animate?: boolean; 
 }
 
-/**
- * GPU-friendly parallax pozadie. Nepoužíva ťažké filtre; animujeme len transform/opacity.
- */
-export default function CosmicBackground({
-  variant = 'mirrorNebula',
-  intensity = 0.8,
-  animate = true,
-  className,
-  children,
-}: Props) {
-  const prefersReduce = useReducedMotion();
-  const safeAnimate = animate && !prefersReduce;
+export const CosmicBackground: React.FC<CosmicBackgroundProps> = ({ 
+    children, 
+    className = '',
+    variant = 'default',
+    intensity = 1,
+    showComets = true
+}) => {
+    const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+    
+    // Parallax State (Only used in luxury mode)
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
 
-  // ✨ LUXURY GLASS EFFECT - Premium holographic shimmer
-  const glassGradient = useMemo(
-    () =>
-      `radial-gradient(ellipse 800px 300px at 30% 20%, rgba(139,92,246,${0.15 * intensity}) 0%, transparent 50%),
-       radial-gradient(ellipse 600px 200px at 70% 80%, rgba(236,72,153,${0.12 * intensity}) 0%, transparent 50%),
-       linear-gradient(135deg, rgba(255,255,255,${0.08 * intensity}) 0%, transparent 30%, rgba(255,255,255,${0.05 * intensity}) 50%, transparent 70%, rgba(255,255,255,${0.08 * intensity}) 100%)`,
-    [intensity]
-  );
+    const springX = useSpring(mouseX, { stiffness: 40, damping: 30, mass: 0.8 });
+    const springY = useSpring(mouseY, { stiffness: 40, damping: 30, mass: 0.8 });
 
-  // 🌌 LUXURY NEBULA - Deep space with vibrant aurora colors
-  const nebulaGradient = useMemo(
-    () =>
-      `radial-gradient(ellipse 120% 80% at 20% 20%, rgba(139,92,246,${0.35 * intensity}) 0%, transparent 50%),
-       radial-gradient(ellipse 100% 60% at 80% 30%, rgba(59,130,246,${0.30 * intensity}) 0%, transparent 50%),
-       radial-gradient(ellipse 80% 50% at 60% 80%, rgba(236,72,153,${0.25 * intensity}) 0%, transparent 50%),
-       radial-gradient(ellipse 60% 40% at 30% 70%, rgba(16,185,129,${0.20 * intensity}) 0%, transparent 50%),
-       radial-gradient(ellipse 150% 100% at 50% 100%, rgba(251,191,36,${0.15 * intensity}) 0%, transparent 40%),
-       linear-gradient(180deg, #0c0015 0%, #0a0020 30%, #050012 70%, #020008 100%)`,
-    [intensity]
-  );
+    useEffect(() => {
+        const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const handleChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+        setPrefersReducedMotion(mediaQuery.matches);
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
 
-  // kométy – zriedkavé, CPU-lite
-  const cometRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!safeAnimate || !cometRef.current) return;
-    const el = cometRef.current;
-    let timer: number | null = null;
-    const spawn = () => {
-      el.style.opacity = '1';
-      el.animate(
-        [
-          { transform: 'translate3d(-20vw,-20vh,0) rotate(15deg)', opacity: 0 },
-          { transform: 'translate3d(40vw,40vh,0) rotate(15deg)', opacity: 1 },
-          { transform: 'translate3d(60vw,60vh,0) rotate(15deg)', opacity: 0 },
-        ],
-        { duration: 4000, easing: 'ease', iterations: 1 }
-      );
-      timer = window.setTimeout(spawn, 7000 + Math.random() * 6000);
+    const handlePointerMove = (e: React.PointerEvent) => {
+        if (prefersReducedMotion || variant !== 'luxury') return;
+        
+        const { clientX, clientY } = e;
+        const { innerWidth, innerHeight } = window;
+        const x = (clientX / innerWidth - 0.5) * 2;
+        const y = (clientY / innerHeight - 0.5) * 2;
+        
+        mouseX.set(x);
+        mouseY.set(y);
     };
-    timer = window.setTimeout(spawn, 2000);
-    return () => {
-      if (timer) window.clearTimeout(timer);
-    };
-  }, [safeAnimate]);
 
-  return (
-    <div className={`relative overflow-hidden ${className ?? ''}`} aria-hidden>
-      {/* Layer 0: Base nebula gradient with subtle pulse */}
-      <motion.div
-        className="absolute inset-0 z-0"
-        style={{ backgroundImage: nebulaGradient }}
-        initial={{ opacity: 0.6, scale: 1 }}
-        animate={safeAnimate ? { 
-          opacity: [0.7, 0.9, 0.7], 
-          scale: [1, 1.02, 1] 
-        } : undefined}
-        transition={{ 
-          duration: 8, 
-          repeat: Infinity, 
-          ease: 'easeInOut' 
-        }}
-      />
+    // --- RENDER DEFAULT (STATIC) ---
+    if (variant === 'default') {
+        return (
+            <div 
+                className={`relative min-h-dvh w-full overflow-hidden bg-black text-white ${className}`}
+                aria-hidden="true"
+            >
+                {/* Single Static Image Layer (Safe & Basic) */}
+                <div className="absolute inset-0">
+                    <img 
+                        src={cosmicBg} 
+                        alt="Background" 
+                        className="w-full h-full object-cover opacity-80"
+                    />
+                </div>
+                {/* Simple Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent pointer-events-none" />
+                
+                <div className="relative z-10 w-full h-full">
+                    {children}
+                </div>
+            </div>
+        );
+    }
 
-      {/* Layer 0.5: Aurora wave effect */}
-      <motion.div
-        className="absolute inset-0 z-[0] pointer-events-none"
-        style={{
-          background: `linear-gradient(45deg, 
-            transparent 0%, 
-            rgba(139,92,246,0.1) 25%, 
-            rgba(59,130,246,0.15) 50%, 
-            rgba(236,72,153,0.1) 75%, 
-            transparent 100%)`,
-          backgroundSize: '400% 400%',
-        }}
-        initial={{ backgroundPosition: '0% 50%' }}
-        animate={safeAnimate ? { 
-          backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] 
-        } : undefined}
-        transition={{ 
-          duration: 15, 
-          repeat: Infinity, 
-          ease: 'linear' 
-        }}
-      />
+    // --- RENDER LUXURY (LAYERED) ---
+    // Transforms for parallax
+    const xStars = useTransform(springX, [-1, 1], [20 * intensity, -20 * intensity]);
+    const yStars = useTransform(springY, [-1, 1], [20 * intensity, -20 * intensity]);
+    const xGlass = useTransform(springX, [-1, 1], [-15 * intensity, 15 * intensity]);
+    const yGlass = useTransform(springY, [-1, 1], [-15 * intensity, 15 * intensity]);
+    const xComets = useTransform(springX, [-1, 1], [-40 * intensity, 40 * intensity]);
+    const yComets = useTransform(springY, [-1, 1], [-40 * intensity, 40 * intensity]);
 
-      {/* Layer 1: Mirror glass effect with shimmer */}
-      <motion.div
-        className="absolute inset-0 z-[1] mix-blend-screen pointer-events-none"
-        style={{ backgroundImage: glassGradient }}
-        initial={{ opacity: 0 }}
-        animate={safeAnimate ? { opacity: [0.6, 1, 0.6] } : undefined}
-        transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
-      />
+    return (
+        <div 
+            className={`relative min-h-dvh w-full overflow-hidden bg-[#060819] text-white ${className}`}
+            onPointerMove={handlePointerMove}
+        >
+            {/* LAYER A: BASE NEBULA */}
+            <div className="absolute inset-0">
+                <img src={layerBase} alt="" className="w-full h-full object-cover opacity-90" />
+            </div>
 
-      {/* Layer 2: Star particles */}
-      <div className="absolute inset-0 z-[2] opacity-90">
-         <StarTwinkle className="w-full h-full" />
-      </div>
+            {/* LAYER B: STARFIELD */}
+            <motion.div className="absolute inset-0" style={{ x: xStars, y: yStars, opacity: 0.8 }}>
+                <img src={layerStars} alt="" className="w-full h-full object-cover" />
+            </motion.div>
 
-      {/* Layer 3: LUXURY Rainbow Comet */}
-      <div
-        ref={cometRef}
-        className="absolute top-0 left-0 z-[3] w-80 h-1.5 rounded-full"
-        style={{
-          background:
-            'linear-gradient(90deg, transparent 0%, rgba(139,92,246,0.8) 20%, rgba(59,130,246,1) 40%, rgba(16,185,129,1) 60%, rgba(251,191,36,0.8) 80%, transparent 100%)',
-          boxShadow: '0 0 30px 10px rgba(139,92,246,.5), 0 0 60px 20px rgba(59,130,246,.3)',
-          opacity: 0,
-          willChange: 'transform, opacity',
-        }}
-      />
+            {/* LAYER C: GLASS STREAKS */}
+            <motion.div className="absolute inset-0 mix-blend-screen" style={{ x: xGlass, y: yGlass, opacity: 0.4 }}>
+                <img src={layerGlass} alt="" className="w-full h-full object-cover" />
+            </motion.div>
 
-      {/* Layer 10: Content (always on top) */}
-      <div className="relative z-10">{children}</div>
-    </div>
-  );
-}
+            {/* LAYER D: FOREGROUND ELEMENTS */}
+            {!prefersReducedMotion && showComets && (
+                <motion.div className="absolute inset-0 pointer-events-none" style={{ x: xComets, y: yComets }}>
+                    <img src={layerComets} alt="" className="w-full h-full object-cover opacity-90" />
+                </motion.div>
+            )}
+
+            <div className="absolute inset-0 bg-gradient-to-t from-[#060819] via-transparent to-transparent opacity-80 pointer-events-none" />
+            
+            <div className="relative z-20 w-full h-full">
+                {children}
+            </div>
+        </div>
+    );
+};
+
+export default CosmicBackground;

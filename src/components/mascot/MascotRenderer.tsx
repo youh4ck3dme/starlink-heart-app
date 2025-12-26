@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import fallbackImage from "../../assets/avatars/starry.png";
+import fallbackImage from "../../assets/avatars/starry.webp";
 
 const RiveMascot = lazy(() => import("./RiveMascot"));
 const Starry3D = lazy(() => import("./Starry3D"));

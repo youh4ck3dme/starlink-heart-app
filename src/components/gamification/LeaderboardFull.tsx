@@ -53,9 +53,12 @@ export const LeaderboardFull: React.FC<Props> = ({ onClose }) => {
         </div>
 
         {/* List */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
           {loading ? (
-             <div className="text-center text-white/50 py-10">Načítavam dáta...</div>
+             <div className="flex flex-col items-center justify-center py-20 opacity-50">
+                <div className="w-8 h-8 border-2 border-t-blue-500 rounded-full animate-spin mb-4"/>
+                <span className="text-sm font-medium tracking-wide">Načítavam dáta...</span>
+             </div>
           ) : (
             leaderboard.map((entry, index) => (
               <motion.div
@@ -63,39 +66,53 @@ export const LeaderboardFull: React.FC<Props> = ({ onClose }) => {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className={`flex items-center gap-4 p-3 rounded-xl border ${
+                className={`relative flex items-center gap-4 p-3 rounded-2xl border transition-all duration-300 group ${
                    entry.id === userEntry?.id 
-                     ? 'bg-blue-500/20 border-blue-500/50' 
-                     : 'bg-white/5 border-white/5'
+                     ? 'bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.2)]' 
+                     : 'bg-white/5 border-white/5 hover:bg-white/10 hover:border-white/10'
                 }`}
               >
-                <div className={`w-8 h-8 flex items-center justify-center font-black text-lg ${
-                    index === 0 ? 'text-yellow-400' :
-                    index === 1 ? 'text-gray-300' :
-                    index === 2 ? 'text-orange-400' : 'text-white/30'
+                {/* Rank Indicator */}
+                <div className={`w-10 h-10 flex items-center justify-center font-black text-xl rounded-full ${
+                    index === 0 ? 'bg-gradient-to-br from-yellow-300 to-amber-600 text-black shadow-lg shadow-amber-500/20' :
+                    index === 1 ? 'bg-gradient-to-br from-gray-300 to-slate-500 text-black shadow-lg shadow-slate-500/20' :
+                    index === 2 ? 'bg-gradient-to-br from-orange-300 to-red-500 text-black shadow-lg shadow-orange-500/20' : 
+                    'text-white/30 bg-white/5'
                 }`}>
-                    {index + 1}
+                    {index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}
                 </div>
                 
-                <div className="text-3xl">{entry.avatar}</div>
+                <div className="text-3xl filter drop-shadow-md transform group-hover:scale-110 transition-transform duration-300">{entry.avatar}</div>
                 
-                <div className="flex-1">
-                    <h4 className={`font-bold ${entry.id === userEntry?.id ? 'text-blue-300' : 'text-white'}`}>
+                <div className="flex-1 min-w-0">
+                    <h4 className={`font-bold truncate ${entry.id === userEntry?.id ? 'text-blue-200' : 'text-white group-hover:text-blue-200 transition-colors'}`}>
                         {entry.nickname}
                     </h4>
-                    <div className="flex items-center gap-2">
-                        {entry.badges.map(b => (
-                            <span key={b} className="text-[10px] px-1.5 py-0.5 bg-yellow-500/20 text-yellow-200 rounded border border-yellow-500/30">
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                        {entry.badges.slice(0, 3).map(b => (
+                            <span key={b} className="text-[10px] px-1.5 py-0.5 bg-yellow-500/10 text-yellow-200 rounded-md border border-yellow-500/20 backdrop-blur-sm">
                                 {b}
                             </span>
                         ))}
+                        {entry.badges.length > 3 && (
+                            <span className="text-[9px] text-white/30">+{entry.badges.length - 3}</span>
+                        )}
                     </div>
                 </div>
 
                 <div className="text-right">
-                    <div className="font-black text-white text-lg">{entry.score}</div>
-                    <div className="text-[10px] text-white/40 uppercase tracking-wider">Bodov</div>
+                    <div className="font-black text-white text-lg tracking-tight tabular-nums group-hover:text-blue-300 transition-colors">
+                        {entry.score}
+                    </div>
+                    <div className="text-[9px] text-white/40 uppercase tracking-widest font-bold">XP</div>
                 </div>
+
+                {/* Shimmer Effect for User */}
+                {entry.id === userEntry?.id && (
+                    <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-blue-400/10 to-transparent skew-x-12 translate-x-[-150%] animate-[shimmer_3s_infinite]"/>
+                    </div>
+                )}
               </motion.div>
             ))
           )}

@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import WelcomeScreen from '@/routes/WelcomeScreen';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import WelcomeScreen from '../routes/WelcomeScreen';
 
 // Mock useNavigate
 const mockNavigate = vi.fn();
@@ -37,20 +38,25 @@ describe('WelcomeScreen', () => {
 
     // Note: The "Starlink Heart" text might be in the image or version text, checking for button and version
     expect(screen.getByText(/Starlink Heart/i)).toBeInTheDocument();
-    
+  });
 
 
   it('handles navigation on button click', () => {
+    vi.useFakeTimers();
     render(
       <BrowserRouter>
         <WelcomeScreen />
       </BrowserRouter>
     );
 
-    const button = screen.getByLabelText(/Železná Hmlovina/i);
+    const button = screen.getByText(/Železná Hmlovina/i);
     fireEvent.click(button);
+    
+    // Fast-forward time to trigger setTimeout
+    vi.advanceTimersByTime(200);
 
     expect(mockNavigate).toHaveBeenCalledWith('/home');
+    vi.useRealTimers();
   });
 
   it('responds to pointer move (parallax)', () => {

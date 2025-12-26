@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { db, storage } from '../services/localService';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, limit, startAfter, getDocs, QueryDocumentSnapshot } from '../services/localService';
 import { ref, uploadBytes, getDownloadURL } from '../services/localService';
@@ -116,6 +117,7 @@ import { useHaptics } from '../hooks/useHaptics';
 
 const StarlinkHeartApp: React.FC = () => {
     // Hooks
+    const navigate = useNavigate();
     const voiceMode = useVoiceMode();
     const haptics = useHaptics();
     // State
@@ -579,11 +581,11 @@ const StarlinkHeartApp: React.FC = () => {
                             mascotMode={mascotMode}
                             onSchoolDashboard={() => {
                                 haptics.lightTap();
-                                window.location.href = '/dashboard';
+                                navigate('/dashboard');
                             }}
                             onEduPage={() => {
                                 haptics.lightTap();
-                                window.location.href = '/school';
+                                navigate('/school');
                             }}
                             onGemEarned={(amount) => {
                                 haptics.successVibrate();

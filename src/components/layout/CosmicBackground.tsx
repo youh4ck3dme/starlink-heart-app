@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import cosmicBg from '../../assets/cosmic.png';
+import cosmicBg from '../../assets/cosmic.webp';
 
 interface CosmicBackgroundProps {
     children?: React.ReactNode;

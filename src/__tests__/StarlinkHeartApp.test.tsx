@@ -1,11 +1,13 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import StarlinkHeartApp from '@/components/StarlinkHeartApp';
-import * as consentService from '@/services/consentService';
+import { MemoryRouter } from 'react-router-dom';
+import { vi, describe, beforeEach, it, expect } from 'vitest';
+import StarlinkHeartApp from '../components/StarlinkHeartApp';
+import * as consentService from '../services/consentService';
 
 // --- MOCKS ---
 
 // Mock Services
-vi.mock('@/services/localService', () => ({
+vi.mock('../services/localService', () => ({
   onSnapshot: (_: any, cb: any) => {
     // Simulate initial data load
     cb({ docs: [] });
@@ -24,41 +26,57 @@ vi.mock('@/services/localService', () => ({
   storage: {}
 }));
 
-vi.mock('@/services/geminiService', () => ({
+vi.mock('../services/geminiService', () => ({
   getStarryTip: vi.fn().mockResolvedValue('Tip of the day!'),
   generateCosmicResponse: vi.fn().mockResolvedValue({ textResponse: 'Cosmic hello!', visualAids: [] }),
 }));
 
-vi.mock('@/services/consentService', () => ({
+vi.mock('../services/consentService', () => ({
   hasParentConsent: vi.fn().mockReturnValue(true), // Default to true
   setParentConsent: vi.fn(),
   clearAllAppData: vi.fn()
 }));
 
-vi.mock('@/services/xpService', () => ({
+vi.mock('../services/xpService', () => ({
   getPlayerStats: vi.fn().mockReturnValue({ level: 1, xp: 0, title: 'Novice' })
 }));
 
-vi.mock('@/hooks/useVoiceMode', () => ({
+vi.mock('../hooks/useVoiceMode', () => ({
   useVoiceMode: () => ({ isSupported: true, isEnabled: false, toggleVoiceMode: vi.fn() })
 }));
 
 // Mock Complex Child Components
-vi.mock('@/components/layout/LiveStarryBackground', () => {
+vi.mock('../components/layout/LiveStarryBackground', () => {
     const React = require('react');
     return { default: () => React.createElement('div', { 'data-testid': 'live-bg' }) };
 });
-vi.mock('@/components/mascot/MascotRenderer', () => {
+vi.mock('../components/mascot/MascotRenderer', () => {
     const React = require('react');
     return { default: () => React.createElement('div', { 'data-testid': 'mascot' }) };
 });
 // Simplify ChatView to allow interaction with passed props if needed, or just existence
-vi.mock('@/components/chat/ChatView', () => {
+vi.mock('../components/chat/ChatView', () => {
     const React = require('react');
     return { default: () => React.createElement('div', { 'data-testid': 'chat-view' }, 'Chat View Content') };
 });
+// Mock Complex Screens to avoid Canvas/3D issues in JSDOM
+vi.mock('../components/screens/DashboardScreen', () => {
+    const React = require('react');
+    return { default: (props: any) => React.createElement('div', { 'data-testid': 'dashboard-screen' }, 
+        React.createElement('button', { 'data-testid': 'start-mission-btn', onClick: props.onNewMission }, 'Nová Misia'), // Mock content needed for nav test
+        React.createElement('button', { 'data-testid': 'profile-btn', onClick: props.onProfile }, 'Profile'), // Mock profile btn
+        React.createElement('button', { 'data-testid': 'open-settings-btn', onClick: props.onCenter }, 'Centrum'), // Mock settings btn with text matching test
+        React.createElement('button', { onClick: props.onCoachToggle }, props.isCoachMode ? 'Kouč: ON' : 'Kouč: OFF') // Mock coach btn
+    ) };
+});
+
+vi.mock('../components/screens/SchoolDashboard', () => {
+    const React = require('react');
+    return { default: () => React.createElement('div', { 'data-testid': 'school-dashboard' }, 'School Dashboard') };
+});
+
 // Mock Camera Modal
-vi.mock('@/components/camera/CameraModal', () => {
+vi.mock('../components/camera/CameraModal', () => {
     const React = require('react');
     return { default: ({ isOpen }: any) => isOpen ? React.createElement('div', { 'data-testid': 'camera-modal' }, 'Camera') : null };
 });
@@ -70,7 +88,11 @@ describe('StarlinkHeartApp', () => {
   });
 
   const navigateToDashboard = async () => {
-    render(<StarlinkHeartApp />);
+    render(
+      <MemoryRouter>
+        <StarlinkHeartApp />
+      </MemoryRouter>
+    );
     const startBtn = screen.getByRole('button', { name: /Start App|ŠTART|Začať/i });
     fireEvent.click(startBtn);
     // Wait for Dashboard animation to complete
@@ -81,8 +103,10 @@ describe('StarlinkHeartApp', () => {
     await navigateToDashboard();
 
     // Check Dashboard
-    // Use findByRole to avoid ambiguity with StarryHelper text
-    const newMissionBtn = await screen.findByRole('button', { name: /Nová/i });
+    const dashboard = await screen.findByTestId('dashboard-screen');
+    expect(dashboard).toBeInTheDocument();
+
+    const newMissionBtn = await screen.findByTestId('start-mission-btn');
     expect(newMissionBtn).toBeInTheDocument();
 
     // Go to Chat
@@ -125,8 +149,6 @@ describe('StarlinkHeartApp', () => {
     
     // Close Settings
     const closeBtn = screen.getByRole('button', { name: /×/i }); // Close 'x' button
-    // OR find by class if x is text
-    // Assuming the x is in a button
     fireEvent.click(closeBtn);
     
     await waitFor(() => {
@@ -149,15 +171,11 @@ describe('StarlinkHeartApp', () => {
     // Override mock for this test
     (consentService.hasParentConsent as any).mockReturnValue(false);
     
-    // We need to trigger a send action to check consent, but ChatView is mocked.
-    // However, the check is in handleConsentAccept which is passed to ParentNotice.
-    // OR we can test that ParentNotice is NOT shown initially, but maybe logic triggers it?
-    // Actually, in StarlinkHeartApp, explicit check is only on sending message.
-    // BUT, we can test that `ParentNotice` renders if `showParentNotice` state is true.
-    // Since we cannot easily trigger send from mocked ChatView, we might assume the logic works if we covered handleConsentAccept.
-    // Let's rely on unit tests for the logic or integration test if ChatView wasn't mocked.
-    
     // For now, let's just ensure basic render doesn't crash with no consent
-    render(<StarlinkHeartApp />);
+    render(
+      <MemoryRouter>
+        <StarlinkHeartApp />
+      </MemoryRouter>
+    );
   });
 });

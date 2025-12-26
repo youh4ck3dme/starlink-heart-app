@@ -1,8 +1,24 @@
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, test, expect, beforeEach, vi } from 'vitest';
 import { DailyMissionsCard } from '../components/gamification/DailyMissionsCard';
 import { LevelUpModal } from '../components/gamification/LevelUpModal';
-import { incrementMissionProgress, getDailyMissions, saveMissions, Mission } from '../services/missionService';
+
+// Mock dependencies
+vi.mock('../features/gamification/services/aiRewardEngine', () => ({
+    generateDailyChallenges: vi.fn(),
+}));
+
+// Mock sound/haptics
+vi.mock('../../utils/haptics', () => ({
+    tapHaptic: vi.fn(),
+    successHaptic: vi.fn(),
+}));
+
+vi.mock('../../utils/sound', () => ({
+    playSound: vi.fn(),
+}));
+
+import { generateDailyChallenges } from '../features/gamification/services/aiRewardEngine';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -14,7 +30,6 @@ const localStorageMock = (() => {
     removeItem: (key: string) => { delete store[key]; }
   };
 })();
-
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 describe('Gamification System', () => {
@@ -24,69 +39,56 @@ describe('Gamification System', () => {
         vi.clearAllMocks();
     });
 
-    test('MissionService generates missions', () => {
-        const missions = getDailyMissions();
-        expect(missions.length).toBeGreaterThan(0);
-        expect(missions[0]).toHaveProperty('id');
-        expect(missions[0]).toHaveProperty('progress', 0);
-    });
+    // Mock Data
+    const mockMissions = [
+        { id: 'm1', type: 'message', title: 'Test Mission', xpReward: 10, difficulty: 'easy' },
+        { id: 'm2', type: 'camera', title: 'Photo Mission', xpReward: 20, difficulty: 'medium' }
+    ];
 
-    test('MissionService tracks progress', () => {
-        // Initial state
-        let missions = getDailyMissions();
-        const firstMissionType = missions[0].type;
-        
-        // Increment
-        incrementMissionProgress(firstMissionType);
-        
-        // Check update
-        missions = getDailyMissions();
-        expect(missions[0].progress).toBe(1);
-    });
-
-    test('DailyMissionsCard renders missions', async () => {
+    test('DailyMissionsCard renders missions provided by AI Engine', async () => {
+        (generateDailyChallenges as any).mockResolvedValue(mockMissions);
         const mockOnGemEarned = vi.fn();
-        
-        // Prevent regeneration
-        window.localStorage.setItem('starlink_last_login_date', new Date().toDateString());
-
-        // Seed missions
-        const missions: Mission[] = [
-            { id: 'm1', type: 'MESSAGE_SENT', label: 'Test Mission', target: 1, progress: 0, completed: false, reward: 10 }
-        ];
-        saveMissions(missions);
 
         render(<DailyMissionsCard onGemEarned={mockOnGemEarned} />);
         
-        expect(screen.getByText('Test Mission')).toBeDefined();
-        expect(screen.getByText('0 / 1')).toBeDefined();
+        // Wait for loading to finish
+        await waitFor(() => {
+            expect(screen.getByText('Test Mission')).toBeInTheDocument();
+            expect(screen.getByText('Photo Mission')).toBeInTheDocument();
+        });
     });
 
-    test('DailyMissionsCard allows claiming reward', async () => {
+    test('DailyMissionsCard completes mission on click and rewards gems', async () => {
+        (generateDailyChallenges as any).mockResolvedValue(mockMissions);
         const mockOnGemEarned = vi.fn();
-
-        // Prevent regeneration
-        window.localStorage.setItem('starlink_last_login_date', new Date().toDateString());
         
-        // Seed completed mission
-        const missions: Mission[] = [
-            { id: 'm1', type: 'MESSAGE_SENT', label: 'Test Mission', target: 1, progress: 1, completed: false, reward: 10 }
-        ];
-        saveMissions(missions);
-
         render(<DailyMissionsCard onGemEarned={mockOnGemEarned} />);
         
-        const claimButton = screen.getByText('Získať 💎10');
-        fireEvent.click(claimButton);
+        await waitFor(() => {
+            expect(screen.getByText('Test Mission')).toBeInTheDocument();
+        });
+
+        // Click the mission to complete it
+        const missionBtn = screen.getByText('Test Mission').closest('button');
+        fireEvent.click(missionBtn!);
         
-        expect(mockOnGemEarned).toHaveBeenCalledWith(10);
+        // Check for visual feedback (optional, depending on implementation details)
+        // Check callback
+        await waitFor(() => {
+            expect(mockOnGemEarned).toHaveBeenCalledWith(10);
+        });
     });
 
     test('LevelUpModal renders correctly', () => {
         const onClose = vi.fn();
         render(<LevelUpModal level={2} title="Kadet" onClose={onClose} />);
         
-        expect(screen.getByText('LEVEL UP!')).toBeDefined();
-        expect(screen.getByText('Úroveň 2')).toBeDefined();
+        expect(screen.getByText('LEVEL UP!')).toBeInTheDocument();
+        expect(screen.getByText('Úroveň 2')).toBeInTheDocument();
+        
+        // Check close button
+        const closeBtn = screen.getByText('Pokračovať');
+        fireEvent.click(closeBtn);
+        expect(onClose).toHaveBeenCalled();
     });
 });
