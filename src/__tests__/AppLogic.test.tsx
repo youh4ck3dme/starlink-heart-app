@@ -123,8 +123,8 @@ describe('StarlinkHeartApp Logic', () => {
         const newMissionBtn = await screen.findByTestId('start-mission-btn'); // Use testid for Nová Misia button
         fireEvent.click(newMissionBtn);
 
-        // Type in input
-        const input = screen.getByPlaceholderText(/Spýtaj sa Starryho/i);
+        // Wait for Chat view to animate in
+        const input = await screen.findByPlaceholderText(/Spýtaj sa Starryho/i);
         fireEvent.change(input, { target: { value: 'Hello Galaxy' } });
 
         // Click send
@@ -162,7 +162,8 @@ describe('StarlinkHeartApp Logic', () => {
         const newMissionBtn = await screen.findByTestId('start-mission-btn');
         fireEvent.click(newMissionBtn);
 
-        const input = screen.getByPlaceholderText(/Spýtaj sa Starryho/i);
+        // Wait for Chat view to animate in
+        const input = await screen.findByPlaceholderText(/Spýtaj sa Starryho/i);
         fireEvent.change(input, { target: { value: 'Fail me' } });
         
         const sendBtn = screen.getByLabelText('Poslať správu');
