@@ -1,10 +1,34 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Moon, Sun, Calendar, Award, Bell } from 'lucide-react';
+import { ArrowLeft, Moon, Sun, Calendar, Award, Bell, LogIn, Loader2, LogOut, RefreshCw } from 'lucide-react';
+import { useEdupage } from '../features/edupage/hooks/useEdupage';
+import { TimetableLesson, Grade, TimelineItem } from '../core/types/schoolSystem';
 
 // Backgrounds
 import greenBg from '../assets/dashboard-bg.webp';
 import pinkBg from '../assets/dashboard-bg-pink.webp';
+
+// --- Components ---
+
+const Clock = () => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="text-center mb-6">
+      <div className="text-4xl font-black tracking-widest drop-shadow-lg font-mono">
+        {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      </div>
+      <div className="text-sm font-medium opacity-80 uppercase tracking-wide">
+        {time.toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long' })}
+      </div>
+    </div>
+  );
+};
 
 // Educational Particles Component
 const EducationalParticles = ({ theme }: { theme: 'green' | 'pink' }) => {
@@ -46,16 +70,9 @@ const EducationalParticles = ({ theme }: { theme: 'green' | 'pink' }) => {
 };
 
 // Timetable Card
-const TimetableCard = ({ theme }: { theme: 'green' | 'pink' }) => {
+const TimetableCard = ({ theme, lessons }: { theme: 'green' | 'pink', lessons: TimetableLesson[] }) => {
   const accent = theme === 'green' ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-pink-500/50 bg-pink-500/10';
   const textAccent = theme === 'green' ? 'text-emerald-400' : 'text-pink-400';
-  
-  const lessons = [
-    { time: '08:00', subject: 'Matematika', teacher: 'Mgr. Nováková', current: true },
-    { time: '08:45', subject: 'Slovenský jazyk', teacher: 'PhDr. Kováč', current: false },
-    { time: '09:40', subject: 'Anglický jazyk', teacher: 'Bc. Smith', current: false },
-    { time: '10:35', subject: 'Fyzika', teacher: 'RNDr. Horák', current: false },
-  ];
 
   return (
     <div className={`rounded-2xl border ${accent} backdrop-blur-xl p-4`} role="region" aria-label="Dnešný rozvrh">
@@ -64,51 +81,54 @@ const TimetableCard = ({ theme }: { theme: 'green' | 'pink' }) => {
         <h3 className="font-bold text-white">Dnešný rozvrh</h3>
       </div>
       <div className="space-y-2">
-        {lessons.map((lesson, i) => (
-          <div 
-            key={i} 
-            className={`flex items-center gap-3 p-2 rounded-lg transition-all ${
-              lesson.current 
-                ? `${accent} ring-2 ${theme === 'green' ? 'ring-emerald-500' : 'ring-pink-500'}` 
-                : 'hover:bg-white/5'
-            }`}
-          >
-            <span className={`font-mono text-sm ${lesson.current ? textAccent : 'text-white/50'}`}>
-              {lesson.time}
-            </span>
-            <div className="flex-1">
-              <p className={`font-semibold ${lesson.current ? 'text-white' : 'text-white/70'}`}>
-                {lesson.subject}
-              </p>
-              <p className="text-xs text-white/40">{lesson.teacher}</p>
+        {lessons.length > 0 ? lessons.map((lesson, i) => {
+           // Simple check for "current" lesson (mock logic or real time check needed)
+           const isCurrent = i === 0; 
+           return (
+            <div 
+              key={i} 
+              className={`flex items-center gap-3 p-2 rounded-lg transition-all ${
+                isCurrent
+                  ? `${accent} ring-2 ${theme === 'green' ? 'ring-emerald-500' : 'ring-pink-500'}` 
+                  : 'hover:bg-white/5'
+              }`}
+            >
+              <span className={`font-mono text-sm ${isCurrent ? textAccent : 'text-white/50'}`}>
+                {lesson.start}
+              </span>
+              <div className="flex-1">
+                <p className={`font-semibold ${isCurrent ? 'text-white' : 'text-white/70'}`}>
+                  {lesson.subject}
+                </p>
+                <p className="text-xs text-white/40">{lesson.room || 'Trieda'}</p>
+              </div>
+              {isCurrent && (
+                <span className={`text-xs font-bold ${textAccent} animate-pulse`}>TERAZ</span>
+              )}
             </div>
-            {lesson.current && (
-              <span className={`text-xs font-bold ${textAccent} animate-pulse`}>TERAZ</span>
-            )}
-          </div>
-        ))}
+          );
+        }) : (
+            <p className="text-center text-white/50 py-4">Žiadne hodiny na dnes</p>
+        )}
       </div>
     </div>
   );
 };
 
 // Grades Card
-const GradesCard = ({ theme }: { theme: 'green' | 'pink' }) => {
+const GradesCard = ({ theme, grades }: { theme: 'green' | 'pink', grades: Grade[] }) => {
   const accent = theme === 'green' ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-pink-500/50 bg-pink-500/10';
   const textAccent = theme === 'green' ? 'text-emerald-400' : 'text-pink-400';
   
-  const grades = [
-    { subject: 'MAT', grade: 1, date: '20.12.' },
-    { subject: 'SJL', grade: 2, date: '19.12.' },
-    { subject: 'ANJ', grade: 1, date: '18.12.' },
-    { subject: 'FYZ', grade: 1, date: '17.12.' },
-  ];
+  const getGradeColor = (gradeValue: string) => {
+    // Handle string grades (e.g. "1" or "1-")
+    const num = parseInt(gradeValue);
+    if (isNaN(num)) return 'bg-gray-500';
 
-  const getGradeColor = (grade: number) => {
-    if (grade === 1) return 'bg-green-500';
-    if (grade === 2) return 'bg-lime-500';
-    if (grade === 3) return 'bg-yellow-500';
-    if (grade === 4) return 'bg-orange-500';
+    if (num === 1) return 'bg-green-500';
+    if (num === 2) return 'bg-lime-500';
+    if (num === 3) return 'bg-yellow-500';
+    if (num === 4) return 'bg-orange-500';
     return 'bg-red-500';
   };
 
@@ -119,32 +139,30 @@ const GradesCard = ({ theme }: { theme: 'green' | 'pink' }) => {
         <h3 className="font-bold text-white">Posledné známky</h3>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        {grades.map((g, i) => (
+        {grades.length > 0 ? grades.slice(0, 6).map((g, i) => (
           <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-white/5">
-            <span className={`w-8 h-8 flex items-center justify-center rounded-full text-white font-bold ${getGradeColor(g.grade)}`}>
-              {g.grade}
+            <span className={`w-8 h-8 flex items-center justify-center rounded-full text-white font-bold ${getGradeColor(g.value)}`}>
+              {g.value}
             </span>
             <div>
               <p className="font-semibold text-white/80">{g.subject}</p>
-              <p className="text-xs text-white/40">{g.date}</p>
+              <p className="text-xs text-white/40">
+                {g.date ? new Date(g.date).toLocaleDateString('sk-SK', { day: 'numeric', month: 'numeric' }) : ''}
+              </p>
             </div>
           </div>
-        ))}
+        )) : (
+            <p className="col-span-2 text-center text-white/50 py-4">Žiadne známky</p>
+        )}
       </div>
     </div>
   );
 };
 
 // Notices Card
-const NoticesCard = ({ theme }: { theme: 'green' | 'pink' }) => {
+const NoticesCard = ({ theme, notices }: { theme: 'green' | 'pink', notices: TimelineItem[] }) => {
   const accent = theme === 'green' ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-pink-500/50 bg-pink-500/10';
   const textAccent = theme === 'green' ? 'text-emerald-400' : 'text-pink-400';
-  
-  const notices = [
-    { title: 'Nová úloha z matematiky', time: 'Pred 2 hodinami', urgent: true },
-    { title: 'Triedna schôdza 15.1.', time: 'Včera', urgent: false },
-    { title: 'Prázdniny od 23.12.', time: 'Pred 3 dňami', urgent: false },
-  ];
 
   return (
     <div className={`rounded-2xl border ${accent} backdrop-blur-xl p-4`} role="region" aria-label="Oznamy">
@@ -153,21 +171,22 @@ const NoticesCard = ({ theme }: { theme: 'green' | 'pink' }) => {
         <h3 className="font-bold text-white">Oznamy</h3>
       </div>
       <div className="space-y-2">
-        {notices.map((notice, i) => (
+        {notices.length > 0 ? notices.slice(0, 3).map((notice, i) => (
           <div key={i} className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer">
             <div className="flex items-start gap-2">
-              {notice.urgent && (
-                <span className="w-2 h-2 mt-1.5 rounded-full bg-red-500 animate-pulse" />
-              )}
               <div className="flex-1">
-                <p className={`font-medium ${notice.urgent ? 'text-white' : 'text-white/70'}`}>
-                  {notice.title}
+                <p className="font-medium text-white">
+                  {notice.title || 'Oznam'}
                 </p>
-                <p className="text-xs text-white/40">{notice.time}</p>
+                <p className="text-xs text-white/40">
+                    {notice.createdAt ? new Date(notice.createdAt).toLocaleDateString('sk-SK') : ''}
+                </p>
               </div>
             </div>
           </div>
-        ))}
+        )) : (
+            <p className="text-center text-white/50 py-4">Žiadne oznamy</p>
+        )}
       </div>
     </div>
   );
@@ -180,9 +199,25 @@ export default function SchoolDashboard() {
     return (localStorage.getItem('dashboardTheme') as 'green' | 'pink') || 'green';
   });
 
+  // EduPage Logic
+  const { snapshot, loading, error, isAuthenticated, login, logout, refresh } = useEdupage();
+  
+  // Login Form State
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [ebuid, setEbuid] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
+
   useEffect(() => {
     localStorage.setItem('dashboardTheme', theme);
   }, [theme]);
+
+  const handleLogin = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLoginLoading(true);
+      await login(username, password, ebuid);
+      setLoginLoading(false);
+  };
 
   const bgImage = theme === 'green' ? greenBg : pinkBg;
   const accentColor = theme === 'green' ? 'text-emerald-400' : 'text-pink-400';
@@ -200,7 +235,7 @@ export default function SchoolDashboard() {
       />
       
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-0 bg-black/50" />
       
       {/* Educational Particles */}
       <EducationalParticles theme={theme} />
@@ -209,7 +244,7 @@ export default function SchoolDashboard() {
       <div className="relative z-20 min-h-dvh flex flex-col safe-area-inset">
         
         {/* Header */}
-        <header className="flex items-center justify-between p-4 backdrop-blur-md bg-black/20">
+        <header className="flex items-center justify-between p-4 backdrop-blur-md bg-black/20 sticky top-0 z-30">
           <button 
             onClick={() => navigate('/home')}
             className={`p-2 rounded-full ${buttonAccent} border transition-colors`}
@@ -222,21 +257,91 @@ export default function SchoolDashboard() {
             ŠKOLA
           </h1>
           
-          {/* Theme Toggle */}
-          <button 
-            onClick={() => setTheme(theme === 'green' ? 'pink' : 'green')}
-            className={`p-2 rounded-full ${buttonAccent} border transition-colors`}
-            aria-label={theme === 'green' ? 'Prepnúť na ružovú tému' : 'Prepnúť na zelenú tému'}
-          >
-            {theme === 'green' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-          </button>
+          <div className="flex gap-2">
+             {isAuthenticated && (
+                <button 
+                    onClick={logout}
+                    className="p-2 rounded-full bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 transition-colors"
+                >
+                    <LogOut className="w-5 h-5 text-red-400" />
+                </button>
+             )}
+            <button 
+                onClick={() => setTheme(theme === 'green' ? 'pink' : 'green')}
+                className={`p-2 rounded-full ${buttonAccent} border transition-colors`}
+            >
+                {theme === 'green' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            </button>
+          </div>
         </header>
 
-        {/* Dashboard Cards */}
-        <main className="flex-1 p-4 space-y-4 overflow-auto pb-20">
-          <TimetableCard theme={theme} />
-          <GradesCard theme={theme} />
-          <NoticesCard theme={theme} />
+        <main className="flex-1 p-4 space-y-6 overflow-auto pb-24">
+           {/* Clock at the top */}
+           <Clock />
+
+           {loading && !snapshot ? (
+             <div className="flex flex-col items-center justify-center py-20">
+                <Loader2 className={`w-12 h-12 ${accentColor} animate-spin mb-4`} />
+                <p className="text-white/60">Načítavam školské dáta...</p>
+             </div>
+           ) : !isAuthenticated ? (
+               // Login Form
+               <div className="max-w-md mx-auto space-y-6 bg-black/30 backdrop-blur-md p-6 rounded-3xl border border-white/10">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-bold mb-2">Prihlás sa</h2>
+                    <p className="text-white/60 text-sm">Pre zobrazenie známok a rozvrhu</p>
+                  </div>
+
+                  <form onSubmit={handleLogin} className="space-y-4">
+                      <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        placeholder="Meno (napr. janko.hrasko)"
+                        required
+                      />
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        placeholder="Heslo"
+                        required
+                      />
+                      <input
+                        type="text"
+                        value={ebuid}
+                        onChange={(e) => setEbuid(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        placeholder="ID školy (napr. zskostolany)"
+                        required
+                      />
+                      
+                      {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+
+                      <button
+                        type="submit"
+                        disabled={loginLoading}
+                        className={`w-full py-4 rounded-xl ${theme === 'green' ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-pink-500 hover:bg-pink-600'} font-bold flex items-center justify-center gap-2 transition-all active:scale-95`}
+                      >
+                        {loginLoading ? <Loader2 className="w-5 h-5 animate-spin"/> : <LogIn className="w-5 h-5" />}
+                        {loginLoading ? 'Prihlasujem...' : 'Prihlásiť sa'}
+                      </button>
+                  </form>
+                  {/* Mock Login Hint */}
+                  <p className="text-center text-xs text-white/30">
+                     Tip: Pre demo režim stačí kliknúť "Prihlásiť sa" s hocijakými údajmi.
+                  </p>
+               </div>
+           ) : (
+             // Authenticated Dashboard
+             <>
+                <TimetableCard theme={theme} lessons={snapshot?.timetable || []} />
+                <GradesCard theme={theme} grades={snapshot?.grades || []} />
+                <NoticesCard theme={theme} notices={snapshot?.timeline || []} />
+             </>
+           )}
         </main>
       </div>
     </div>

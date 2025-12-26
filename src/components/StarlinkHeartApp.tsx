@@ -587,7 +587,7 @@ const StarlinkHeartApp: React.FC = () => {
                             }}
                             onEduPage={() => {
                                 haptics.lightTap();
-                                navigate('/school');
+                                navigate('/dashboard');
                             }}
                             onGemEarned={(amount) => {
                                 haptics.successVibrate();
