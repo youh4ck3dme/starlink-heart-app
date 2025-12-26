@@ -27,27 +27,27 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onStart, avatar, textColor })
                 </p>
 
                 {/* Features Grid - Clean & Glassmorphic */}
-                <div className="grid grid-cols-3 gap-3 w-full mb-10">
+                <div className="grid grid-cols-3 gap-4 w-full mb-12 px-4">
                     {[
                         { icon: "🤖", title: "AI Kamarát", desc: "Vždy pomôže" },
                         { icon: "💎", title: "Zbieraj XP", desc: "Hraj a rasti" },
                         { icon: "🎨", title: "Tvoj Štýl", desc: "Prispôsob si" }
                     ].map((feature, idx) => (
-                        <div key={idx} className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3 flex flex-col items-center transition-transform hover:scale-105 duration-300">
-                            <span className="text-2xl mb-1">{feature.icon}</span>
-                            <span className={`font-bold text-sm ${textColor}`}>{feature.title}</span>
-                            <span className={`text-[10px] opacity-70 ${textColor}`}>{feature.desc}</span>
+                        <div key={idx} className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-4 flex flex-col items-center transition-all hover:scale-105 duration-300 hover:bg-white/10 shadow-lg">
+                            <span className="text-3xl mb-2 filter drop-shadow-md">{feature.icon}</span>
+                            <span className={`font-bold text-sm ${textColor} tracking-wide`}>{feature.title}</span>
                         </div>
                     ))}
                 </div>
 
                 <button 
                     onClick={onStart}
-                    className="group relative px-12 py-5 bg-gradient-to-b from-yellow-300 to-yellow-500 hover:from-yellow-200 hover:to-yellow-400 rounded-[2rem] shadow-[0_10px_30px_rgba(234,179,8,0.5)] border-b-[6px] border-yellow-700 active:border-b-0 active:translate-y-[6px] transition-all w-full md:w-auto"
+                    className="group relative w-full md:w-auto min-w-[280px] px-8 py-6 bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-500 rounded-full shadow-[0_0_40px_rgba(250,204,21,0.6)] border border-yellow-200 transition-all hover:scale-105 hover:shadow-[0_0_60px_rgba(250,204,21,0.8)] active:scale-95"
                 >
-                    <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent rounded-[2rem] pointer-events-none"></div>
-                    <span className="relative text-2xl md:text-3xl font-black text-yellow-900 tracking-wider flex items-center justify-center gap-3 drop-shadow-sm">
-                        ŠTART <span className="text-4xl group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform">🚀</span>
+                    <div className="absolute inset-0 bg-white/20 rounded-full blur-sm"></div>
+                    <span className="relative flex items-center justify-center gap-3">
+                        <span className="text-3xl font-black text-yellow-900 tracking-wider">ŠTART</span>
+                        <span className="text-3xl animate-pulse">🚀</span>
                     </span>
                 </button>
             </div>
