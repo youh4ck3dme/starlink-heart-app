@@ -11,9 +11,13 @@ const StarryAvatarDisplay = ({
     isExcited?: boolean; 
     size?: string; 
 }) => {
-    // If avatar is the Starry or Comet image key (e.g., '⭐', '☄️'), render the image
-    const isImageAvatar = avatar === '⭐' || avatar === '☄️'; 
-    const avatarImageSrc = avatar === '⭐' ? "/src/assets/avatars/starry.png" : "/src/assets/avatars/comet.png";
+    // If avatar is one of the new 3D avatars, render the image
+    const isImageAvatar = ['⭐', '☄️', '🤖'].includes(avatar); 
+    
+    let avatarImageSrc = '';
+    if (avatar === '⭐') avatarImageSrc = "/src/assets/avatars/starry.png";
+    else if (avatar === '☄️') avatarImageSrc = "/src/assets/avatars/comet.png";
+    else if (avatar === '🤖') avatarImageSrc = "/src/assets/avatars/robo.png";
 
     // Calculate pixel size based on text size class for image
     const pixelSize = size.includes('text-[') ? size.match(/text-\[(.*?)\]/)?.[1] : 
@@ -26,7 +30,7 @@ const StarryAvatarDisplay = ({
                 {isImageAvatar ? (
                     <img 
                         src={avatarImageSrc}
-                        alt="Avatar" 
+                        alt="3D Avatar" 
                         className="object-contain drop-shadow-lg"
                         style={{ width: pixelSize, height: pixelSize }}
                     />
