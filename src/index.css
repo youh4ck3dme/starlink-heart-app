@@ -333,3 +333,25 @@ html, body {
   from { --angle: 0deg; }
   to { --angle: 360deg; }
 }
+
+/* ===== EDUCATIONAL PARTICLES ANIMATION ===== */
+@keyframes float-up {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-float-up {
+  animation: float-up 15s linear infinite;
+}

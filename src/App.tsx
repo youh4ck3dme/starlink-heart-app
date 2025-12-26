@@ -5,6 +5,7 @@ import { ToastProvider } from './hooks/use-toast';
 const WelcomeScreen = lazy(() => import('./routes/WelcomeScreen'));
 const Home = lazy(() => import('./routes/Home'));
 const AuthPage = lazy(() => import('./routes/AuthPage'));
+const SchoolDashboard = lazy(() => import('./routes/SchoolDashboard'));
 const NotFound = lazy(() => import('./routes/NotFound'));
 
 /**
@@ -62,6 +63,14 @@ const router = createBrowserRouter([
     element: (
       <Suspense fallback={<LoadingFallback />}>
         <AuthPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/dashboard",
+    element: (
+      <Suspense fallback={<LoadingFallback />}>
+        <SchoolDashboard />
       </Suspense>
     ),
   },
