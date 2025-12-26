@@ -3,34 +3,75 @@
   "short_name": "Starlink",
   "description": "AI tutor pre slovenské deti - matematika, slovenčina, angličtina",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
+  "background_color": "#060819",
   "theme_color": "#3b82f6",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
+  "id": "com.starlinkheart.app",
   "icons": [
     {
-      "src": "/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
   "categories": ["education", "kids"],
   "lang": "sk-SK",
   "dir": "ltr",
+  "prefer_related_applications": false,
   "shortcuts": [
     {
       "name": "Domov",
       "short_name": "Domov",
       "description": "Hlavná obrazovka",
       "url": "/home",
-      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Škola",
+      "short_name": "Škola",
+      "description": "Školský dashboard",
+      "url": "/dashboard",
+      "icons": [{ "src": "/android-chrome-192x192.png", "sizes": "192x192" }]
     }
-  ]
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "handle_links": "preferred"
 }

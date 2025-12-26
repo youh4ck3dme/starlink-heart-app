@@ -4,7 +4,7 @@
 
 ---
 
-## 📊 Celková Hotovosť: ~85%
+## 📊 Celková Hotovosť: ~90%
 
 ---
 
