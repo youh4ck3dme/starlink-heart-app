@@ -16,12 +16,13 @@ import CameraModal from './camera/CameraModal';
 import { useVoiceMode } from '../hooks/useVoiceMode';
 import IntroScreen from './screens/IntroScreen';
 import DashboardScreen from './screens/DashboardScreen';
+import { useGamification, getAvatarForLevel, getAvatarName } from '../features/gamification/context/GamificationContext';
 
-// Define Avatars with Names
+// Define Avatars with Names (progression order: Robot → Comet → Starry)
 const AVATAR_OPTIONS = [
-    { emoji: '⭐', name: 'Starry', price: 0 },
-    { emoji: '☄️', name: 'Cometa', price: 20 },
-    { emoji: '🤖', name: 'Robo', price: 50 },
+    { emoji: '🤖', name: 'Robo', levelRequired: 1 },
+    { emoji: '☄️', name: 'Cometa', levelRequired: 6 },
+    { emoji: '⭐', name: 'Starry', levelRequired: 11 },
 ];
 
 // Compatibility constant for existing logic
@@ -120,6 +121,11 @@ const StarlinkHeartApp: React.FC = () => {
     const navigate = useNavigate();
     const voiceMode = useVoiceMode();
     const haptics = useHaptics();
+    const { state: gamificationState } = useGamification();
+    
+    // Auto-select avatar based on level (progression system)
+    const starryAvatar = getAvatarForLevel(gamificationState.level);
+    const avatarName = getAvatarName(gamificationState.level);
     // State
     const [hearts, setHearts] = useState<Heart[]>([]);
     const [newMessage, setNewMessage] = useState('');
@@ -133,7 +139,7 @@ const StarlinkHeartApp: React.FC = () => {
     const [starryTip, setStarryTip] = useState('');
     const [isTipLoading, setIsTipLoading] = useState(false);
     const [showCustomizeModal, setShowCustomizeModal] = useState(false);
-    const [starryAvatar, setStarryAvatar] = useState<string>(STARRY_AVATARS[0]);
+    // starryAvatar is now derived from level (see above)
     const [showBackgroundModal, setShowBackgroundModal] = useState(false);
     const [appBackground, setAppBackground] = useState(BACKGROUND_OPTIONS[1]); // Default to Deep Space
     const [customApiKey, setCustomApiKey] = useState('');
@@ -193,8 +199,7 @@ const StarlinkHeartApp: React.FC = () => {
     // --- Effects ---
 
     useEffect(() => {
-        const savedAvatar = localStorage.getItem(STARRY_AVATAR_KEY);
-        if (savedAvatar && STARRY_AVATARS.includes(savedAvatar)) setStarryAvatar(savedAvatar);
+        // Avatar is now auto-derived from level, no need to load from storage
         
         const savedBackgroundId = localStorage.getItem(STARRY_BACKGROUND_KEY);
         const savedBackground = BACKGROUND_OPTIONS.find(bg => bg.id === savedBackgroundId);
@@ -369,11 +374,8 @@ const StarlinkHeartApp: React.FC = () => {
         
         // Unlock item
         if (type === 'avatar') {
-            const newUnlocked = [...unlockedAvatars, id];
-            setUnlockedAvatars(newUnlocked);
-            localStorage.setItem('unlockedAvatars', JSON.stringify(newUnlocked));
-            // Auto-select purchased avatar
-            setStarryAvatar(id);
+            // Avatars are now level-based, not purchasable
+            return false;
         } else {
             const newUnlocked = [...unlockedBackgrounds, id];
             setUnlockedBackgrounds(newUnlocked);
@@ -598,6 +600,20 @@ const StarlinkHeartApp: React.FC = () => {
                                 setTimeout(() => setGemJustEarned(false), 2000);
                             }}
                         />
+                        
+                        {/* Intro Text for Main Avatar */}
+                        {hearts.length === 0 && (
+                            <motion.div 
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5 }}
+                                className="mt-6 max-w-sm mx-auto bg-white/20 backdrop-blur-md p-4 rounded-3xl border border-white/30 text-center shadow-xl"
+                            >
+                                <p className="text-white text-lg font-medium drop-shadow-md">
+                                    Ahoj! 👋 Klikni na <span className="font-bold text-yellow-300">"Nová Misia"</span> a opýtaj sa ma čokoľvek o vesmíre! PRE DETI: Môžeme si pozrieť aj fotky! 📸✨
+                                </p>
+                            </motion.div>
+                        )}
                         <StarryHelper avatar={starryAvatar} />
                     </motion.div>
                 )}
@@ -742,57 +758,47 @@ const StarlinkHeartApp: React.FC = () => {
                         
                         <h3 className="text-lg font-bold text-gray-800 mb-6 text-center">Vzhľad a Téma</h3>
                         
-                        {/* Avatars with Prices */}
+                        {/* Avatars - Level Based Progression */}
                         <div className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1 flex items-center gap-2">
                             Tvoj Avatar
-                            <span className="text-yellow-600 font-bold">💎 {gemCount}</span>
+                            <span className="text-indigo-600 font-bold">Level {gamificationState.level}</span>
                         </div>
                         <div className="grid grid-cols-3 gap-3 mb-8">
                             {AVATAR_OPTIONS.map((option) => {
-                                const isUnlocked = unlockedAvatars.includes(option.emoji);
+                                const isUnlocked = gamificationState.level >= option.levelRequired;
                                 const isSelected = starryAvatar === option.emoji;
-                                const canAfford = gemCount >= option.price;
                                 
                                 return (
-                                    <button 
+                                    <div 
                                         key={option.emoji} 
-                                        onClick={() => {
-                                            if (isUnlocked) {
-                                                setStarryAvatar(option.emoji);
-                                            } else if (canAfford) {
-                                                purchaseItem('avatar', option.emoji, option.price);
-                                            }
-                                        }} 
                                         className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all ${
                                             isSelected ? 'bg-sky-100 ring-2 ring-sky-500 transform scale-105 shadow-md' : 
                                             !isUnlocked ? 'bg-gray-100 opacity-75' :
-                                            'hover:bg-gray-50 border border-transparent hover:border-gray-100'
+                                            'bg-gray-50 border border-gray-200'
                                         }`}
                                     >
                                         <div className={`mb-1 ${!isUnlocked ? 'grayscale opacity-50' : ''}`}>
                                             <StarryAvatarDisplay 
                                                 avatar={option.emoji} 
                                                 size="text-4xl" 
-                                                isFloating={isSelected} // Animate if selected (gentle bounce)
+                                                isFloating={isSelected}
                                                 isExcited={false}
                                             />
                                         </div>
                                         <span className="text-xs font-bold text-gray-600">{option.name}</span>
                                         
-                                        {/* Price or Lock indicator */}
+                                        {/* Level requirement indicator */}
                                         {!isUnlocked && (
-                                            <div className={`absolute -top-1 -right-1 px-2 py-0.5 rounded-full text-[10px] font-bold shadow-md ${
-                                                canAfford ? 'bg-yellow-400 text-yellow-900' : 'bg-gray-300 text-gray-600'
-                                            }`}>
-                                                💎{option.price}
+                                            <div className="absolute -top-1 -right-1 px-2 py-0.5 rounded-full text-[10px] font-bold shadow-md bg-indigo-500 text-white">
+                                                L{option.levelRequired}
                                             </div>
                                         )}
-                                        {isSelected && isUnlocked && (
+                                        {isSelected && (
                                             <div className="absolute -top-1 -right-1 bg-sky-500 text-white rounded-full p-1 shadow-md z-10">
                                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                                             </div>
                                         )}
-                                    </button>
+                                    </div>
                                 );
                             })}
                         </div>

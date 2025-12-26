@@ -27,6 +27,20 @@ function levelFor(xp: number) {
   return Math.floor(1 + Math.sqrt(xp) / 5); 
 }
 
+// Avatar progression based on level
+// Robot (1-5) → Comet (6-10) → Starry (11+)
+export function getAvatarForLevel(level: number): string {
+  if (level >= 11) return '⭐'; // Starry - Final form
+  if (level >= 6) return '☄️';  // Comet - Mid tier
+  return '🤖';                   // Robot - Starter
+}
+
+export function getAvatarName(level: number): string {
+  if (level >= 11) return 'Starry';
+  if (level >= 6) return 'Cometa';
+  return 'Robo';
+}
+
 function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'GAIN_XP': {
