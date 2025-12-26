@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 // Don't mock these - we want to test real behavior!
 import RiveMascot from '../components/mascot/RiveMascot';
@@ -56,21 +56,24 @@ describe('MascotRenderer Fallback Tests', () => {
             
             const img = container.querySelector('img');
             expect(img).toBeInTheDocument();
-            expect(img?.alt).toBe('Starry');
+            // Fallback image alt changed to "Starry Loading" in shared fallback
+            expect(img?.alt).toBe('Starry Loading');
         });
 
-        it('renders with rive mode and shows fallback when Rive unavailable', () => {
+        it('renders with rive mode and shows fallback when Rive unavailable', async () => {
             render(<MascotRenderer mode="rive" />);
             
             // Since Rive is mocked to fail, should show fallback
-            expect(screen.getByText('✨')).toBeInTheDocument();
+            // Wrapped in waitFor for lazy load
+            await expect(screen.findByText('✨')).resolves.toBeInTheDocument();
         });
 
-        it('does NOT render Spline for spline3d mode without valid URL', () => {
+        it('does NOT render Spline for spline3d mode without valid URL', async () => {
             const { container } = render(<MascotRenderer mode="spline3d" />);
             
             // Should fallback to Rive (then to emoji since Rive is mocked to fail)
-            expect(screen.getByText('✨')).toBeInTheDocument();
+            // Lazy load needs async wait
+            await expect(screen.findByText('✨')).resolves.toBeInTheDocument();
             expect(screen.queryByTestId('spline-mock')).not.toBeInTheDocument();
         });
 

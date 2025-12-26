@@ -74,7 +74,7 @@ describe('Gem Shop Features', () => {
         render(<StarlinkHeartApp />);
         
         // Click Start
-        fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
         
         // Wait for Dashboard and click Settings (Centrum) - find by text
         const centrumBtn = await screen.findByText('Centrum');
@@ -89,11 +89,9 @@ describe('Gem Shop Features', () => {
     it('displays avatar prices in customize modal', async () => {
         await navigateToCustomizeModal();
         
-        // Check for price badges (💎30, 💎50, etc.)
-        expect(screen.getByText('💎30')).toBeInTheDocument();
+        // Check for price badges (new prices: Cometa 💎20, Robo 💎50)
+        expect(screen.getByText('💎20')).toBeInTheDocument();
         expect(screen.getByText('💎50')).toBeInTheDocument();
-        expect(screen.getByText('💎75')).toBeInTheDocument();
-        expect(screen.getByText('💎100')).toBeInTheDocument();
     });
 
     it('displays background prices in customize modal', async () => {
@@ -201,8 +199,8 @@ describe('Voice Mode UI', () => {
         render(<StarlinkHeartApp />);
         
         // Navigate to chat
-        fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
-        const newMissionBtn = await screen.findByText(/Nová/i);
+        fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
+        const newMissionBtn = await screen.findByTestId('start-mission-btn');
         fireEvent.click(newMissionBtn);
         
         // Find mic button
@@ -213,8 +211,8 @@ describe('Voice Mode UI', () => {
     it('mic button has correct styling', async () => {
         render(<StarlinkHeartApp />);
         
-        fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
-        const newMissionBtn = await screen.findByText(/Nová/i);
+        fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
+        const newMissionBtn = await screen.findByTestId('start-mission-btn');
         fireEvent.click(newMissionBtn);
         
         const micBtn = await screen.findByLabelText('Hlasový vstup');

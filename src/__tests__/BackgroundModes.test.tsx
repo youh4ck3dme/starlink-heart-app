@@ -77,7 +77,7 @@ describe('Background Modes', () => {
         render(<StarlinkHeartApp />);
         
         // Click Start
-        fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
         
         // Wait for Dashboard and click Settings (Centrum)
         const centrumBtn = await screen.findByText('Centrum');
@@ -148,7 +148,7 @@ describe('Background Modes', () => {
             localStorage.setItem('starryBackground', 'space');
             render(<StarlinkHeartApp />);
             
-            fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
+            fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
             
             await waitFor(() => {
                 const container = document.querySelector('.bg-deep-space');
@@ -160,7 +160,7 @@ describe('Background Modes', () => {
             localStorage.setItem('starryBackground', 'sky');
             render(<StarlinkHeartApp />);
             
-            fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
+            fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
             
             await waitFor(() => {
                 const container = document.querySelector('.bg-sky-50');
@@ -172,7 +172,7 @@ describe('Background Modes', () => {
             localStorage.setItem('starryBackground', 'mars');
             render(<StarlinkHeartApp />);
             
-            fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
+            fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
             
             await waitFor(() => {
                 const container = document.querySelector('.bg-mars-sunset');
@@ -184,7 +184,7 @@ describe('Background Modes', () => {
             localStorage.setItem('starryBackground', 'galaxy');
             render(<StarlinkHeartApp />);
             
-            fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
+            fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
             
             await waitFor(() => {
                 const container = document.querySelector('.bg-galaxy-swirl');
@@ -213,7 +213,7 @@ describe('Background Modes', () => {
             localStorage.setItem('starryBackground', 'galaxy');
             
             render(<StarlinkHeartApp />);
-            fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
+            fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
             
             await waitFor(() => {
                 const container = document.querySelector('.bg-galaxy-swirl');
@@ -227,7 +227,7 @@ describe('Background Modes', () => {
             localStorage.setItem('starryBackground', 'sky');
             render(<StarlinkHeartApp />);
             
-            fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
+            fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
             
             await waitFor(() => {
                 const container = document.querySelector('.text-gray-800');
@@ -239,7 +239,7 @@ describe('Background Modes', () => {
             localStorage.setItem('starryBackground', 'space');
             render(<StarlinkHeartApp />);
             
-            fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
+            fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
             
             await waitFor(() => {
                 const container = document.querySelector('.text-gray-100');
@@ -261,7 +261,7 @@ describe('Background Modes', () => {
 
     const navigateToSettings = async () => {
         render(<StarlinkHeartApp />);
-        fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
         const centrumBtn = await screen.findByText('Centrum');
         fireEvent.click(centrumBtn.closest('button')!);
         await waitFor(() => {
@@ -325,28 +325,25 @@ describe('Mascot Modes', () => {
 
     it('renders with avatar display on dashboard', async () => {
         render(<StarlinkHeartApp />);
-        fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
         
         await waitFor(() => {
-            // Dashboard should show avatar emoji (Starry ⭐ default)
-            // Intro uses ⭐, Dashboard uses ⭐.
-            const avatars = screen.getAllByText('⭐');
+            // Dashboard should show avatar image (Starry default)
+            const avatars = screen.getAllByAltText(/Starry Mascot|Avatar/i);
             expect(avatars.length).toBeGreaterThanOrEqual(1);
         });
     });
 
     it('mascot mode can be changed in settings', async () => {
         render(<StarlinkHeartApp />);
-        fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
         
-        const centrumBtn = await screen.findByText('Centrum');
-        fireEvent.click(centrumBtn.closest('button')!);
+        const centrumBtn = await screen.findByTestId('open-settings-btn');
+        fireEvent.click(centrumBtn);
         
         await waitFor(() => {
-            // Look for mascot mode controls
-            const mascotSection = screen.queryByText(/Maskot|Starry/i);
-            // This may or may not be present depending on implementation
-            expect(true).toBe(true); // Placeholder - implement based on actual UI
+            // Verify settings modal opened
+            expect(screen.getByText('Vzhľad a Téma')).toBeInTheDocument();
         });
     });
 });

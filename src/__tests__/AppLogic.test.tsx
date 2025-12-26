@@ -116,11 +116,11 @@ describe('StarlinkHeartApp Logic', () => {
 
         // Initial render shows Intro because useEffect updates state after first render in Vitest
         // We find the Start button and click it
-        const startBtn = screen.getByRole('button', { name: /ŠTART|Začať/i });
+        const startBtn = screen.getByRole('button', { name: /Start App|ŠTART|Začať/i });
         fireEvent.click(startBtn);
 
         // Now we should be on Dashboard
-        const newMissionBtn = await screen.findByText(/Nová/i); // Use findBy to wait for re-render
+        const newMissionBtn = await screen.findByTestId('start-mission-btn'); // Use testid for Nová Misia button
         fireEvent.click(newMissionBtn);
 
         // Type in input
@@ -157,9 +157,9 @@ describe('StarlinkHeartApp Logic', () => {
         render(<StarlinkHeartApp />);
         
         // Go through flow: Intro -> Dashboard -> Chat
-        fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
         
-        const newMissionBtn = await screen.findByText(/Nová/i);
+        const newMissionBtn = await screen.findByTestId('start-mission-btn');
         fireEvent.click(newMissionBtn);
 
         const input = screen.getByPlaceholderText(/Spýtaj sa Starryho/i);
@@ -202,8 +202,8 @@ describe('StarlinkHeartApp Logic', () => {
         render(<StarlinkHeartApp />);
         
         // Go to chat
-        fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
-        const newMissionBtn = await screen.findByText(/Nová/i);
+        fireEvent.click(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i }));
+        const newMissionBtn = await screen.findByTestId('start-mission-btn');
         fireEvent.click(newMissionBtn);
 
         // Find "Načítať históriu" button

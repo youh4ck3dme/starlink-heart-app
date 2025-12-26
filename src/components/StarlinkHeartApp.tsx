@@ -107,6 +107,8 @@ const FormatText = ({ text }: { text: string }) => {
 
 import StarryAvatarDisplay from './common/StarryAvatarDisplay';
 import XPBar from './common/XPBar';
+import StarryHelper from './common/StarryHelper';
+import { incrementMissionProgress } from '../services/missionService';
 
 // IntroScreen and DashboardScreen are now imported from ./screens/
 
@@ -303,6 +305,9 @@ const StarlinkHeartApp: React.FC = () => {
         });
         setGemJustEarned(true);
         setTimeout(() => setGemJustEarned(false), 2000);
+        
+        // Mission Progress: Send Message
+        incrementMissionProgress('MESSAGE_SENT');
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -463,6 +468,8 @@ const StarlinkHeartApp: React.FC = () => {
     const handlePhotoTaken = (file: File) => {
         setImageFile(file);
         setShowCameraModal(false);
+        // Mission Progress: Take Photo
+        incrementMissionProgress('PHOTO_TAKEN');
     };
 
     const saveCustomization = () => {
@@ -486,8 +493,8 @@ const StarlinkHeartApp: React.FC = () => {
                     <LiveStarryBackground />
                 )}
 
-                {/* XP Bar - Visible only after Intro */}
-                {viewMode !== 'intro' && <XPBar />}
+                {/* XP Bar - Visible only after Intro and NOT on Dashboard (as Dashboard has its own header) */}
+                {viewMode !== 'intro' && viewMode !== 'dashboard' && <XPBar />}
 
                 {/* Header - Unified Glassmorphic Component */}
                 {viewMode === 'chat' && (
@@ -515,17 +522,29 @@ const StarlinkHeartApp: React.FC = () => {
                 {/* Dashboard Screen */}
                 {/* Dashboard Screen */}
                 {viewMode === 'dashboard' && (
-                    <DashboardScreen 
-                        onNewMission={() => setViewMode('chat')}
-                        onProfile={() => setShowProfileModal(true)}
-                        onCenter={() => setShowCustomizeModal(true)}
-                        onCoachToggle={() => setIsTeacherCloneMode(!isTeacherCloneMode)}
-                        isCoachMode={isTeacherCloneMode}
-                        avatar={starryAvatar}
-                        gems={gemCount}
-                        textColor={appBackground.textColor}
-                        mascotMode={mascotMode}
-                    />
+                    <React.Fragment>
+                        <DashboardScreen 
+                            onNewMission={() => setViewMode('chat')}
+                            onProfile={() => setShowProfileModal(true)}
+                            onCenter={() => setShowCustomizeModal(true)}
+                            onCoachToggle={() => setIsTeacherCloneMode(!isTeacherCloneMode)}
+                            isCoachMode={isTeacherCloneMode}
+                            avatar={starryAvatar}
+                            gems={gemCount}
+                            textColor={appBackground.textColor}
+                            mascotMode={mascotMode}
+                            onGemEarned={(amount) => {
+                                setGemCount(prev => {
+                                    const newCount = prev + amount;
+                                    localStorage.setItem(STARRY_GEMS_KEY, String(newCount));
+                                    return newCount;
+                                });
+                                setGemJustEarned(true);
+                                setTimeout(() => setGemJustEarned(false), 2000);
+                            }}
+                        />
+                        <StarryHelper avatar={starryAvatar} />
+                    </React.Fragment>
                 )}
 
                 {/* --- CHAT VIEW --- */}
