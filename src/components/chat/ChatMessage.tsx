@@ -112,7 +112,7 @@ export default memo(function ChatMessage({
                                 <button 
                                     onClick={() => onGetHint(heart.id!, allHearts.slice(0, index + 1))}
                                     disabled={!!hintLoadingId}
-                                    className="text-xs font-bold bg-yellow-400/20 hover:bg-yellow-400/40 text-yellow-700 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1"
+                                    className="text-xs font-bold bg-amber-100 hover:bg-amber-200 text-amber-900 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1 shadow-sm border border-amber-200"
                                 >
                                     {hintLoadingId === heart.id ? 'Thinking...' : '🤔 Potrebujem nápovedu'}
                                 </button>
@@ -121,7 +121,7 @@ export default memo(function ChatMessage({
                                 <button 
                                     onClick={() => onParentGuide(heart.id!, allHearts.slice(Math.max(0, index - 1), index + 1))}
                                     disabled={parentGuideLoadingId === heart.id}
-                                    className="text-xs font-bold bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-600 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1"
+                                    className="text-xs font-bold bg-indigo-100 hover:bg-indigo-200 text-indigo-900 px-3 py-1.5 rounded-full transition-colors flex items-center gap-1 shadow-sm border border-indigo-200"
                                 >
                                     {parentGuideLoadingId === heart.id ? 'Prekladám...' : '👨‍👩‍👧 Rodičovský prekladač'}
                                 </button>
