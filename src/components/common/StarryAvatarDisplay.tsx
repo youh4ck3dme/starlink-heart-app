@@ -1,4 +1,6 @@
-import React from 'react';
+import starApng from '../../assets/star_bounce256.apng';
+import cometImg from '../../assets/avatars/cometa_3d.png';
+import roboImg from '../../assets/avatars/robo_3d.png';
 
 const StarryAvatarDisplay = ({ 
     avatar, 
@@ -18,9 +20,9 @@ const StarryAvatarDisplay = ({
     
     let avatarImageSrc = '';
     // Use the animated APNG for Starry!
-    if (avatar === '⭐') avatarImageSrc = "/src/assets/star_bounce256.apng";
-    else if (avatar === '☄️') avatarImageSrc = "/src/assets/avatars/comet.png";
-    else if (avatar === '🤖') avatarImageSrc = "/src/assets/avatars/robo.png";
+    if (avatar === '⭐') avatarImageSrc = starApng;
+    else if (avatar === '☄️') avatarImageSrc = cometImg;
+    else if (avatar === '🤖') avatarImageSrc = roboImg;
 
     // Calculate pixel size based on text size class for image
     const pixelSize = size.includes('text-[') ? size.match(/text-\[(.*?)\]/)?.[1] : 

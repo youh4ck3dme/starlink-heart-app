@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { getPlayerStats, type PlayerStats } from '../../services/xpService';
 import ProfileModal from './ProfileModal';
+import { LevelUpModal } from '../gamification/LevelUpModal';
 
 export default function XPBar() {
   const [stats, setStats] = useState<PlayerStats | null>(null);
@@ -89,20 +90,12 @@ export default function XPBar() {
         )}
       </div>
 
-      {/* Level Up Modal */}
       {showLevelUp && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in-up">
-          <div className="bg-gradient-to-br from-yellow-400 via-orange-500 to-pink-500 p-1 rounded-3xl animate-glow">
-            <div className="bg-slate-900 rounded-3xl px-12 py-8 text-center">
-              <div className="text-6xl mb-4 animate-bounce">🎉</div>
-              <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 mb-2">
-                LEVEL UP!
-              </h2>
-              <p className="text-2xl font-bold text-white mb-1">Level {stats.level}</p>
-              <p className="text-sm text-white/60">{stats.title}</p>
-            </div>
-          </div>
-        </div>
+        <LevelUpModal 
+          level={stats.level} 
+          title={stats.title} 
+          onClose={() => setShowLevelUp(false)} 
+        />
       )}
 
       {/* Profile Modal */}

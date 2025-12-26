@@ -27,6 +27,10 @@ export default defineConfig(({ mode }) => {
       setupFiles: './src/test/setup.ts',
       css: true,
       exclude: ['**/node_modules/**', '**/e2e/**'],
+      alias: {
+        // Mock static assets to return a string
+        '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga|apng)$': path.resolve(__dirname, './src/test/fileMock.js'),
+      },
       coverage: {
         provider: 'v8',
         reporter: ['text', 'json', 'html'],

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import CameraModal from '../components/camera/CameraModal';
 
 // Mock MediaDevices API
@@ -52,35 +52,40 @@ describe('CameraModal Component', () => {
             expect(screen.queryByText('Zrušiť')).not.toBeInTheDocument();
         });
 
-        it('renders modal when isOpen is true', () => {
+        it('renders modal when isOpen is true', async () => {
             render(<CameraModal {...defaultProps} />);
             expect(screen.getByText('Zrušiť')).toBeInTheDocument();
+            await waitFor(() => expect(mockGetUserMedia).toHaveBeenCalled());
         });
 
-        it('renders video element', () => {
+        it('renders video element', async () => {
             render(<CameraModal {...defaultProps} />);
             const video = document.querySelector('video');
             expect(video).toBeInTheDocument();
+            await waitFor(() => expect(mockGetUserMedia).toHaveBeenCalled());
         });
 
-        it('renders shutter button', () => {
+        it('renders shutter button', async () => {
             render(<CameraModal {...defaultProps} />);
             const buttons = screen.getAllByRole('button');
             // Shutter button is the largest one (w-20 h-20)
             const shutterBtn = buttons.find(btn => btn.classList.contains('w-20'));
             expect(shutterBtn).toBeInTheDocument();
+            await waitFor(() => expect(mockGetUserMedia).toHaveBeenCalled());
         });
 
-        it('renders text mode toggle button', () => {
+        it('renders text mode toggle button', async () => {
             render(<CameraModal {...defaultProps} />);
             const textModeBtn = screen.getByTitle('Vysoký kontrast pre text');
             expect(textModeBtn).toBeInTheDocument();
+            await waitFor(() => expect(mockGetUserMedia).toHaveBeenCalled());
         });
 
-        it('renders camera switch button', () => {
+        it('renders camera switch button', async () => {
             render(<CameraModal {...defaultProps} />);
             const buttons = screen.getAllByRole('button');
             expect(buttons.length).toBeGreaterThanOrEqual(4); // text mode, shutter, switch, cancel
+            await waitFor(() => expect(mockGetUserMedia).toHaveBeenCalled());
         });
     });
 
@@ -147,33 +152,43 @@ describe('CameraModal Component', () => {
     });
 
     describe('Text Mode', () => {
-        it('toggles text mode when button is clicked', () => {
+        it('toggles text mode when button is clicked', async () => {
             render(<CameraModal {...defaultProps} />);
             
+            await waitFor(() => expect(mockGetUserMedia).toHaveBeenCalled());
+
             const textModeBtn = screen.getByTitle('Vysoký kontrast pre text');
-            fireEvent.click(textModeBtn);
+            act(() => {
+                fireEvent.click(textModeBtn);
+            });
             
             // Should show "Textový Režim" indicator
             expect(screen.getByText('Textový Režim')).toBeInTheDocument();
         });
 
-        it('applies grayscale filter in text mode', () => {
+        it('applies grayscale filter in text mode', async () => {
             render(<CameraModal {...defaultProps} />);
+            await waitFor(() => expect(mockGetUserMedia).toHaveBeenCalled());
             
             const textModeBtn = screen.getByTitle('Vysoký kontrast pre text');
-            fireEvent.click(textModeBtn);
+            act(() => {
+                fireEvent.click(textModeBtn);
+            });
             
             const video = document.querySelector('video');
             expect(video?.style.filter).toContain('grayscale');
         });
 
-        it('changes button style when text mode is active', () => {
+        it('changes button style when text mode is active', async () => {
             render(<CameraModal {...defaultProps} />);
+            await waitFor(() => expect(mockGetUserMedia).toHaveBeenCalled());
             
             const textModeBtn = screen.getByTitle('Vysoký kontrast pre text');
             expect(textModeBtn).toHaveClass('bg-white/10');
             
-            fireEvent.click(textModeBtn);
+            act(() => {
+                fireEvent.click(textModeBtn);
+            });
             expect(textModeBtn).toHaveClass('bg-white');
         });
     });
@@ -190,7 +205,9 @@ describe('CameraModal Component', () => {
             const buttons = screen.getAllByRole('button');
             const switchBtn = buttons[2]; // Text, Shutter, Switch, Cancel
             
-            fireEvent.click(switchBtn);
+            act(() => {
+                fireEvent.click(switchBtn);
+            });
             
             await waitFor(() => {
                 expect(mockGetUserMedia).toHaveBeenCalledWith({
@@ -221,7 +238,9 @@ describe('CameraModal Component', () => {
             const buttons = screen.getAllByRole('button');
             const shutterBtn = buttons.find(btn => btn.classList.contains('w-20'));
             
-            fireEvent.click(shutterBtn!);
+            act(() => {
+                fireEvent.click(shutterBtn!);
+            });
             
             await waitFor(() => {
                 expect(defaultProps.onPhotoTaken).toHaveBeenCalled();
@@ -230,19 +249,23 @@ describe('CameraModal Component', () => {
     });
 
     describe('Close Button', () => {
-        it('calls onClose when cancel button is clicked', () => {
+        it('calls onClose when cancel button is clicked', async () => {
             render(<CameraModal {...defaultProps} />);
+            await waitFor(() => expect(mockGetUserMedia).toHaveBeenCalled());
             
             const cancelBtn = screen.getByText('Zrušiť');
-            fireEvent.click(cancelBtn);
+            act(() => {
+                fireEvent.click(cancelBtn);
+            });
             
             expect(defaultProps.onClose).toHaveBeenCalled();
         });
     });
 
     describe('Grid Overlay', () => {
-        it('renders camera grid overlay', () => {
+        it('renders camera grid overlay', async () => {
             render(<CameraModal {...defaultProps} />);
+            await waitFor(() => expect(mockGetUserMedia).toHaveBeenCalled());
             
             // Grid has specific class for pointer-events-none
             const overlay = document.querySelector('.pointer-events-none.opacity-30');

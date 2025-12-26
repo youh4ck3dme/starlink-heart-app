@@ -71,15 +71,17 @@ describe('StarlinkHeartApp', () => {
 
   const navigateToDashboard = () => {
     render(<StarlinkHeartApp />);
-    const startBtns = screen.getAllByText(/ŠTART/i);
-    fireEvent.click(startBtns[0]);
+    // Standardized selector matching other tests
+    const startBtn = screen.getByRole('button', { name: /Start App|ŠTART|Začať/i });
+    fireEvent.click(startBtn);
   };
 
   it('navigates full flow: Intro -> Dashboard -> Chat', async () => {
     navigateToDashboard();
 
     // Check Dashboard
-    const newMissionBtn = await screen.findByText(/Nová/i);
+    // Use findByRole to avoid ambiguity with StarryHelper text
+    const newMissionBtn = await screen.findByRole('button', { name: /Nová/i });
     expect(newMissionBtn).toBeInTheDocument();
 
     // Go to Chat
@@ -92,8 +94,8 @@ describe('StarlinkHeartApp', () => {
   it('opens and closes Profile Modal', async () => {
     navigateToDashboard();
     
-    // Open Profile
-    const profileBtn = screen.getByText(/Profil/i);
+    // Open Profile via header button
+    const profileBtn = screen.getByTestId('profile-btn');
     fireEvent.click(profileBtn);
     
     await waitFor(() => {
@@ -134,11 +136,11 @@ describe('StarlinkHeartApp', () => {
   it('toggles Coach Mode', async () => {
     navigateToDashboard();
     
-    const coachBtn = screen.getByText(/Hra/i); // Initially 'Hra' (Coach Mode off)
+    const coachBtn = screen.getByText(/Kouč: OFF/i); // New layout text
     fireEvent.click(coachBtn);
     
     await waitFor(() => {
-        expect(screen.getByText(/Kouč/i)).toBeInTheDocument();
+        expect(screen.getByText(/Kouč: ON/i)).toBeInTheDocument();
     });
   });
 
