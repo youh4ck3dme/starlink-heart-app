@@ -278,3 +278,58 @@ html, body {
 .animate-scale-in {
   animation: scale-in 0.2s ease-out;
 }
+
+/* ===== NEON SNAKE BORDER ===== */
+
+@property --angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.neon-snake-border {
+  /* position: relative;  <-- Removed to allow fixed/absolute/sticky override/inherit */
+  /* border-radius: 0.5rem; <-- Removed to allow utility class inheritance (e.g., rounded-full) */
+  /* Ensure a positioning context exists if not fixed/absolute */
+  isolation: isolate;
+}
+
+/* The rotating gradient layer */
+.neon-snake-border::before, 
+.neon-snake-border::after {
+  content: '';
+  position: absolute;
+  inset: -2px; /* Border width */
+  z-index: -1;
+  background: conic-gradient(from var(--angle), transparent 70%, #4ade80, #3b82f6, #a855f7, #4ade80);
+  border-radius: inherit; /* THIS inherits from parent (e.g. rounded-full) */
+  animation: snake-rotate 3s linear infinite;
+  
+  /* Create a hollow mask so the center is transparent */
+  -webkit-mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  mask: 
+    linear-gradient(#fff 0 0) content-box, 
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  padding: 2px; /* Match the negative inset to define the border thickness in the mask */
+}
+
+/* Blur layer for glow */
+.neon-snake-border::after {
+  filter: blur(10px);
+  opacity: 0.6;
+}
+
+/* Masking the center to create a border effect */
+/* We need a solid background inside to hide the gradient, OR used mask-composite if transparent center needed (complex) */
+/* Ideally the user's content has a background. If transparent, this snake logic fills the whole box. */
+/* Given the prompt "border", usually implies hollow center. */
+/* Let's assume the component needing this will have a background color like bg-slate-900 set on a child or the element itself *on top* of the pseudo */
+
+@keyframes snake-rotate {
+  from { --angle: 0deg; }
+  to { --angle: 360deg; }
+}

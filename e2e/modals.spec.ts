@@ -26,28 +26,28 @@ test.describe('Starlink Heart Modals & Features', () => {
         // Find and click Profile button
         await page.getByTestId('profile-btn').click();
 
-        // Wait for modal to appear - look for close button or any modal content
-        await expect(page.getByLabel(/Zatvoriť/i).first()).toBeVisible({ timeout: 5000 });
+        // Wait for modal to appear - look for specific content
+        await expect(page.getByText('Drahokamy')).toBeVisible({ timeout: 5000 });
         
-        // Close Modal
-        await page.getByLabel(/Zatvoriť/i).first().click();
+        // Close Modal using specific test id
+        await page.getByTestId('close-profile-btn').click();
         
         // Wait for modal to close
-        await page.waitForTimeout(500);
+        await expect(page.getByTestId('close-profile-btn')).not.toBeVisible();
     });
 
     test('Settings Modal opens and displays options', async ({ page }) => {
         // Find and click Settings button
         await page.getByTestId('settings-btn').click();
 
-        // Wait for modal to appear - look for close button
-        await expect(page.getByLabel(/Zatvoriť/i).first()).toBeVisible({ timeout: 5000 });
+        // Wait for modal to appear - look for Title
+        await expect(page.getByText('Vzhľad a Téma')).toBeVisible({ timeout: 5000 });
 
-        // Close Modal
-        await page.getByLabel(/Zatvoriť/i).first().click();
+        // Close Modal using specific test id
+        await page.getByTestId('close-settings-btn').click();
         
         // Wait for modal to close
-        await page.waitForTimeout(500);
+        await expect(page.getByTestId('close-settings-btn')).not.toBeVisible();
     });
 
     test('Coach Mode toggle switches state', async ({ page }) => {

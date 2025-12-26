@@ -53,7 +53,7 @@ export default function XPBar() {
   return (
     <>
       {/* XP Bar - Top Right */}
-      <div className="fixed top-4 right-4 z-50 flex items-center gap-3 bg-gradient-to-r from-indigo-600/90 to-purple-600/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-white/20">
+      <div className="fixed top-4 right-4 z-50 flex items-center gap-3 bg-gradient-to-r from-indigo-600/90 to-purple-600/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg border border-white/20 neon-snake-border">
         {/* Level Badge - Clickable */}
         <button 
           onClick={() => setShowProfile(true)}

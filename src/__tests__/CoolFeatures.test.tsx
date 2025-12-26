@@ -114,37 +114,34 @@ describe('Gem Shop Features', () => {
         expect(screen.getByText('💎 150')).toBeInTheDocument();
     });
 
-    it('first avatar (Iskra) is unlocked by default', async () => {
+    it('first avatar (Starry) is unlocked by default', async () => {
         await navigateToCustomizeModal();
         
-        // Iskra should be selectable (no price badge on first avatar)
-        const iskraButton = screen.getByText('Iskra').closest('button');
-        expect(iskraButton).not.toHaveClass('opacity-75');
+        // Starry should be selectable (no price badge on first avatar)
+        const starryButton = screen.getByText('Starry').closest('button');
+        expect(starryButton).not.toHaveClass('opacity-75');
     });
 
     it('locked avatars show grayscale effect', async () => {
         await navigateToCustomizeModal();
         
-        // Find all 🚀 emojis (one in Dashboard, one in modal) - modal one has grayscale
-        const raketkaEmojis = screen.getAllByText('🚀');
-        // The modal emoji (second one) should have grayscale
-        const modalEmoji = raketkaEmojis.find(el => el.classList.contains('grayscale'));
-        expect(modalEmoji).toBeTruthy();
+        // Cometa (20 gems) should be locked and grayscale
+        const cometaButton = screen.getByText('Cometa').closest('button');
+        expect(cometaButton?.querySelector('.grayscale')).toBeTruthy();
     });
 
     it('cannot select locked avatar without enough gems', async () => {
-        localStorage.setItem('starryGems', '10'); // Not enough for Raketka (30)
+        localStorage.setItem('starryGems', '10'); // Not enough for Cometa (20)
         
         await navigateToCustomizeModal();
         
-        // Try to click Raketka
-        const raketkaButton = screen.getByText('Raketka').closest('button');
-        fireEvent.click(raketkaButton!);
+        // Try to click Cometa
+        const cometaButton = screen.getByText('Cometa').closest('button');
+        fireEvent.click(cometaButton!);
         
-        // Avatar should NOT change (still Iskra) - find all ✨ and check one is selected
-        const iskraEmojis = screen.getAllByText('✨');
-        const selectedIskra = iskraEmojis.find(el => el.closest('button')?.classList.contains('ring-sky-500'));
-        expect(selectedIskra).toBeTruthy();
+        // Avatar should NOT change from default Starry
+        const starryButton = screen.getByText('Starry').closest('button');
+        expect(starryButton).toHaveClass('ring-sky-500');
     });
 
     it('can purchase avatar with enough gems', async () => {
@@ -152,13 +149,13 @@ describe('Gem Shop Features', () => {
         
         await navigateToCustomizeModal();
         
-        // Click Raketka (costs 30)
-        const raketkaButton = screen.getByText('Raketka').closest('button');
-        fireEvent.click(raketkaButton!);
+        // Click Cometa (costs 20)
+        const cometaButton = screen.getByText('Cometa').closest('button');
+        fireEvent.click(cometaButton!);
         
         // Should auto-select after purchase
         await waitFor(() => {
-            expect(raketkaButton).toHaveClass('ring-sky-500');
+            expect(cometaButton).toHaveClass('ring-sky-500');
         });
     });
 
@@ -167,13 +164,13 @@ describe('Gem Shop Features', () => {
         
         await navigateToCustomizeModal();
         
-        // Purchase Raketka
-        const raketkaButton = screen.getByText('Raketka').closest('button');
-        fireEvent.click(raketkaButton!);
+        // Purchase Cometa
+        const cometaButton = screen.getByText('Cometa').closest('button');
+        fireEvent.click(cometaButton!);
         
         await waitFor(() => {
             const unlocked = JSON.parse(localStorage.getItem('unlockedAvatars') || '[]');
-            expect(unlocked).toContain('🚀');
+            expect(unlocked).toContain('☄️');
         });
     });
 
@@ -182,13 +179,13 @@ describe('Gem Shop Features', () => {
         
         await navigateToCustomizeModal();
         
-        // Purchase Raketka (costs 30)
-        const raketkaButton = screen.getByText('Raketka').closest('button');
-        fireEvent.click(raketkaButton!);
+        // Purchase Cometa (costs 20)
+        const cometaButton = screen.getByText('Cometa').closest('button');
+        fireEvent.click(cometaButton!);
         
         await waitFor(() => {
             const gems = localStorage.getItem('starryGems');
-            expect(gems).toBe('70'); // 100 - 30
+            expect(gems).toBe('80'); // 100 - 20
         });
     });
 });

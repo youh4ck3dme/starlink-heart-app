@@ -249,12 +249,13 @@ describe('Background Modes', () => {
     });
 });
 
-describe('Avatar Modes', () => {
+    describe('Avatar Modes', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         localStorage.clear();
         localStorage.setItem('hasStarted', 'true');
-        localStorage.setItem('unlockedAvatars', JSON.stringify(['✨', '🚀', '🤖', '🧠', '💡']));
+        // Unlock all new avatars for testing
+        localStorage.setItem('unlockedAvatars', JSON.stringify(['⭐', '☄️', '🤖']));
         localStorage.setItem('starryGems', '999');
     });
 
@@ -269,14 +270,12 @@ describe('Avatar Modes', () => {
     };
 
     describe('Avatar Options Display', () => {
-        it('displays all 5 avatar options', async () => {
+        it('displays all 3 avatar options', async () => {
             await navigateToSettings();
             
-            expect(screen.getByText('Iskra')).toBeInTheDocument();
-            expect(screen.getByText('Raketka')).toBeInTheDocument();
+            expect(screen.getByText('Starry')).toBeInTheDocument();
+            expect(screen.getByText('Cometa')).toBeInTheDocument();
             expect(screen.getByText('Robo')).toBeInTheDocument();
-            expect(screen.getByText('Génius')).toBeInTheDocument();
-            expect(screen.getByText('Lumen')).toBeInTheDocument();
         });
     });
 
@@ -284,11 +283,12 @@ describe('Avatar Modes', () => {
         it('switches avatar when clicked', async () => {
             await navigateToSettings();
             
-            const raketkaBtn = screen.getByText('Raketka').closest('button');
-            fireEvent.click(raketkaBtn!);
+            // Switch to Cometa
+            const cometaBtn = screen.getByText('Cometa').closest('button');
+            fireEvent.click(cometaBtn!);
             
             await waitFor(() => {
-                expect(raketkaBtn).toHaveClass('ring-sky-500');
+                expect(cometaBtn).toHaveClass('ring-sky-500');
             });
         });
     });
@@ -300,7 +300,13 @@ describe('Avatar Modes', () => {
             const roboBtn = screen.getByText('Robo').closest('button');
             fireEvent.click(roboBtn!);
             
-            const saveBtn = screen.getByText(/Uložiť|Hotovo/i);
+            // Verify selection happened first
+            await waitFor(() => {
+                expect(roboBtn).toHaveClass('ring-sky-500');
+            });
+
+            // Click explicit save button
+            const saveBtn = screen.getByText('Uložiť zmeny'); 
             fireEvent.click(saveBtn);
             
             await waitFor(() => {
@@ -322,9 +328,9 @@ describe('Mascot Modes', () => {
         fireEvent.click(screen.getByRole('button', { name: /ŠTART|Začať/i }));
         
         await waitFor(() => {
-            // Dashboard should show avatar emoji, not mascot-renderer
-            // (MascotRenderer was replaced with avatar display in top bar)
-            const avatars = screen.getAllByText('✨');
+            // Dashboard should show avatar emoji (Starry ⭐ default)
+            // Intro uses ⭐, Dashboard uses ⭐.
+            const avatars = screen.getAllByText('⭐');
             expect(avatars.length).toBeGreaterThanOrEqual(1);
         });
     });
