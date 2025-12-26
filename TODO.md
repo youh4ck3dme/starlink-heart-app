@@ -4,7 +4,7 @@
 
 ---
 
-## 📊 Celková Hotovosť: ~90%
+## 📊 Celková Hotovosť: ~95%
 
 ---
 
@@ -53,7 +53,7 @@
 ## ⏳ V PRÍPRAVE (15%)
 
 ### Pre MVP Release
-- [ ] Offline mode (Service Worker)
+- [x] Offline mode (Service Worker) ✅
 - [ ] Push notifikácie (Firebase Cloud Messaging)
 - [ ] Lazy-load Gemini AI (ďalšia ~253KB úspora)
 - [ ] Skutočné EduPage API prepojenie
@@ -62,9 +62,9 @@
 
 ### Pre Play Store
 - [ ] Android manifest (TWA/Capacitor)
-- [ ] App icons (všetky veľkosti)
+- [x] App icons (všetky veľkosti) ✅
 - [ ] Splash screen
-- [ ] Privacy Policy stránka
+- [x] Privacy Policy stránka ✅
 - [ ] Terms of Service stránka
 - [ ] Age rating (PEGI/ESRB)
 - [ ] Store listing (screenshots, popis)
@@ -79,8 +79,8 @@
 | Požiadavka | Stav | Poznámka |
 |------------|------|----------|
 | HTTPS hosting | ✅ | Vercel |
-| manifest.json | ⚠️ | Treba doplniť |
-| Service Worker | ❌ | Treba vytvoriť |
+| manifest.json | ✅ | Kompletný |
+| Service Worker | ✅ | Funguje |
 | assetlinks.json | ❌ | Treba vytvoriť |
 | Bubblewrap CLI | ❌ | Treba nainštalovať |
 | Signing key | ❌ | Treba vygenerovať |
@@ -100,32 +100,32 @@
 
 ## 📋 TESTY POTREBNÉ PRE RELEASE
 
-### Aktuálne: 142 testov ✅
-### Odporúčané minimum: 150-200 testov
+### Aktuálne: 161 testov ✅
+### Odporúčané minimum: 150-200 testov ✅ SPLNENÉ
 
 | Oblasť | Aktuálne | Cieľ | Priorita |
 |--------|----------|------|----------|
-| Unit testy | 142 | 160 | ⭐⭐⭐ |
-| E2E testy | 0 | 10-15 | ⭐⭐⭐ |
-| Accessibility testy | 0 | 5-10 | ⭐⭐ |
+| Unit testy | 161 | 160 | ⭐⭐⭐ ✅ |
+| E2E testy | 7 | 10-15 | ⭐⭐⭐ |
+| Accessibility testy | ~ | 5-10 | ⭐⭐ |
 | Performance testy | 0 | 3-5 | ⭐ |
 
 ### Chýbajúce testy (priorita):
-1. [ ] SchoolDashboard.test.tsx (nový komponent)
-2. [ ] E2E: Welcome → Home flow
-3. [ ] E2E: Chat conversation
-4. [ ] E2E: Settings changes persist
+1. [x] SchoolDashboard.test.tsx (nový komponent) ✅
+2. [x] E2E: Welcome → Home flow ✅
+3. [x] E2E: Chat conversation ✅
+4. [x] E2E: Settings changes persist ✅
 5. [ ] Accessibility: Screen reader compatibility
 
 ---
 
 ## 🔥 PRIORITNÝ BACKLOG
 
-### Tento týždeň
-1. [ ] Service Worker pre offline
-2. [ ] manifest.json kompletný
-3. [ ] SchoolDashboard testy
-4. [ ] Privacy Policy stránka
+### Tento týždeň ✅ HOTOVÉ
+1. [x] Service Worker pre offline
+2. [x] manifest.json kompletný
+3. [x] SchoolDashboard testy (19 testov)
+4. [x] Privacy Policy stránka (/privacy)
 
 ### Budúci týždeň
 1. [ ] TWA/Capacitor setup
