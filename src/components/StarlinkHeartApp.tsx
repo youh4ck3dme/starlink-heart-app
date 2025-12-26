@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { db, storage } from '../services/localService';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, limit, startAfter, getDocs, QueryDocumentSnapshot } from '../services/localService';
 import { ref, uploadBytes, getDownloadURL } from '../services/localService';
@@ -109,12 +110,14 @@ import StarryAvatarDisplay from './common/StarryAvatarDisplay';
 import XPBar from './common/XPBar';
 import StarryHelper from './common/StarryHelper';
 import { incrementMissionProgress } from '../services/missionService';
+import { useHaptics } from '../hooks/useHaptics';
 
 // IntroScreen and DashboardScreen are now imported from ./screens/
 
 const StarlinkHeartApp: React.FC = () => {
     // Hooks
     const voiceMode = useVoiceMode();
+    const haptics = useHaptics();
     // State
     const [hearts, setHearts] = useState<Heart[]>([]);
     const [newMessage, setNewMessage] = useState('');
@@ -511,29 +514,61 @@ const StarlinkHeartApp: React.FC = () => {
                 )}
 
                 {/* Intro Screen */}
+                <AnimatePresence mode="wait">
                 {viewMode === 'intro' && (
-                    <IntroScreen 
-                        onStart={() => setViewMode('dashboard')} 
-                        avatar={starryAvatar} 
-                        textColor={appBackground.textColor}
-                    />
+                    <motion.div
+                        key="intro"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        transition={{ duration: 0.3, ease: 'easeOut' }}
+                        className="flex-1 flex flex-col"
+                    >
+                        <IntroScreen 
+                            onStart={() => {
+                                haptics.mediumTap();
+                                setViewMode('dashboard');
+                            }} 
+                            avatar={starryAvatar} 
+                            textColor={appBackground.textColor}
+                        />
+                    </motion.div>
                 )}
 
                 {/* Dashboard Screen */}
-                {/* Dashboard Screen */}
                 {viewMode === 'dashboard' && (
-                    <React.Fragment>
+                    <motion.div
+                        key="dashboard"
+                        initial={{ opacity: 0, x: -30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 30 }}
+                        transition={{ duration: 0.25, ease: 'easeOut' }}
+                        className="flex-1 flex flex-col"
+                    >
                         <DashboardScreen 
-                            onNewMission={() => setViewMode('chat')}
-                            onProfile={() => setShowProfileModal(true)}
-                            onCenter={() => setShowCustomizeModal(true)}
-                            onCoachToggle={() => setIsTeacherCloneMode(!isTeacherCloneMode)}
+                            onNewMission={() => {
+                                haptics.mediumTap();
+                                setViewMode('chat');
+                            }}
+                            onProfile={() => {
+                                haptics.lightTap();
+                                setShowProfileModal(true);
+                            }}
+                            onCenter={() => {
+                                haptics.lightTap();
+                                setShowCustomizeModal(true);
+                            }}
+                            onCoachToggle={() => {
+                                haptics.lightTap();
+                                setIsTeacherCloneMode(!isTeacherCloneMode);
+                            }}
                             isCoachMode={isTeacherCloneMode}
                             avatar={starryAvatar}
                             gems={gemCount}
                             textColor={appBackground.textColor}
                             mascotMode={mascotMode}
                             onGemEarned={(amount) => {
+                                haptics.successVibrate();
                                 setGemCount(prev => {
                                     const newCount = prev + amount;
                                     localStorage.setItem(STARRY_GEMS_KEY, String(newCount));
@@ -544,11 +579,19 @@ const StarlinkHeartApp: React.FC = () => {
                             }}
                         />
                         <StarryHelper avatar={starryAvatar} />
-                    </React.Fragment>
+                    </motion.div>
                 )}
 
                 {/* --- CHAT VIEW --- */}
                 {viewMode === 'chat' && (
+                <motion.div
+                    key="chat"
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -50 }}
+                    transition={{ duration: 0.25, ease: 'easeOut' }}
+                    className="flex-1 flex flex-col"
+                >
                 <ChatView 
                     hearts={hearts}
                     starryAvatar={starryAvatar}
@@ -576,7 +619,9 @@ const StarlinkHeartApp: React.FC = () => {
                     onParentGuide={handleParentGuide}
                     voiceMode={voiceMode}
                 />
+                </motion.div>
                 )}
+                </AnimatePresence>
 </div>
 
             {/* --- MODALS --- */}

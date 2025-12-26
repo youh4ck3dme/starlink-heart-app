@@ -69,15 +69,16 @@ describe('StarlinkHeartApp', () => {
     localStorage.clear();
   });
 
-  const navigateToDashboard = () => {
+  const navigateToDashboard = async () => {
     render(<StarlinkHeartApp />);
-    // Standardized selector matching other tests
     const startBtn = screen.getByRole('button', { name: /Start App|ŠTART|Začať/i });
     fireEvent.click(startBtn);
+    // Wait for Dashboard animation to complete
+    await screen.findByTestId('start-mission-btn');
   };
 
   it('navigates full flow: Intro -> Dashboard -> Chat', async () => {
-    navigateToDashboard();
+    await navigateToDashboard();
 
     // Check Dashboard
     // Use findByRole to avoid ambiguity with StarryHelper text
@@ -92,7 +93,7 @@ describe('StarlinkHeartApp', () => {
   });
 
   it('opens and closes Profile Modal', async () => {
-    navigateToDashboard();
+    await navigateToDashboard();
     
     // Open Profile via header button
     const profileBtn = screen.getByTestId('profile-btn');
@@ -112,7 +113,7 @@ describe('StarlinkHeartApp', () => {
   });
 
   it('opens and closes Settings (Centrum) Modal', async () => {
-    navigateToDashboard();
+    await navigateToDashboard();
     
     // Open Settings
     const centerBtn = screen.getByText(/Centrum/i);
@@ -134,7 +135,7 @@ describe('StarlinkHeartApp', () => {
   });
 
   it('toggles Coach Mode', async () => {
-    navigateToDashboard();
+    await navigateToDashboard();
     
     const coachBtn = screen.getByText(/Kouč: OFF/i); // New layout text
     fireEvent.click(coachBtn);
