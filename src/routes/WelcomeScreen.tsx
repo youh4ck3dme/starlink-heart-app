@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import introBg from '../assets/intro-bg.png';
+import introBg from '../assets/intro-bg.webp';
 
 export default function WelcomeScreen() {
   const navigate = useNavigate();

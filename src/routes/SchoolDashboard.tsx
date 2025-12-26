@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Moon, Sun, Calendar, Award, Bell } from 'lucide-react';
 
 // Backgrounds
-import greenBg from '../assets/dashboard-bg.png';
-import pinkBg from '../assets/dashboard-bg-pink.png';
+import greenBg from '../assets/dashboard-bg.webp';
+import pinkBg from '../assets/dashboard-bg-pink.webp';
 
 // Educational Particles Component
 const EducationalParticles = ({ theme }: { theme: 'green' | 'pink' }) => {
