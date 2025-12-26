@@ -17,6 +17,8 @@ import DashboardScreen from './screens/DashboardScreen';
 
 // Define Avatars with Names
 const AVATAR_OPTIONS = [
+    { emoji: '⭐', name: 'Starry', price: 0 }, // New 3D Star
+    { emoji: '☄️', name: 'Cometa', price: 20 }, // New 3D Comet
     { emoji: '✨', name: 'Iskra', price: 0 },
     { emoji: '🚀', name: 'Raketka', price: 30 },
     { emoji: '🤖', name: 'Robo', price: 50 },

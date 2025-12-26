@@ -11,10 +11,28 @@ const StarryAvatarDisplay = ({
     isExcited?: boolean; 
     size?: string; 
 }) => {
+    // If avatar is the Starry or Comet image key (e.g., '⭐', '☄️'), render the image
+    const isImageAvatar = avatar === '⭐' || avatar === '☄️'; 
+    const avatarImageSrc = avatar === '⭐' ? "/src/assets/avatars/starry.png" : "/src/assets/avatars/comet.png";
+
+    // Calculate pixel size based on text size class for image
+    const pixelSize = size.includes('text-[') ? size.match(/text-\[(.*?)\]/)?.[1] : 
+                      size === 'text-6xl' ? '60px' : 
+                      size === 'text-[8rem]' || size === 'text-[7rem]' ? '120px' : '32px';
+
     return (
         <div className={`relative flex items-center justify-center ${size} transition-all duration-300`}>
             <div className={`relative z-10 transition-transform duration-500 ${isExcited ? 'scale-125 rotate-[360deg]' : 'scale-100'} ${isThinking ? 'animate-bounce' : ''}`}>
-                {avatar}
+                {isImageAvatar ? (
+                    <img 
+                        src={avatarImageSrc}
+                        alt="Avatar" 
+                        className="object-contain drop-shadow-lg"
+                        style={{ width: pixelSize, height: pixelSize }}
+                    />
+                ) : (
+                    avatar
+                )}
             </div>
             {isThinking && (
                  <span className="absolute -top-1 -right-1 flex h-3 w-3">
