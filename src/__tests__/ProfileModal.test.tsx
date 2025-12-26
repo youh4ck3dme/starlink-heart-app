@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import ProfileModal from '@/components/common/ProfileModal';
+import { GamificationProvider } from '@/features/gamification/context/GamificationContext';
 
 // Mock XP service to avoid localStorage dependency
 vi.mock('@/services/xpService', () => ({
@@ -17,7 +18,11 @@ describe('ProfileModal', () => {
   const mockOnClose = vi.fn();
 
   it('renders stats correctly', () => {
-    render(<ProfileModal onClose={mockOnClose} gems={50} hearts={10} />);
+    render(
+      <GamificationProvider>
+        <ProfileModal onClose={mockOnClose} gems={50} hearts={10} />
+      </GamificationProvider>
+    );
     
     expect(screen.getByText('Galaktický Prieskumník')).toBeInTheDocument();
     expect(screen.getByText('Level 3')).toBeInTheDocument();
@@ -26,7 +31,11 @@ describe('ProfileModal', () => {
   });
 
   it('calls onClose when close button is clicked', () => {
-    render(<ProfileModal onClose={mockOnClose} />);
+    render(
+      <GamificationProvider>
+        <ProfileModal onClose={mockOnClose} />
+      </GamificationProvider>
+    );
     
     // There are multiple close buttons (X icon, backdrop, Close button), getting one by text is safest
     const closeBtn = screen.getByText('Zatvoriť');

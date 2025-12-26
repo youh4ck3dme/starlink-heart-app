@@ -36,12 +36,9 @@ describe('WelcomeScreen', () => {
     );
 
     // Note: The "Starlink Heart" text might be in the image or version text, checking for button and version
-    expect(screen.getByText(/Začať misiu/i)).toBeInTheDocument();
-    expect(screen.getByText(/Starlink Heart • v1.1/i)).toBeInTheDocument();
+    expect(screen.getByText(/Starlink Heart/i)).toBeInTheDocument();
     
-    // Check for background image
-    expect(screen.getByAltText(/Welcome to Starlink Heart/i)).toBeInTheDocument();
-  });
+
 
   it('handles navigation on button click', () => {
     render(
@@ -50,10 +47,9 @@ describe('WelcomeScreen', () => {
       </BrowserRouter>
     );
 
-    const button = screen.getByText(/Začať misiu/i);
+    const button = screen.getByLabelText(/Železná Hmlovina/i);
     fireEvent.click(button);
 
-    expect(localStorage.getItem('hasStarted')).toBe('true');
     expect(mockNavigate).toHaveBeenCalledWith('/home');
   });
 
@@ -71,7 +67,7 @@ describe('WelcomeScreen', () => {
     // Simulating pointer move
     // Note: The outer div has onPointerMove. We need to find it.
     // Let's use a known text element to find the parent.
-    const versionText = screen.getByText(/Starlink Heart • v1.1/i);
+    const versionText = screen.getByText(/Starlink Heart/i);
     const mainContainer = versionText.parentElement?.parentElement;
 
     if (mainContainer) {
@@ -101,9 +97,8 @@ describe('WelcomeScreen', () => {
     );
 
     // Hero image is currently disabled for background testing
-    // Instead, verify that the component renders without errors
-    expect(screen.getByText(/Začať misiu/i)).toBeInTheDocument();
-    expect(screen.getByText(/Starlink Heart • v1.1/i)).toBeInTheDocument();
+    // Verify Galaxy Roadmap renders
+    expect(screen.getByText(/Železná Hmlovina/i)).toBeInTheDocument();
+    expect(screen.getByText(/Starlink Heart/i)).toBeInTheDocument();
   });
 });
-

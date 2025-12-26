@@ -1,5 +1,5 @@
 import starApng from '../../assets/avatars/starry.png';
-import cometImg from '../../assets/avatars/comet_4k.webp';
+import cometImg from '../../assets/avatars/cometa.png';
 import roboImg from '../../assets/avatars/roboto.webp';
 
 const StarryAvatarDisplay = ({ 

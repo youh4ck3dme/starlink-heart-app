@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import DashboardHeader from '../layout/DashboardHeader';
 import MascotRenderer, { MascotMode } from '../mascot/MascotRenderer';
 import { DailyMissionsCard } from '../gamification/DailyMissionsCard';
+import { LeaderboardWidget } from '../gamification/LeaderboardWidget';
+import { LeaderboardFull } from '../gamification/LeaderboardFull';
+import { PlanetCorner } from '../effects/PlanetCorner';
+import { AnimatePresence } from 'framer-motion';
 
 interface DashboardScreenProps {
     onNewMission: () => void;
@@ -32,8 +36,12 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
     textColor,
     mascotMode
 }) => {
+    const [showLeaderboard, setShowLeaderboard] = useState(false);
+
     return (
         <div className="relative min-h-[calc(100dvh-80px)] flex flex-col items-center px-4 pt-4 pb-24 touch-pan-y select-none">
+            {/* 3D Planet Decoration (Lazy Loaded) */}
+            <PlanetCorner />
             
             {/* Header */}
             <DashboardHeader 
@@ -43,22 +51,35 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
                 onProfile={onProfile}
             />
 
-            {/* Mascot Area */}
-            <div className={`w-full flex-1 flex flex-col items-center justify-center min-h-[200px] transition-all duration-700`}>
-                <div className="relative w-full max-w-xs aspect-square flex items-center justify-center">
-                    <MascotRenderer 
-                         mode={mascotMode}
-                         className="w-full h-full"
+            {/* Mascot Area - Modified Layout */}
+            <div className={`w-full flex-1 flex flex-col items-center justify-center min-h-[300px] transition-all duration-700`}>
+                <div className="relative w-full max-w-sm flex flex-col items-center justify-center gap-4">
+                    {/* Floating 3D Logo */}
+                    <img 
+                        src="/src/assets/logo_3d.webp" 
+                        alt="Starlink Heart Logo" 
+                        className="w-32 h-auto animate-bounce-slow drop-shadow-lg z-10"
                     />
+                    
+                    {/* Starry Avatar */}
+                    <div className="w-full aspect-square max-w-[280px] flex items-center justify-center">
+                        <MascotRenderer 
+                             mode="image" 
+                             className="w-full h-full drop-shadow-2xl hover:scale-105 transition-transform duration-300"
+                        />
+                    </div>
                 </div>
             </div>
 
-            {/* Daily Missions */}
-            {onGemEarned && (
-                <div className="w-full max-w-sm mb-4">
+            {/* Gamification Widgets */}
+            <div className="w-full max-w-sm space-y-4 mb-4">
+                {onGemEarned && (
                     <DailyMissionsCard onGemEarned={onGemEarned} />
-                </div>
-            )}
+                )}
+                
+                {/* Leaderboard Widget */}
+                <LeaderboardWidget onShowFull={() => setShowLeaderboard(true)} />
+            </div>
 
             {/* Action Buttons - Main CTA */}
             <div className="w-full max-w-sm space-y-3 z-20">
@@ -114,6 +135,13 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
                     </button>
                 </div>
             </div>
+
+            {/* Full Leaderboard Modal */}
+            <AnimatePresence>
+                {showLeaderboard && (
+                    <LeaderboardFull onClose={() => setShowLeaderboard(false)} />
+                )}
+            </AnimatePresence>
         </div>
     );
 };

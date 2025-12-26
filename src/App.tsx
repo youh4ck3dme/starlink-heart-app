@@ -102,11 +102,23 @@ const router = createBrowserRouter([
   },
 ]);
 
+import { GamificationProvider, useGamification } from './features/gamification/context/GamificationContext';
+import { useDailyStreakTick } from './features/gamification/hooks/useStreak';
+
+function AppContent() {
+  const { state } = useGamification();
+  useDailyStreakTick(true); // Active streak tracking
+  
+  return <RouterProvider router={router} />;
+}
+
 function App() {
   return (
-    <ToastProvider>
-      <RouterProvider router={router} />
-    </ToastProvider>
+    <GamificationProvider>
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
+    </GamificationProvider>
   );
 }
 

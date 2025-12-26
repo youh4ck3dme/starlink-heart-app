@@ -21,7 +21,7 @@ describe('MascotRenderer', () => {
 
   it('renders Image when mode is image', () => {
     render(<MascotRenderer mode="image" />);
-    expect(screen.getByAltText('Starry Loading')).toBeInTheDocument();
+    expect(screen.getByAltText('Starry Avatar')).toBeInTheDocument();
   });
 
   it('renders 3D when mode is spline3d AND scene is configured', async () => {

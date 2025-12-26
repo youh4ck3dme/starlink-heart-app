@@ -1,4 +1,5 @@
 import { getPlayerStats } from '../../services/xpService';
+import { BadgeShowcase } from '../gamification/BadgeShowcase';
 
 interface ProfileModalProps {
   onClose: () => void;
@@ -107,6 +108,10 @@ export default function ProfileModal({
                 {stats.xp} XP • Ešte {stats.xpToNextLevel} na ďalší level
               </div>
             </div>
+
+            {/* Badges */}
+            <BadgeShowcase />
+
 
             {/* Streak Badge */}
             {stats.streak > 0 && (

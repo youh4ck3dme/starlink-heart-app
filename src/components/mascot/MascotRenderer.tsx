@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import fallbackImage from "../../assets/logo_3d.webp";
+import fallbackImage from "../../assets/avatars/starry.png";
 
 const RiveMascot = lazy(() => import("./RiveMascot"));
 const Starry3D = lazy(() => import("./Starry3D"));
@@ -23,7 +23,7 @@ export default function MascotRenderer({
     <img
       className={className}
       src={fallbackImage}
-      alt="Starry Loading"
+      alt="Starry Avatar"
       style={{ width: "100%", height: "100%", objectFit: "contain" }}
       loading="eager"
     />

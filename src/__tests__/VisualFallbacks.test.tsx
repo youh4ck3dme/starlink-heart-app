@@ -18,6 +18,27 @@ vi.mock('@splinetool/react-spline', () => ({
     default: () => <div data-testid="spline-mock" />
 }));
 
+// Mock lottie-web to avoid canvas issues in jsdom
+vi.mock('lottie-web', () => ({
+    default: {
+        loadAnimation: vi.fn(() => ({
+            destroy: vi.fn(),
+            play: vi.fn(),
+            pause: vi.fn(),
+        })),
+    },
+}));
+
+// Mock lottie-react
+vi.mock('lottie-react', () => ({
+    default: () => <div data-testid="lottie-mock">Lottie</div>,
+}));
+
+// Mock PlanetCorner (R3F component)
+vi.mock('../components/effects/PlanetCorner', () => ({
+    PlanetCorner: () => <div data-testid="planet-mock">Planet</div>,
+}));
+
 describe('MascotRenderer Fallback Tests', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -57,7 +78,7 @@ describe('MascotRenderer Fallback Tests', () => {
             const img = container.querySelector('img');
             expect(img).toBeInTheDocument();
             // Fallback image alt changed to "Starry Loading" in shared fallback
-            expect(img?.alt).toBe('Starry Loading');
+            expect(img?.alt).toBe('Starry Avatar');
         });
 
         it('renders with rive mode and shows fallback when Rive unavailable', async () => {
