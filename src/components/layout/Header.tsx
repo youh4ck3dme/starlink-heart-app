@@ -28,7 +28,7 @@ export default function Header({
     <header 
       className={`shrink-0 px-4 py-3 flex items-center justify-between sticky top-0 z-20 ${appBackground.glass} backdrop-blur-md shadow-sm border-b border-white/10`}
     >
-      {/* LEFT SECTION: Back + Avatar */}
+      {/* LEFT SECTION: Back + Avatar + Gems */}
       <div className="flex items-center gap-2">
         <button 
           onClick={onBack} 
@@ -52,6 +52,21 @@ export default function Header({
           isExcited={gemJustEarned}
           size="text-2xl"
         />
+
+        {/* Gems Badge - Next to avatar */}
+        <button
+          onClick={onGemsTap}
+          className={`flex items-center gap-1 px-3 py-1.5 rounded-full border-2 transition-all ${
+            gemJustEarned 
+              ? 'bg-yellow-400 border-yellow-500 scale-110 animate-pulse' 
+              : 'bg-yellow-400/30 border-yellow-500/50 hover:bg-yellow-400/50'
+          }`}
+        >
+          <span className="text-lg">{gemJustEarned ? '✨' : '💎'}</span>
+          <span className={`font-bold ${isDarkTheme ? 'text-yellow-200' : 'text-yellow-800'}`}>
+            {gemCount}
+          </span>
+        </button>
       </div>
 
       {/* CENTER SECTION: Title */}
@@ -61,23 +76,8 @@ export default function Header({
         Starlink Heart
       </h1>
 
-      {/* RIGHT SECTION: Gems + Settings */}
-      <div className="flex items-center gap-3">
-        {/* Gems Badge - Much more visible */}
-        <button
-          onClick={onGemsTap}
-          className={`flex items-center gap-2 px-4 py-2 rounded-full border-2 transition-all ${
-            gemJustEarned 
-              ? 'bg-yellow-400 border-yellow-500 scale-110 animate-pulse' 
-              : 'bg-yellow-400/30 border-yellow-500/50 hover:bg-yellow-400/50'
-          }`}
-        >
-          <span className="text-xl">{gemJustEarned ? '✨' : '💎'}</span>
-          <span className={`font-bold text-lg ${isDarkTheme ? 'text-yellow-200' : 'text-yellow-800'}`}>
-            {gemCount}
-          </span>
-        </button>
-
+      {/* RIGHT SECTION: Settings only */}
+      <div className="flex items-center">
         {/* Settings Button */}
         <button 
           onClick={onSettings} 
