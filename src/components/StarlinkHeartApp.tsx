@@ -480,8 +480,18 @@ const StarlinkHeartApp: React.FC = () => {
         localStorage.setItem(STARRY_BACKGROUND_KEY, appBackground.id);
         if (customApiKey) {
             localStorage.setItem('custom_api_key', customApiKey);
+            
+            // 🔓 DEVELOPER MODE: Unlock all features when custom API key is set
+            localStorage.setItem('starryGems', '999');
+            localStorage.setItem('starryHearts', '999');
+            localStorage.setItem('unlockedAvatars', JSON.stringify(['✨', '🚀', '🤖', '🧠', '💡', '🦊', '🐱', '🐶']));
+            localStorage.setItem('unlockedBackgrounds', JSON.stringify(['sky', 'space', 'mars', 'galaxy', 'ocean', 'forest']));
+            localStorage.setItem('developerMode', 'true');
+            setGemCount(999);
+            console.log('🔓 DEVELOPER MODE ACTIVATED: 999 gems, 999 hearts, all items unlocked!');
         } else {
             localStorage.removeItem('custom_api_key');
+            localStorage.removeItem('developerMode');
         }
         setShowCustomizeModal(false);
     }
