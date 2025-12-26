@@ -126,7 +126,7 @@ import { DashboardSnapshot, GradeItem, TimelineItem } from './types';
 export class EdupageClient {
   private jar: CookieJar;
   private client: AxiosInstance;
-  private baseUrl: string = 'https://VASA_SKOLA.edupage.org'; // ⚠️ ZMENIŤ!
+  private baseUrl: string = 'https://zskostolany.edupage.org'; // ZŠ Kostoľany
   private ebuid: string = '';
 
   constructor() {
