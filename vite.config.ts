@@ -3,6 +3,7 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import glsl from 'vite-plugin-glsl';
+import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -12,7 +13,69 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, (process as any).cwd(), '');
 
   return {
-    plugins: [react(), glsl()],
+    plugins: [
+      react(), 
+      glsl(),
+      VitePWA({
+        registerType: 'autoUpdate',
+        includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg', 'android-chrome-192x192.png', 'android-chrome-512x512.png'],
+        manifest: {
+          name: 'Starlink Heart',
+          short_name: 'Starlink',
+          description: 'AI tutor pre slovenské deti - matematika, slovenčina, angličtina',
+          theme_color: '#3b82f6',
+          background_color: '#060819',
+          display: 'standalone',
+          orientation: 'portrait-primary',
+          id: 'com.starlinkheart.app',
+          start_url: '/',
+          scope: '/',
+          icons: [
+            {
+              src: '/android-chrome-192x192.png',
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'any'
+            },
+            {
+              src: '/android-chrome-192x192.png',
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'maskable'
+            },
+            {
+              src: '/android-chrome-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'any'
+            },
+            {
+              src: '/android-chrome-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable'
+            }
+          ]
+        },
+        workbox: {
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,json}'], // Cache static assets
+          runtimeCaching: [
+            {
+              urlPattern: ({ url }) => url.pathname.startsWith('/api'),
+              handler: 'NetworkFirst',
+              options: {
+                cacheName: 'api-cache',
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 60 * 60 * 24 // 1 day
+                },
+                networkTimeoutSeconds: 10
+              }
+            }
+          ]
+        }
+      })
+    ],
     define: {
       // This ensures your code using process.env.API_KEY works in the browser
       'process.env': env
@@ -51,15 +114,15 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      chunkSizeWarningLimit: 600, // Slightly increase limit
+      chunkSizeWarningLimit: 2500, // Spline 3D is lazy-loaded (~2MB) - acceptable for premium 3D feature
       rollupOptions: {
         output: {
           manualChunks: {
             'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-            'genai-vendor': ['@google/genai'],
             'spline-vendor': ['@splinetool/react-spline', '@splinetool/runtime'],
+            'genai-vendor': ['@google/genai'],
             'firebase-vendor': ['firebase/app', 'firebase/firestore', 'firebase/storage'],
-            'ui-utils': ['framer-motion', 'lucide-react'],
+            'utils-vendor': ['framer-motion', 'lucide-react', 'zod', 'clsx', 'howler'],
           },
         },
       },

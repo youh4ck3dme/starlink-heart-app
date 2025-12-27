@@ -7,13 +7,15 @@ const StarryAvatarDisplay = ({
     isThinking = false, 
     isExcited = false, 
     isFloating = false,
-    size = "text-3xl" 
+    size = "text-3xl",
+    gender = 'unspecified'
 }: { 
     avatar: string; 
     isThinking?: boolean; 
     isExcited?: boolean; 
     isFloating?: boolean;
     size?: string; 
+    gender?: 'boy' | 'girl' | 'unspecified';
 }) => {
     // If avatar is one of the new 3D avatars, render the image
     const isImageAvatar = ['⭐', '☄️', '🤖'].includes(avatar); 
@@ -40,7 +42,11 @@ const StarryAvatarDisplay = ({
                         src={avatarImageSrc}
                         alt={avatar === '⭐' ? "Starry Mascot" : "Avatar"} 
                         className="object-contain drop-shadow-lg"
-                        style={{ width: pixelSize, height: pixelSize }}
+                        style={{ 
+                            width: pixelSize, 
+                            height: pixelSize,
+                            filter: gender === 'girl' ? 'hue-rotate(300deg)' : 'none'
+                        }}
                     />
                 ) : (
                     avatar

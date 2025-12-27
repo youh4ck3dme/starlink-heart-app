@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { vi, describe, beforeEach, it, expect } from 'vitest';
 import StarlinkHeartApp from '../components/StarlinkHeartApp';
 import * as consentService from '../services/consentService';
+import { GamificationProvider } from '../features/gamification/context/GamificationContext';
 
 // --- MOCKS ---
 
@@ -89,9 +90,11 @@ describe('StarlinkHeartApp', () => {
 
   const navigateToDashboard = async () => {
     render(
-      <MemoryRouter>
-        <StarlinkHeartApp />
-      </MemoryRouter>
+      <GamificationProvider>
+        <MemoryRouter>
+          <StarlinkHeartApp />
+        </MemoryRouter>
+      </GamificationProvider>
     );
     const startBtn = screen.getByRole('button', { name: /Start App|ŠTART|Začať/i });
     fireEvent.click(startBtn);
@@ -173,9 +176,11 @@ describe('StarlinkHeartApp', () => {
     
     // For now, let's just ensure basic render doesn't crash with no consent
     render(
-      <MemoryRouter>
-        <StarlinkHeartApp />
-      </MemoryRouter>
+      <GamificationProvider>
+        <MemoryRouter>
+          <StarlinkHeartApp />
+        </MemoryRouter>
+      </GamificationProvider>
     );
   });
 });

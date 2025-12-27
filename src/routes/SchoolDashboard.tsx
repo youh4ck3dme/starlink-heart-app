@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Moon, Sun, Calendar, Award, Bell, LogIn, Loader2, LogOut, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Moon, Sun, Calendar, Award, Bell, Loader2, LogOut } from 'lucide-react';
 import { useEdupage } from '../features/edupage/hooks/useEdupage';
 import { TimetableLesson, Grade, TimelineItem } from '../core/types/schoolSystem';
 
@@ -100,7 +100,7 @@ const TimetableCard = ({ theme, lessons }: { theme: 'green' | 'pink', lessons: T
                 <p className={`font-semibold ${isCurrent ? 'text-white' : 'text-white/70'}`}>
                   {lesson.subject}
                 </p>
-                <p className="text-xs text-white/40">{lesson.room || 'Trieda'}</p>
+                <p className="text-xs text-white/40">{lesson.room || 'Trieda'} • {lesson.teacher}</p>
               </div>
               {isCurrent && (
                 <span className={`text-xs font-bold ${textAccent} animate-pulse`}>TERAZ</span>
@@ -199,25 +199,12 @@ export default function SchoolDashboard() {
     return (localStorage.getItem('dashboardTheme') as 'green' | 'pink') || 'green';
   });
 
-  // EduPage Logic
-  const { snapshot, loading, error, isAuthenticated, login, logout, refresh } = useEdupage();
+  // EduPage Logic (Login disabled)
+  const { snapshot, loading, isAuthenticated, logout } = useEdupage();
   
-  // Login Form State
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [ebuid, setEbuid] = useState('');
-  const [loginLoading, setLoginLoading] = useState(false);
-
   useEffect(() => {
     localStorage.setItem('dashboardTheme', theme);
   }, [theme]);
-
-  const handleLogin = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setLoginLoading(true);
-      await login(username, password, ebuid);
-      setLoginLoading(false);
-  };
 
   const bgImage = theme === 'green' ? greenBg : pinkBg;
   const accentColor = theme === 'green' ? 'text-emerald-400' : 'text-pink-400';
@@ -269,6 +256,7 @@ export default function SchoolDashboard() {
             <button 
                 onClick={() => setTheme(theme === 'green' ? 'pink' : 'green')}
                 className={`p-2 rounded-full ${buttonAccent} border transition-colors`}
+                aria-label="Prepnúť tému"
             >
                 {theme === 'green' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
             </button>
@@ -284,58 +272,8 @@ export default function SchoolDashboard() {
                 <Loader2 className={`w-12 h-12 ${accentColor} animate-spin mb-4`} />
                 <p className="text-white/60">Načítavam školské dáta...</p>
              </div>
-           ) : !isAuthenticated ? (
-               // Login Form
-               <div className="max-w-md mx-auto space-y-6 bg-black/30 backdrop-blur-md p-6 rounded-3xl border border-white/10">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-bold mb-2">Prihlás sa</h2>
-                    <p className="text-white/60 text-sm">Pre zobrazenie známok a rozvrhu</p>
-                  </div>
-
-                  <form onSubmit={handleLogin} className="space-y-4">
-                      <input
-                        type="text"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                        placeholder="Meno (napr. janko.hrasko)"
-                        required
-                      />
-                      <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                        placeholder="Heslo"
-                        required
-                      />
-                      <input
-                        type="text"
-                        value={ebuid}
-                        onChange={(e) => setEbuid(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                        placeholder="ID školy (napr. zskostolany)"
-                        required
-                      />
-                      
-                      {error && <p className="text-red-400 text-sm text-center">{error}</p>}
-
-                      <button
-                        type="submit"
-                        disabled={loginLoading}
-                        className={`w-full py-4 rounded-xl ${theme === 'green' ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-pink-500 hover:bg-pink-600'} font-bold flex items-center justify-center gap-2 transition-all active:scale-95`}
-                      >
-                        {loginLoading ? <Loader2 className="w-5 h-5 animate-spin"/> : <LogIn className="w-5 h-5" />}
-                        {loginLoading ? 'Prihlasujem...' : 'Prihlásiť sa'}
-                      </button>
-                  </form>
-                  {/* Mock Login Hint */}
-                  <p className="text-center text-xs text-white/30">
-                     Tip: Pre demo režim stačí kliknúť "Prihlásiť sa" s hocijakými údajmi.
-                  </p>
-               </div>
            ) : (
-             // Authenticated Dashboard
+             // Dashboard Widgets (Login disabled for now)
              <>
                 <TimetableCard theme={theme} lessons={snapshot?.timetable || []} />
                 <GradesCard theme={theme} grades={snapshot?.grades || []} />

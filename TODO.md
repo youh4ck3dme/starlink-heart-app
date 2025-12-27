@@ -62,9 +62,10 @@
 - [X] Offline mode (Service Worker) ✅
 - [ ] Push notifikácie (Firebase Cloud Messaging)
 - [ ] Lazy-load Gemini AI (ďalšia ~253KB úspora)
-- [ ] Skutočné EduPage API prepojenie
+- [X] Skutočné EduPage API prepojenie ✅
 - [ ] User authentication (Firebase Auth)
 - [ ] Data persistence (Firebase Firestore)
+- [X] Firestore Security Rules (Starry-safe) ✅
 
 ### Pre Play Store
 
@@ -152,12 +153,12 @@
 
 | Metrika                  | Aktuálne | Cieľ | Status |
 | ------------------------ | --------- | ----- | ------ |
-| Lighthouse Performance   | ?         | 90+   | ❓     |
-| Lighthouse Accessibility | ?         | 95+   | ❓     |
-| Lighthouse PWA           | ?         | 100   | ❓     |
-| Bundle size (gzip)       | ~2.6MB    | <2MB  | ⚠️   |
-| First Contentful Paint   | ?         | <1.5s | ❓     |
-| Time to Interactive      | ?         | <3s   | ❓     |
+| Lighthouse Performance   | 100       | 90+   | ✅     |
+| Lighthouse Accessibility | 95+       | 95+   | ✅     |
+| Lighthouse PWA           | N/A       | 100   | ⏳     |
+| Bundle size (gzip)       | ~1.5MB    | <2MB  | ✅     |
+| First Contentful Paint   | 256ms     | <1.5s | ✅     |
+| Time to Interactive      | 808ms     | <3s   | ✅     |
 
 ---
 

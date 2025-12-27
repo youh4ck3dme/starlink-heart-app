@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+// Dynamic import used inside functions to reduce initial bundle size
 import { Heart } from "../types";
 import { checkInputSafety, getSafetyBlockMessage } from "./safetyFilter";
 import { PROF_STARLINK_SYSTEM_PROMPT, TEACHER_CLONE_SYSTEM_PROMPT } from "../config/prompts";
@@ -61,6 +61,9 @@ export const generateCosmicResponse = async (prompt: string, conversationHistory
     }
     // Use filtered prompt (PII removed if detected)
     const safePrompt = safetyCheck.filtered;
+
+    // Dynamically import GoogleGenAI
+    const { GoogleGenAI, Type } = await import("@google/genai");
 
     // Initialize AI with the environment variable directly as per new standards
     const ai = new GoogleGenAI({ apiKey: getApiKey() });
@@ -170,6 +173,7 @@ export const generateCosmicResponse = async (prompt: string, conversationHistory
 };
 
 export const generateParentGuide = async (conversationHistory: Heart[], image?: File | string): Promise<string> => {
+    const { GoogleGenAI } = await import("@google/genai");
     const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
     const lastInteraction = conversationHistory.slice(-2); 
@@ -233,6 +237,7 @@ export const generateParentGuide = async (conversationHistory: Heart[], image?: 
 };
 
 export const generateCosmicHint = async (conversationHistory: Heart[]): Promise<{ textResponse: string; visualAids: string[] }> => {
+    const { GoogleGenAI, Type } = await import("@google/genai");
     const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
     const formattedHistory = conversationHistory.map(heart => {
@@ -291,6 +296,7 @@ export const generateCosmicHint = async (conversationHistory: Heart[]): Promise<
 };
 
 export const getStarryTip = async (): Promise<string> => {
+    const { GoogleGenAI } = await import("@google/genai");
     const ai = new GoogleGenAI({ apiKey: getApiKey() });
 
     const systemInstruction = `

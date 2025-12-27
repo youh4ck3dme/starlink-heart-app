@@ -4,8 +4,8 @@ import MascotRenderer, { MascotMode } from '../mascot/MascotRenderer';
 import { DailyMissionsCard } from '../gamification/DailyMissionsCard';
 import { LeaderboardWidget } from '../gamification/LeaderboardWidget';
 import { LeaderboardFull } from '../gamification/LeaderboardFull';
-import { PlanetCorner } from '../effects/PlanetCorner';
 import { AnimatePresence } from 'framer-motion';
+import logo3d from '../../assets/logo_3d.webp';
 
 interface DashboardScreenProps {
     onNewMission: () => void;
@@ -20,6 +20,8 @@ interface DashboardScreenProps {
     gems: number;
     textColor: string;
     mascotMode: MascotMode;
+    showIntro?: boolean;
+    gender: 'boy' | 'girl' | 'unspecified';
 }
 
 const DashboardScreen: React.FC<DashboardScreenProps> = ({
@@ -34,14 +36,15 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
     avatar,
     gems,
     textColor,
-    mascotMode
+    mascotMode,
+    showIntro = false,
+    gender
 }) => {
     const [showLeaderboard, setShowLeaderboard] = useState(false);
 
     return (
         <div className="relative min-h-[calc(100dvh-80px)] flex flex-col items-center px-4 pt-4 pb-24 touch-pan-y select-none">
-            {/* 3D Planet Decoration (Lazy Loaded) */}
-            <PlanetCorner />
+            {/* 3D Planet Decoration Removed for simplicity */}
             
             {/* Header */}
             <DashboardHeader 
@@ -56,7 +59,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
                 <div className="relative w-full max-w-sm flex flex-col items-center justify-center gap-4">
                     {/* Floating 3D Logo */}
                     <img 
-                        src="/src/assets/logo_3d.webp" 
+                        src={logo3d} 
                         alt="Starlink Heart Logo" 
                         className="w-32 h-auto animate-bounce-slow drop-shadow-lg z-10"
                     />
@@ -65,11 +68,22 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
                     <div className="w-full aspect-square max-w-[280px] flex items-center justify-center">
                         <MascotRenderer 
                              mode="image" 
+                             avatar={avatar}
+                             gender={gender}
                              className="w-full h-full drop-shadow-2xl hover:scale-105 transition-transform duration-300"
                         />
                     </div>
                 </div>
             </div>
+
+            {/* Intro Text for Main Avatar */}
+            {showIntro && (
+                <div className="w-full max-w-sm mb-6 bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/20 text-center shadow-lg transform hover:scale-[1.02] transition-transform animate-float">
+                    <p className="text-white text-sm md:text-base font-medium">
+                        Ahoj! 👋 Klikni na <span className="font-bold text-yellow-300">"Nová Misia"</span> a opýtaj sa ma čokoľvek! Môžeme si pozrieť aj fotky! 📸✨
+                    </p>
+                </div>
+            )}
 
             {/* Gamification Widgets */}
             <div className="w-full max-w-sm space-y-4 mb-4">

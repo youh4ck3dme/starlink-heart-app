@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type } from "@google/genai";
+// Dynamic import to optimized bundle size
 
 export type Skill = 'math' | 'reading' | 'science' | 'language';
 
@@ -34,6 +34,10 @@ export async function generateDailyChallenges(profile: StudentProfile): Promise<
           console.warn("Generating challenges: No API Key, using fallback.");
           return FALLBACK_CHALLENGES;
       }
+
+
+      // Dynamic import
+      const { GoogleGenAI, Type } = await import("@google/genai");
 
       const ai = new GoogleGenAI({ apiKey });
       

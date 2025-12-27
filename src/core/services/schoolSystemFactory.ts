@@ -5,8 +5,10 @@ import {
 
 // Lazy imports for code splitting
 const getEdupageClient = async () => {
-  const { EdupageClient } = await import('../../features/edupage/services/edupageClient');
-  return new EdupageClient();
+    // Deep Clean: EduPage Client Removed
+    // const { EdupageClient } = await import('../../features/edupage/services/edupageClient');
+    // return new EdupageClient();
+    throw new Error("EduPage integration disabled for Deep Clean");
 };
 
 /**

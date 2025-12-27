@@ -45,6 +45,7 @@
 | **Testing**        | Vitest + React Testing Library + Playwright |
 | **Icons**          | Lucide React                     |
 | **Backend**        | Express (EduPage proxy)          |
+| **Vybavenie**      | Firebase (Auth, Firestore, Storage) |
 
 ---
 
@@ -148,6 +149,17 @@ Viď `minedu.md` pre kompletnú dokumentáciu.
 
 ---
 
+## 🔐 Zabezpečenie (Firebase)
+
+Aplikácia využíva Firebase pre ukladanie dát. Bezpečnosť je vynútená pomocou **Firestore Security Rules**:
+- **Hearts**: Deti vidia a upravujú len svoju históriu četov.
+- **Users**: Osobné štatistiky (XP, level) sú prístupné len prihlásenému používateľovi.
+- **Global**: Verejné dáta sú prístupné len na čítanie.
+
+Pravidlá nájdete v súbore [firestore.rules](file:///Users/youh4ck3dme/Downloads/starlink-homework(1)/firestore.rules).
+
+---
+
 ## 🎯 Play Store Checklist
 
 ### Hotové ✅
@@ -162,6 +174,25 @@ Viď `minedu.md` pre kompletnú dokumentáciu.
 - [ ] Store listing (screenshots, popis)
 - [ ] Age rating (PEGI/ESRB)
 - [ ] Podpísanie APK
+
+---
+
+## 🚀 Nasadenie (Deployment)
+
+### Frontend (Vercel)
+Aplikácia je optimalizovaná pre Vercel. Pri prepojení repozitára sa automaticky spustí build a nasadenie.
+
+### Backend (Proxy Server)
+EduPage proxy beží ako samostatná Node.js služba. Odporúčame nasadiť na:
+- Render.com
+- Railway.app
+- Vlastný VPS (pomocou PM2)
+
+### Firebase Security Rules
+Pravidlá nasadíte pomocou Firebase CLI:
+```bash
+firebase deploy --only firestore:rules
+```
 
 ---
 
@@ -198,4 +229,4 @@ Proprietárny software. Všetky práva vyhradené.
 
 ---
 
-*Posledná aktualizácia: 26.12.2024*
+*Posledná aktualizácia: 27.12.2024 (v0.1.1)*

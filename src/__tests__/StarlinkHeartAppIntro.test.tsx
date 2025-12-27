@@ -2,11 +2,11 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import StarlinkHeartApp from '../components/StarlinkHeartApp';
+import { GamificationProvider } from '../features/gamification/context/GamificationContext';
 
 // Mock Services
 vi.mock('../services/localService', () => ({
   onSnapshot: vi.fn((q, cb) => {
-      // Simulate generic snapshot if needed, or just return unsubscribe
       return () => {};
   }),
   query: vi.fn(),
@@ -53,10 +53,6 @@ vi.mock('../hooks/useVoiceMode', () => ({
 vi.mock('../components/layout/LiveStarryBackground', () => ({ default: () => <div /> }));
 vi.mock('../components/mascot/MascotRenderer', () => ({ default: () => <div /> }));
 
-// Intro Screen relies on IntroScreen component
-// We can let it render or verify StarlinkHeartApp renders it.
-// StarlinkHeartApp checks viewMode === 'intro'.
-
 describe('StarlinkHeartApp Intro', () => {
     beforeEach(() => {
         vi.clearAllMocks();
@@ -65,22 +61,26 @@ describe('StarlinkHeartApp Intro', () => {
 
     it('renders intro screen initially', async () => {
         render(
-            <MemoryRouter>
-                <StarlinkHeartApp />
-            </MemoryRouter>
+            <GamificationProvider>
+                <MemoryRouter>
+                    <StarlinkHeartApp />
+                </MemoryRouter>
+            </GamificationProvider>
         );
 
         // Expect Start button from IntroScreen
         expect(screen.getByRole('button', { name: /Start App|ŠTART|Začať/i })).toBeInTheDocument();
         // Expect Logo or Title
-        expect(screen.getByAltText(/Starlink Heart/i)).toBeInTheDocument();
+        // Image replaced by gradient, so no alt text check needed
     });
 
     it('transitions to Dashboard on Start', async () => {
         render(
-            <MemoryRouter>
-                <StarlinkHeartApp />
-            </MemoryRouter>
+            <GamificationProvider>
+                <MemoryRouter>
+                    <StarlinkHeartApp />
+                </MemoryRouter>
+            </GamificationProvider>
         );
 
         const startBtn = screen.getByRole('button', { name: /Start App|ŠTART|Začať/i });
@@ -88,10 +88,7 @@ describe('StarlinkHeartApp Intro', () => {
 
         // Wait for Dashboard element
         await waitFor(() => {
-            // Check for the dashboard screen specifically
             expect(screen.getByTestId('dashboard-screen')).toBeInTheDocument();
-            // Or use more specific text query if needed
-            // expect(screen.getAllByText(/Nová Misia/i)[0]).toBeInTheDocument();
         });
     });
 });

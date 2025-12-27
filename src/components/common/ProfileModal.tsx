@@ -1,5 +1,7 @@
-import { getPlayerStats } from '../../services/xpService';
+import { useState } from 'react';
+import { useGamification } from '../../features/gamification/context/GamificationContext';
 import { BadgeShowcase } from '../gamification/BadgeShowcase';
+import { getPlayerStats } from '../../services/xpService';
 
 interface ProfileModalProps {
   onClose: () => void;
@@ -14,8 +16,21 @@ export default function ProfileModal({
   gems = 0,
   hearts = "∞"
 }: ProfileModalProps) {
+  const { state, dispatch } = useGamification();
   const stats = getPlayerStats();
   const progressPct = stats.progress;
+  
+  const [editName, setEditName] = useState(state.userName);
+  const [editGender, setEditGender] = useState(state.gender);
+
+  const handleSave = () => {
+    dispatch({ 
+        type: 'UPDATE_PROFILE', 
+        userName: editName || 'Kadet', 
+        gender: editGender 
+    });
+    onClose();
+  };
 
   return (
     <>
@@ -61,11 +76,37 @@ export default function ProfileModal({
                 <span>Level {stats.level}</span>
               </div>
 
-              <h3 className="mt-3 text-2xl sm:text-3xl font-black tracking-tight drop-shadow-sm">
-                {profileName ?? stats.title}
-              </h3>
+              {/* Edit Mode: Simple toggle or just always editable here? Let's make it inline editable style */}
+              <div className="mt-3 flex flex-col items-center gap-2">
+                 <input 
+                    type="text" 
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="bg-transparent border-b-2 border-white/30 text-center text-2xl sm:text-3xl font-black tracking-tight text-white focus:outline-none focus:border-white placeholder-white/50 w-full max-w-[200px]"
+                    placeholder="Tvoje meno"
+                    maxLength={15}
+                 />
+                 
+                 {/* Gender Toggle */}
+                 <div className="flex gap-2 bg-black/20 p-1 rounded-full backdrop-blur-md">
+                    <button 
+                        onClick={() => setEditGender('boy')}
+                        className={`text-xl px-3 py-1 rounded-full transition-all ${editGender === 'boy' ? 'bg-blue-500 text-white shadow-lg scale-105' : 'text-white/50 hover:text-white/80'}`}
+                        title="Chlapec"
+                    >
+                        🧑
+                    </button>
+                    <button 
+                        onClick={() => setEditGender('girl')}
+                        className={`text-xl px-3 py-1 rounded-full transition-all ${editGender === 'girl' ? 'bg-pink-500 text-white shadow-lg scale-105' : 'text-white/50 hover:text-white/80'}`}
+                        title="Dievča"
+                    >
+                        👧
+                    </button>
+                 </div>
+              </div>
 
-              <p className="mt-1.5 text-white/90 text-sm font-medium">
+              <p className="mt-2 text-white/90 text-sm font-medium">
                 Prieskumník vesmíru 🚀
               </p>
             </div>
@@ -131,10 +172,10 @@ export default function ProfileModal({
             style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
           >
             <button
-              onClick={onClose}
+              onClick={handleSave}
               className="w-full rounded-2xl bg-gray-900 text-white py-4 font-extrabold shadow-lg active:scale-[0.98] transition-transform motion-reduce:transition-none"
             >
-              Pokračovať 🚀
+              Uložiť a Pokračovať 🚀
             </button>
 
             <button

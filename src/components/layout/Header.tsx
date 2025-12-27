@@ -1,12 +1,14 @@
 import React from 'react';
 import StarryAvatarDisplay from '../common/StarryAvatarDisplay';
+import { useGamification } from '../../features/gamification/context/GamificationContext';
+import { useGameStore } from '../../store/gameStore';
 
 interface HeaderProps {
   onBack: () => void;
   onSettings: () => void;
   onGemsTap: () => void;
   avatar: string;
-  gemCount: number;
+  // gemCount removed - now from Zustand store
   isThinking?: boolean;
   gemJustEarned?: boolean;
   appBackground: { id: string; glass: string };
@@ -17,12 +19,15 @@ export default function Header({
   onSettings,
   onGemsTap,
   avatar,
-  gemCount,
+  // gemCount removed - using Zustand
   isThinking = false,
   gemJustEarned = false,
   appBackground,
 }: HeaderProps) {
+  // ✅ Zustand: Get gems from store (auto-persisted!)
+  const gems = useGameStore((state) => state.gems);
   const isDarkTheme = appBackground.id !== 'sky';
+  const { state } = useGamification();
 
   return (
     <header 
@@ -51,11 +56,13 @@ export default function Header({
           isThinking={isThinking} 
           isExcited={gemJustEarned}
           size="text-2xl"
+          gender={state.gender}
         />
 
         {/* Gems Badge - Next to avatar */}
         <button
           onClick={onGemsTap}
+          aria-label={`Počet drahokamov: ${gems}`}
           className={`flex items-center gap-1 px-3 py-1.5 rounded-full border-2 transition-all ${
             gemJustEarned 
               ? 'bg-yellow-400 border-yellow-500 scale-110 animate-pulse' 
@@ -64,17 +71,22 @@ export default function Header({
         >
           <span className="text-lg">{gemJustEarned ? '✨' : '💎'}</span>
           <span className={`font-bold ${isDarkTheme ? 'text-yellow-200' : 'text-yellow-800'}`}>
-            {gemCount}
+            {gems}
           </span>
         </button>
       </div>
 
       {/* CENTER SECTION: Title */}
-      <h1 
-        className={`text-xl font-bold tracking-tight ${isDarkTheme ? 'text-white' : 'text-sky-600'}`}
-      >
-        Starlink Heart
-      </h1>
+      <div className="flex flex-col items-center">
+        <h1 
+          className={`text-xl font-bold tracking-tight ${isDarkTheme ? 'text-white' : 'text-sky-600'}`}
+        >
+          Starlink Heart
+        </h1>
+        <span className={`text-xs font-medium opacity-80 ${isDarkTheme ? 'text-white' : 'text-sky-800'}`}>
+          Ahoj, {state.userName}!
+        </span>
+      </div>
 
       {/* RIGHT SECTION: Settings only */}
       <div className="flex items-center">

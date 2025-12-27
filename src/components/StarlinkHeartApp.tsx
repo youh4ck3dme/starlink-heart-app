@@ -16,14 +16,10 @@ import CameraModal from './camera/CameraModal';
 import { useVoiceMode } from '../hooks/useVoiceMode';
 import IntroScreen from './screens/IntroScreen';
 import DashboardScreen from './screens/DashboardScreen';
-import { useGamification, getAvatarForLevel, getAvatarName } from '../features/gamification/context/GamificationContext';
-
-// Define Avatars with Names (progression order: Robot → Comet → Starry)
-const AVATAR_OPTIONS = [
-    { emoji: '🤖', name: 'Robo', levelRequired: 1 },
-    { emoji: '☄️', name: 'Cometa', levelRequired: 6 },
-    { emoji: '⭐', name: 'Starry', levelRequired: 11 },
-];
+import ShopScreen from './screens/ShopScreen';
+import { AVATAR_OPTIONS, BACKGROUND_OPTIONS, BackgroundItem, isBackground } from '../core/config/shopConfig';
+import { useGamification, getAvatarForLevel, getAvatarName, getLevelTitle } from '../features/gamification/context/GamificationContext';
+import { useGameStore } from '../store/gameStore';
 
 // Compatibility constant for existing logic
 const STARRY_AVATARS = AVATAR_OPTIONS.map(opt => opt.emoji);
@@ -31,12 +27,7 @@ const STARRY_AVATAR_KEY = 'starryAvatar';
 const STARRY_BACKGROUND_KEY = 'starryBackground';
 const STARRY_GEMS_KEY = 'starryGems';
 
-const BACKGROUND_OPTIONS = [
-    { id: 'sky', name: 'Svetlá obloha', price: 0, className: 'bg-sky-50', textColor: 'text-gray-800', accent: 'bg-sky-500', glass: 'bg-white/70' },
-    { id: 'space', name: 'Hlboký vesmír', price: 0, className: 'bg-deep-space', textColor: 'text-gray-100', accent: 'bg-indigo-500', glass: 'bg-slate-900/60' },
-    { id: 'mars', name: 'Západ na Marse', price: 60, className: 'bg-mars-sunset', textColor: 'text-white', accent: 'bg-orange-600', glass: 'bg-orange-900/40' },
-    { id: 'galaxy', name: 'Galaktický vír', price: 120, className: 'bg-galaxy-swirl', textColor: 'text-white', accent: 'bg-fuchsia-500', glass: 'bg-purple-900/40' }
-];
+// Inline Options removed - imported from config
 
 const processHeartDoc = (doc: QueryDocumentSnapshot): Heart => {
     const data = doc.data();
@@ -111,6 +102,7 @@ const FormatText = ({ text }: { text: string }) => {
 import StarryAvatarDisplay from './common/StarryAvatarDisplay';
 import XPBar from './common/XPBar';
 import StarryHelper from './common/StarryHelper';
+import PWANotification from './common/PWANotification';
 import { incrementMissionProgress } from '../services/missionService';
 import { useHaptics } from '../hooks/useHaptics';
 
@@ -141,9 +133,12 @@ const StarlinkHeartApp: React.FC = () => {
     const [showCustomizeModal, setShowCustomizeModal] = useState(false);
     // starryAvatar is now derived from level (see above)
     const [showBackgroundModal, setShowBackgroundModal] = useState(false);
-    const [appBackground, setAppBackground] = useState(BACKGROUND_OPTIONS[1]); // Default to Deep Space
+    const [appBackground, setAppBackground] = useState<BackgroundItem>(() => {
+        const saved = localStorage.getItem(STARRY_BACKGROUND_KEY);
+        return BACKGROUND_OPTIONS.find(bg => bg.id === saved) || BACKGROUND_OPTIONS[1];
+    });
     const [customApiKey, setCustomApiKey] = useState('');
-    const [viewMode, setViewMode] = useState<'intro' | 'dashboard' | 'chat'>('intro');
+    const [viewMode, setViewMode] = useState<'intro' | 'dashboard' | 'chat' | 'shop'>('intro');
     const [showProfileModal, setShowProfileModal] = useState(false);
     
     // Pagination
@@ -155,8 +150,11 @@ const StarlinkHeartApp: React.FC = () => {
     const [showCameraModal, setShowCameraModal] = useState(false);
     // Camera state moved to CameraModal
     
-    // Gamification
-    const [gemCount, setGemCount] = useState<number>(0);
+    // Gamification - Zustand Store
+    const addGems = useGameStore((state) => state.addGems);
+    const spendGems = useGameStore((state) => state.spendGems);
+    const gems = useGameStore((state) => state.gems);
+    // gemCount useState removed - now in Zustand
     const [gemJustEarned, setGemJustEarned] = useState(false);
     
     // Shop - Unlocked Items
@@ -177,13 +175,17 @@ const StarlinkHeartApp: React.FC = () => {
 
     // Mascot Mode State
     const [mascotMode, setMascotMode] = useState<MascotMode>(() => {
-        return (localStorage.getItem('mascotMode') as MascotMode) || 'rive';
+        return (localStorage.getItem('mascotMode') as MascotMode) || 'image';
     });
 
-    // Effect to persist mascot mode changes
     useEffect(() => {
         localStorage.setItem('mascotMode', mascotMode);
     }, [mascotMode]);
+
+    // Effect to persist background changes
+    useEffect(() => {
+        localStorage.setItem(STARRY_BACKGROUND_KEY, appBackground.id);
+    }, [appBackground.id]);
 
     // Parent Consent (Kids Compliance)
     const [showParentNotice, setShowParentNotice] = useState(false);
@@ -201,12 +203,8 @@ const StarlinkHeartApp: React.FC = () => {
     useEffect(() => {
         // Avatar is now auto-derived from level, no need to load from storage
         
-        const savedBackgroundId = localStorage.getItem(STARRY_BACKGROUND_KEY);
-        const savedBackground = BACKGROUND_OPTIONS.find(bg => bg.id === savedBackgroundId);
-        if (savedBackground) setAppBackground(savedBackground);
-
-        const savedGems = localStorage.getItem(STARRY_GEMS_KEY);
-        if (savedGems) setGemCount(parseInt(savedGems, 10));
+        // Gems now loaded from Zustand store automatically (persisted)
+        // if (savedGems) setGemCount(parseInt(savedGems, 10));
 
         const savedApiKey = localStorage.getItem('custom_api_key');
         if (savedApiKey) setCustomApiKey(savedApiKey);
@@ -308,11 +306,8 @@ const StarlinkHeartApp: React.FC = () => {
         
         await updateDoc(docRef, { aiResponse: response });
 
-        setGemCount(prev => {
-            const newCount = prev + 1;
-            localStorage.setItem(STARRY_GEMS_KEY, String(newCount));
-            return newCount;
-        });
+        // ✅ Zustand: Auto-persisted gems
+        addGems(1);
         setGemJustEarned(true);
         setTimeout(() => setGemJustEarned(false), 2000);
         
@@ -358,19 +353,13 @@ const StarlinkHeartApp: React.FC = () => {
         }
     };
 
-    // Shop - Purchase Item
+    // Shop - Purchase Item (now using Zustand)
     const purchaseItem = (type: 'avatar' | 'background', id: string, price: number) => {
-        if (gemCount < price) {
+        // ✅ Zustand: spendGems returns false if not enough
+        if (!spendGems(price)) {
             // Could show a "not enough gems" toast here
             return false;
         }
-        
-        // Deduct gems
-        setGemCount(prev => {
-            const newCount = prev - price;
-            localStorage.setItem(STARRY_GEMS_KEY, String(newCount));
-            return newCount;
-        });
         
         // Unlock item
         if (type === 'avatar') {
@@ -485,14 +474,11 @@ const StarlinkHeartApp: React.FC = () => {
         if (customApiKey) {
             localStorage.setItem('custom_api_key', customApiKey);
             
-            // 🔓 DEVELOPER MODE: Unlock all features when custom API key is set
-            localStorage.setItem('starryGems', '999');
-            localStorage.setItem('starryHearts', '999');
-            localStorage.setItem('unlockedAvatars', JSON.stringify(['✨', '🚀', '🤖', '🧠', '💡', '🦊', '🐱', '🐶']));
-            localStorage.setItem('unlockedBackgrounds', JSON.stringify(['sky', 'space', 'mars', 'galaxy', 'ocean', 'forest']));
+            // ✅ Zustand: Set dev mode gems via store
+            // Note: For full dev mode, we'd add a setGems action to store
+            // For now, add 999 gems
+            for (let i = 0; i < 999; i++) { addGems(1); } // Quick hack
             localStorage.setItem('developerMode', 'true');
-            setGemCount(999);
-            console.log('🔓 DEVELOPER MODE ACTIVATED: 999 gems, 999 hearts, all items unlocked!');
         } else {
             localStorage.removeItem('custom_api_key');
             localStorage.removeItem('developerMode');
@@ -513,152 +499,153 @@ const StarlinkHeartApp: React.FC = () => {
                 {/* XP Bar - Visible only after Intro and NOT on Dashboard (as Dashboard has its own header) */}
                 {viewMode !== 'intro' && viewMode !== 'dashboard' && <XPBar />}
 
+                {/* PWA Update Notification */}
+                <PWANotification />
+
                 {/* Header - Unified Glassmorphic Component */}
                 {viewMode === 'chat' && (
                     <Header
                         onBack={() => setViewMode('dashboard')}
                         onSettings={() => setShowCustomizeModal(true)}
-                        onGemsTap={handleGetTip}
+                        onGemsTap={() => setShowProfileModal(true)}
                         avatar={starryAvatar}
-                        gemCount={gemCount}
-                        isThinking={isSending}
-                        gemJustEarned={gemJustEarned}
                         appBackground={appBackground}
+                        gemJustEarned={gemJustEarned}
                     />
                 )}
 
-                {/* Intro Screen */}
-                <AnimatePresence mode="wait">
-                {viewMode === 'intro' && (
-                    <motion.div
-                        key="intro"
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 1.05 }}
-                        transition={{ duration: 0.3, ease: 'easeOut' }}
-                        className="flex-1 flex flex-col"
-                    >
-                        <IntroScreen 
-                            onStart={() => {
-                                haptics.mediumTap();
-                                setViewMode('dashboard');
-                            }} 
-                            avatar={starryAvatar} 
-                            textColor={appBackground.textColor}
-                        />
-                    </motion.div>
-                )}
-
-                {/* Dashboard Screen */}
-                {viewMode === 'dashboard' && (
-                    <motion.div
-                        key="dashboard"
-                        initial={{ opacity: 0, x: -30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: 30 }}
-                        transition={{ duration: 0.25, ease: 'easeOut' }}
-                        className="flex-1 flex flex-col"
-                    >
-                        <DashboardScreen 
-                            onNewMission={() => {
-                                haptics.mediumTap();
-                                setViewMode('chat');
-                            }}
-                            onProfile={() => {
-                                haptics.lightTap();
-                                setShowProfileModal(true);
-                            }}
-                            onCenter={() => {
-                                haptics.lightTap();
-                                setShowCustomizeModal(true);
-                            }}
-                            onCoachToggle={() => {
-                                haptics.lightTap();
-                                setIsTeacherCloneMode(!isTeacherCloneMode);
-                            }}
-                            isCoachMode={isTeacherCloneMode}
-                            avatar={starryAvatar}
-                            gems={gemCount}
-                            textColor={appBackground.textColor}
-                            mascotMode={mascotMode}
-                            onSchoolDashboard={() => {
-                                haptics.lightTap();
-                                navigate('/dashboard');
-                            }}
-                            onEduPage={() => {
-                                haptics.lightTap();
-                                navigate('/dashboard');
-                            }}
-                            onGemEarned={(amount) => {
-                                haptics.successVibrate();
-                                setGemCount(prev => {
-                                    const newCount = prev + amount;
-                                    localStorage.setItem(STARRY_GEMS_KEY, String(newCount));
-                                    return newCount;
-                                });
-                                setGemJustEarned(true);
-                                setTimeout(() => setGemJustEarned(false), 2000);
-                            }}
-                        />
-                        
-                        {/* Intro Text for Main Avatar */}
-                        {hearts.length === 0 && (
-                            <motion.div 
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.5 }}
-                                className="mt-6 max-w-sm mx-auto bg-white/20 backdrop-blur-md p-4 rounded-3xl border border-white/30 text-center shadow-xl"
+                {/* Main Content Area */}
+                <div className="flex-1 overflow-hidden relative z-10 w-full max-w-4xl mx-auto">
+                    <AnimatePresence mode="wait">
+                        {/* INTRO SCREEN */}
+                        {viewMode === 'intro' && (
+                            <motion.div
+                                key="intro"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="h-full"
                             >
-                                <p className="text-white text-lg font-medium drop-shadow-md">
-                                    Ahoj! 👋 Klikni na <span className="font-bold text-yellow-300">"Nová Misia"</span> a opýtaj sa ma čokoľvek o vesmíre! PRE DETI: Môžeme si pozrieť aj fotky! 📸✨
-                                </p>
+                                <IntroScreen 
+                                    onStart={() => setViewMode('dashboard')} 
+                                    avatar={starryAvatar}
+                                    textColor={appBackground.textColor}
+                                />
                             </motion.div>
                         )}
-                        <StarryHelper avatar={starryAvatar} />
-                    </motion.div>
-                )}
 
-                {/* --- CHAT VIEW --- */}
-                {viewMode === 'chat' && (
-                <motion.div
-                    key="chat"
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -50 }}
-                    transition={{ duration: 0.25, ease: 'easeOut' }}
-                    className="flex-1 flex flex-col"
-                >
-                <ChatView 
-                    hearts={hearts}
-                    starryAvatar={starryAvatar}
-                    appBackground={appBackground}
-                    isLoading={isLoading}
-                    hasMore={hasMore}
-                    isLoadingMore={isLoadingMore}
-                    isSending={isSending}
-                    hintLoadingId={hintLoadingId}
-                    parentGuideLoadingId={parentGuideLoadingId}
-                    newMessage={newMessage}
-                    setNewMessage={setNewMessage}
-                    imageFile={imageFile}
-                    setImageFile={setImageFile}
-                    imagePreviewUrl={imagePreviewUrl}
-                    isTeacherCloneMode={isTeacherCloneMode}
-                    setIsTeacherCloneMode={setIsTeacherCloneMode}
-                    chatContainerRef={chatContainerRef}
-                    messagesEndRef={messagesEndRef}
-                    fileInputRef={fileInputRef}
-                    onLoadMore={handleLoadMore}
-                    onSubmit={handleSubmit}
-                    onOpenCamera={handleOpenCamera}
-                    onGetHint={handleGetHint}
-                    onParentGuide={handleParentGuide}
-                    voiceMode={voiceMode}
-                />
-                </motion.div>
-                )}
-                </AnimatePresence>
-</div>
+                        {/* DASHBOARD SCREEN */}
+                        {viewMode === 'dashboard' && (
+                            <motion.div
+                                key="dashboard"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="h-full"
+                            >
+                                <DashboardScreen
+                                    isCoachMode={isTeacherCloneMode}
+                                    onCoachToggle={() => setIsTeacherCloneMode(!isTeacherCloneMode)}
+                                    // Navigation
+                                    onNewMission={() => setViewMode('chat')}
+                                    onProfile={() => setShowProfileModal(true)}
+                                    onCenter={() => setShowCustomizeModal(true)} // Keep for backwards compat if needed, or redirect
+                                    onSchoolDashboard={() => navigate('/dashboard')}
+                                    onEduPage={() => navigate('/dashboard')}
+                                    // Data
+                                    avatar={starryAvatar}
+                                    mascotMode={mascotMode}
+                                    gender={gamificationState.gender}
+                                    gems={gems}
+                                    textColor={appBackground.textColor}
+                                />
+                                
+                                {/* Quick Shop Access Button (floating) */}
+                                <div className="absolute top-20 right-4 z-50">
+                                    <button 
+                                        onClick={() => setViewMode('shop')}
+                                        aria-label="Otvoriť obchod"
+                                        className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-3 rounded-full shadow-lg border border-white/20 animate-pulse hover:scale-110 transition-transform"
+                                    >
+                                        <span className="text-xl">🛍️</span>
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* SHOP SCREEN */}
+                        {viewMode === 'shop' && (
+                            <motion.div
+                                key="shop"
+                                initial={{ opacity: 0, y: 50 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 50 }}
+                                className="h-full"
+                            >
+                                <ShopScreen
+                                    gems={gems}
+                                    level={gamificationState.level}
+                                    unlockedBackgrounds={unlockedBackgrounds}
+                                    currentBackgroundId={appBackground.id}
+                                    onBack={() => setViewMode('dashboard')}
+                                    onPurchase={(item) => {
+                                        purchaseItem(item.type, item.id, item.price);
+                                    }}
+                                    onEquip={(item) => {
+                                        if (isBackground(item)) {
+                                            const bg = BACKGROUND_OPTIONS.find(b => b.id === item.id);
+                                            if (bg) {
+                                                setAppBackground(bg);
+                                                localStorage.setItem(STARRY_BACKGROUND_KEY, bg.id);
+                                            }
+                                        }
+                                    }}
+                                />
+                            </motion.div>
+                        )}
+
+                        {/* CHAT VIEW */}
+                        {viewMode === 'chat' && (
+                            <motion.div
+                                key="chat"
+                                initial={{ opacity: 0, x: 50 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -50 }}
+                                transition={{ duration: 0.25, ease: 'easeOut' }}
+                                className="flex-1 flex flex-col h-full"
+                            >
+                                <ChatView 
+                                    hearts={hearts}
+                                    starryAvatar={starryAvatar}
+                                    appBackground={appBackground}
+                                    isLoading={isLoading}
+                                    hasMore={hasMore}
+                                    isLoadingMore={isLoadingMore}
+                                    isSending={isSending}
+                                    hintLoadingId={hintLoadingId}
+                                    parentGuideLoadingId={parentGuideLoadingId}
+                                    newMessage={newMessage}
+                                    setNewMessage={setNewMessage}
+                                    imageFile={imageFile}
+                                    setImageFile={setImageFile}
+                                    imagePreviewUrl={imagePreviewUrl}
+                                    isTeacherCloneMode={isTeacherCloneMode}
+                                    setIsTeacherCloneMode={setIsTeacherCloneMode}
+                                    chatContainerRef={chatContainerRef}
+                                    messagesEndRef={messagesEndRef}
+                                    fileInputRef={fileInputRef}
+                                    onLoadMore={handleLoadMore}
+                                    onSubmit={handleSubmit}
+                                    onOpenCamera={handleOpenCamera}
+                                    onGetHint={handleGetHint}
+                                    onParentGuide={handleParentGuide}
+                                    voiceMode={voiceMode}
+                                />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </div>
 
             {/* --- MODALS --- */}
 
@@ -678,7 +665,7 @@ const StarlinkHeartApp: React.FC = () => {
                             <h2 className="text-white font-bold text-lg flex items-center gap-2">
                                 <span>🛡️</span> Rodičovský Prekladač
                             </h2>
-                            <button onClick={() => setActiveParentGuide(null)} className="text-white/80 hover:text-white text-2xl">&times;</button>
+                            <button onClick={() => setActiveParentGuide(null)} aria-label="Zatvoriť" className="text-white/80 hover:text-white text-2xl">&times;</button>
                         </div>
                         <div className="p-6 overflow-y-auto bg-indigo-50/50">
                             <div className="prose prose-sm prose-indigo text-gray-700">
@@ -716,7 +703,7 @@ const StarlinkHeartApp: React.FC = () => {
                             <div className="grid grid-cols-2 gap-8 w-full mb-6">
                                 <div className="bg-yellow-50 rounded-2xl p-4 text-center border border-yellow-200">
                                     <div className="text-3xl mb-1">💎</div>
-                                    <div className="font-bold text-2xl text-yellow-800">{gemCount}</div>
+                                    <div className="font-bold text-2xl text-yellow-800">{gems}</div>
                                     <div className="text-xs text-yellow-600 uppercase font-bold tracking-wide">Drahokamy</div>
                                 </div>
                                 <div className="bg-sky-50 rounded-2xl p-4 text-center border border-sky-200">
@@ -759,9 +746,12 @@ const StarlinkHeartApp: React.FC = () => {
                         <h3 className="text-lg font-bold text-gray-800 mb-6 text-center">Vzhľad a Téma</h3>
                         
                         {/* Avatars - Level Based Progression */}
-                        <div className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1 flex items-center gap-2">
-                            Tvoj Avatar
-                            <span className="text-indigo-600 font-bold">Level {gamificationState.level}</span>
+                        <div className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                Tvoj Avatar
+                                <span className="text-indigo-600 font-bold">Level {gamificationState.level}</span>
+                            </div>
+                            <span className="text-indigo-500 font-bold normal-case">{getLevelTitle(gamificationState.level)}</span>
                         </div>
                         <div className="grid grid-cols-3 gap-3 mb-8">
                             {AVATAR_OPTIONS.map((option) => {
@@ -809,7 +799,7 @@ const StarlinkHeartApp: React.FC = () => {
                             {BACKGROUND_OPTIONS.map(bg => {
                                 const isUnlocked = unlockedBackgrounds.includes(bg.id);
                                 const isSelected = appBackground.id === bg.id;
-                                const canAfford = gemCount >= bg.price;
+                                const canAfford = gems >= bg.price;
                                 
                                 return (
                                     <button 
@@ -900,16 +890,7 @@ const StarlinkHeartApp: React.FC = () => {
                                 >
                                     🖼️ Statický
                                 </button>
-                                <button
-                                    onClick={() => setMascotMode('rive')}
-                                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                                        mascotMode === 'rive' 
-                                            ? 'bg-indigo-600 text-white shadow-lg' 
-                                            : 'bg-white/60 text-indigo-700 hover:bg-white'
-                                    }`}
-                                >
-                                    🎬 Animovaný
-                                </button>
+                                {/* Rive option removed */}
                                 <button
                                     onClick={() => setMascotMode('spline3d')}
                                     className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
@@ -927,7 +908,7 @@ const StarlinkHeartApp: React.FC = () => {
                                     ? '3D režim stiahne extra 4MB pri zapnutí (premium funkcia).'
                                     : mascotMode === 'image'
                                         ? 'Najrýchlejší režim - statický obrázok.'
-                                        : 'Animovaný mascot - optimálny pomer výkon/kvalita.'}
+                                    : 'Animovaný mascot (nedostupné)'}
                             </p>
                         </div>
 

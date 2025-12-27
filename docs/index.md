@@ -1,26 +1,26 @@
 # Starlink Heart — Workspace Index
 
-> Last updated: 2024-12-25  
+> Last updated: 2024-12-25
 > Status: Development (MVP Phase)
 
 ---
 
 ## Quick Links
 
-| Document | Purpose | Status |
-|----------|---------|--------|
-| [Implementation Plan](../../.gemini/antigravity/brain/aeaeba9d-2910-4d80-805e-692e035bbc3a/implementation_plan.md) | Architecture & execution plan | ✅ Approved |
-| [AI Prompts](./ai/prompts.md) | All AI prompts (SSOT) | ✅ Active |
-| [Safety Rules](./ai/safety-rules.md) | Content safety for kids | ✅ Active |
-| [Store Checklist](./play-store/checklist.md) | Play Store submission | 🔲 Not started |
-| [Release Checklist](../ops/release-checklist.md) | Build & deploy process | 🔲 Not started |
+| Document                                                                                                        | Purpose                       | Status         |
+| --------------------------------------------------------------------------------------------------------------- | ----------------------------- | -------------- |
+| [Implementation Plan](../../.gemini/antigravity/brain/aeaeba9d-2910-4d80-805e-692e035bbc3a/implementation_plan.md) | Architecture & execution plan | ✅ Approved    |
+| [AI Prompts](./ai/prompts.md)                                                                                      | All AI prompts (SSOT)         | ✅ Active      |
+| [Safety Rules](./ai/safety-rules.md)                                                                               | Content safety for kids       | ✅ Active      |
+| [Store Checklist](./play-store/checklist.md)                                                                       | Play Store submission         | 🔲 Not started |
+| [Release Checklist](../ops/release-checklist.md)                                                                   | Build & deploy process        | 🔲 Not started |
 
 ---
 
 ## Architecture Decisions
 
-| ADR | Title | Status | Date |
-|-----|-------|--------|------|
+| ADR                                      | Title                              | Status      | Date       |
+| ---------------------------------------- | ---------------------------------- | ----------- | ---------- |
 | [ADR-001](./decisions/ADR-001-capacitor.md) | Use Capacitor for mobile packaging | ✅ Accepted | 2024-12-25 |
 
 ---
@@ -68,8 +68,8 @@ npx cap run android  # Run on Android device
 
 ## Team
 
-| Role | Contact |
-|------|---------|
-| Product | TBD |
-| Engineering | TBD |
-| Design | TBD |
+| Role        | Contact |
+| ----------- | ------- |
+| Product     | TBD     |
+| Engineering | TBD     |
+| Design      | TBD     |

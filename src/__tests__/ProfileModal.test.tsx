@@ -24,7 +24,7 @@ describe('ProfileModal', () => {
       </GamificationProvider>
     );
     
-    expect(screen.getByText('Galaktický Prieskumník')).toBeInTheDocument();
+    expect(screen.getByText(/Prieskumník vesmíru/i)).toBeInTheDocument();
     expect(screen.getByText('Level 3')).toBeInTheDocument();
     expect(screen.getByText('50')).toBeInTheDocument(); // Gems
     expect(screen.getByText('10')).toBeInTheDocument(); // Hearts

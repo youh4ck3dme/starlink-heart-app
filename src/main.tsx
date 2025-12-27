@@ -9,7 +9,6 @@ if (import.meta.env.DEV) {
   localStorage.setItem('starryGems', '999');
   localStorage.setItem('unlockedAvatars', JSON.stringify(['✨', '🚀', '🤖', '🧠', '💡']));
   localStorage.setItem('unlockedBackgrounds', JSON.stringify(['sky', 'space', 'mars', 'galaxy']));
-  console.log('🔧 DEV MODE: Gems = 999, All avatars & backgrounds unlocked');
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -25,10 +24,8 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        console.log('SW registered:', registration.scope);
       })
       .catch((error) => {
-        console.log('SW registration failed:', error);
       });
   });
 }

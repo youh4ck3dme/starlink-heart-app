@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+!/usr/bin/env node
 /**
  * Icon Generator Script
  * Generates all required icons for PWA, browsers, iOS, and Android

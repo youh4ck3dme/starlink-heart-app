@@ -1,6 +1,6 @@
 /**
- * Abstract interface for school system clients
- * Allows easy extension for Bakalári, iŽiak, etc.
+ * Abstraktné rozhranie pre klientov školských systémov
+ * Umožňuje jednoduché rozšírenie pre Bakaláři, iŽiak, atď.
  */
 
 export interface Credentials {

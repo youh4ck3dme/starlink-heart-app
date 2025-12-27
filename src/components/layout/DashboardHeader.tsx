@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { getPlayerStats, type PlayerStats } from '../../services/xpService';
+import { useGamification, getLevelTitle } from '../../features/gamification/context/GamificationContext';
 import StarryAvatarDisplay from '../common/StarryAvatarDisplay';
 
 interface DashboardHeaderProps {
@@ -15,43 +15,20 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     textColor, 
     onProfile 
 }) => {
-    // XP State Logic (reused from XPBar)
-    const [stats, setStats] = useState<PlayerStats | null>(null);
+    const { state: gamificationState, xpForNextLevel, progressToNextLevel } = useGamification();
     const [showLevelUp, setShowLevelUp] = useState(false);
-    const prevLevelRef = useRef<number>(0);
+    const prevLevelRef = useRef<number>(gamificationState.level);
 
     useEffect(() => {
-        let isMounted = true;
-        
-        // Initial load
-        const initialStats = getPlayerStats();
-        if (isMounted) {
-            setStats(initialStats);
-            prevLevelRef.current = initialStats.level;
+        if (gamificationState.level > prevLevelRef.current) {
+            setShowLevelUp(true);
+            const timer = setTimeout(() => setShowLevelUp(false), 3000);
+            prevLevelRef.current = gamificationState.level;
+            return () => clearTimeout(timer);
         }
+    }, [gamificationState.level]);
 
-        // Listener
-        const handleXPUpdate = () => {
-            if (!isMounted) return;
-            const newStats = getPlayerStats();
-            
-            if (newStats.level > prevLevelRef.current) {
-                setShowLevelUp(true);
-                setTimeout(() => {
-                    if (isMounted) setShowLevelUp(false);
-                }, 3000);
-            }
-            
-            prevLevelRef.current = newStats.level;
-            setStats(newStats);
-        };
-
-        window.addEventListener('xp-updated', handleXPUpdate);
-        return () => {
-            isMounted = false;
-            window.removeEventListener('xp-updated', handleXPUpdate);
-        };
-    }, []);
+    const title = getLevelTitle(gamificationState.level);
 
     // Color adaptation for the header background
     const isDarkText = textColor.includes('gray-800');
@@ -74,31 +51,27 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     </div>
                     <div className="flex flex-col items-start leading-none">
                         <span className={`font-black text-lg ${textColor}`}>Kadet</span>
-                        {stats && (
-                            <span className={`text-xs font-medium opacity-80 ${textColor}`}>
-                                Lvl {stats.level} • {stats.title}
-                            </span>
-                        )}
+                        <span className={`text-xs font-medium opacity-80 ${textColor}`}>
+                            Lvl {gamificationState.level} • {title}
+                        </span>
                     </div>
                 </button>
 
                 {/* 2. Right: Stats (XP Bar + Gems) */}
                 <div className="flex items-center gap-4 pr-4">
                     
-                    {/* XP Progress (Hidden on very small screens if needed, but important for game) */}
-                    {stats && (
-                        <div className="hidden sm:flex flex-col items-end gap-1">
-                            <div className="w-24 h-2 bg-gray-200/30 rounded-full overflow-hidden">
-                                <div 
-                                    className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-500"
-                                    style={{ width: `${stats.progress}%` }}
-                                />
-                            </div>
-                            <span className={`text-[10px] font-bold opacity-70 ${textColor}`}>
-                                {stats.xpToNextLevel} XP do levelu {stats.level + 1}
-                            </span>
+                    {/* XP Progress */}
+                    <div className="hidden sm:flex flex-col items-end gap-1">
+                        <div className="w-24 h-2 bg-gray-200/30 rounded-full overflow-hidden">
+                            <div 
+                                className="h-full bg-gradient-to-r from-yellow-400 to-orange-500 transition-all duration-500"
+                                style={{ width: `${progressToNextLevel}%` }}
+                            />
                         </div>
-                    )}
+                        <span className={`text-[10px] font-bold opacity-70 ${textColor}`}>
+                            {xpForNextLevel} XP do levelu {gamificationState.level + 1}
+                        </span>
+                    </div>
 
                     {/* Gems */}
                     <div className="flex items-center gap-1.5 bg-yellow-400/20 px-3 py-1.5 rounded-full border border-yellow-400/30 shadow-sm">
@@ -111,10 +84,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             </div>
 
             {/* Level Up Notification (Overlay) */}
-            {showLevelUp && stats && (
+            {showLevelUp && (
                 <div className="absolute top-20 left-1/2 -translate-x-1/2 z-50 animate-pop-in pointer-events-none">
                     <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-black px-6 py-2 rounded-full shadow-xl border-4 border-white transform scale-125">
-                        LEVEL UP! {stats.level} 🚀
+                        LEVEL UP! {gamificationState.level} 🚀
                     </div>
                 </div>
             )}

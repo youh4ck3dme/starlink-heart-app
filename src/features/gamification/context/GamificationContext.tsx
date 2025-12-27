@@ -8,16 +8,27 @@ type State = {
   streakDays: number;
   freezesLeft: number;
   unlockedBadges: string[];
+  userName: string;
+  gender: 'boy' | 'girl' | 'unspecified';
 };
 
-const initial: State = { xp: 0, level: 1, streakDays: 0, freezesLeft: 3, unlockedBadges: [] };
+const initial: State = { 
+  xp: 0, 
+  level: 1, 
+  streakDays: 0, 
+  freezesLeft: 3, 
+  unlockedBadges: [],
+  userName: 'Kadet',
+  gender: 'unspecified'
+};
 
 type Action =
   | { type: 'GAIN_XP'; amount: number }
   | { type: 'TICK_STREAK' }
   | { type: 'FREEZE_STREAK' }
   | { type: 'RESET' }
-  | { type: 'UNLOCK_BADGE'; badgeId: string };
+  | { type: 'UNLOCK_BADGE'; badgeId: string }
+  | { type: 'UPDATE_PROFILE'; userName: string; gender: 'boy' | 'girl' | 'unspecified' };
 
 function levelFor(xp: number) {
   // Upravená krivka: Pomalší rast, aby levely nelietali
@@ -39,6 +50,28 @@ export function getAvatarName(level: number): string {
   if (level >= 11) return 'Starry';
   if (level >= 6) return 'Cometa';
   return 'Robo';
+}
+
+export function getLevelTitle(level: number): string {
+  const titles = [
+    'Kozmický Nováčik',    // Level 1
+    'Hviezdny Študent',     // Level 2
+    'Galaktický Prieskumník', // Level 3
+    'Planetárny Majster',   // Level 4
+    'Vesmírny Génius',      // Level 5
+    'Supernova Talent',     // Level 6
+    'Čierna Diera Múdrosti', // Level 7
+    'Kvazárový Expert',     // Level 8
+    'Galaxový Profesor',    // Level 9
+    'Vesmírny Maestro',     // Level 10
+  ];
+  return titles[level - 1] || titles[titles.length - 1];
+}
+
+export function xpForLevel(level: number): number {
+  if (level <= 1) return 0;
+  // Inverse of levelFor: (level - 1) * 5 = sqrt(xp) -> xp = ((level - 1) * 5)^2
+  return Math.pow((level - 1) * 5, 2);
 }
 
 function reducer(state: State, action: Action): State {
@@ -81,6 +114,8 @@ function reducer(state: State, action: Action): State {
     case 'UNLOCK_BADGE':
         if (state.unlockedBadges.includes(action.badgeId)) return state;
         return { ...state, unlockedBadges: [...state.unlockedBadges, action.badgeId] };
+    case 'UPDATE_PROFILE':
+        return { ...state, userName: action.userName, gender: action.gender };
     case 'RESET':
       return initial;
     default:
@@ -88,12 +123,24 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-const Ctx = createContext<{ state: State; dispatch: React.Dispatch<Action>; multiplier: number } | null>(null);
+const Ctx = createContext<{ 
+    state: State; 
+    dispatch: React.Dispatch<Action>; 
+    multiplier: number;
+    xpForNextLevel: number;
+    progressToNextLevel: number;
+} | null>(null);
 
 const GAMIFICATION_STORAGE_KEY = 'starlink_gamification_v1';
 
-export function GamificationProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, initial, (defaultState) => {
+export function GamificationProvider({ 
+  children, 
+  initialState 
+}: { 
+  children: React.ReactNode; 
+  initialState?: State;
+}) {
+  const [state, dispatch] = useReducer(reducer, initialState || initial, (defaultState) => {
     try {
       const stored = localStorage.getItem(GAMIFICATION_STORAGE_KEY);
       return stored ? JSON.parse(stored) : defaultState;
@@ -114,7 +161,26 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
     return 1.0;
   }, [state.streakDays]);
 
-  const value = useMemo(() => ({ state, dispatch, multiplier }), [state, multiplier]);
+  const progressInfo = useMemo(() => {
+    const currentLevelXp = xpForLevel(state.level);
+    const nextLevelXp = xpForLevel(state.level + 1);
+    const totalNeeded = nextLevelXp - currentLevelXp;
+    const progressXp = state.xp - currentLevelXp;
+    const progress = Math.min(100, Math.round((progressXp / totalNeeded) * 100));
+    const toNext = nextLevelXp - state.xp;
+    
+    return {
+        xpForNextLevel: Math.max(0, toNext),
+        progressToNextLevel: Math.max(0, progress)
+    };
+  }, [state.xp, state.level]);
+
+  const value = useMemo(() => ({ 
+    state, 
+    dispatch, 
+    multiplier,
+    ...progressInfo
+  }), [state, multiplier, progressInfo]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

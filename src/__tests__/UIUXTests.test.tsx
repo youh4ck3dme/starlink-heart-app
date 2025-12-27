@@ -79,6 +79,7 @@ describe('UI/UX Tests', () => {
                         gems={100}
                         textColor="text-white"
                         mascotMode="image"
+                        gender="unspecified"
                     />
                 </TestWrapper>
             );
@@ -110,6 +111,7 @@ describe('UI/UX Tests', () => {
                         gems={100}
                         textColor="text-white"
                         mascotMode="image"
+                        gender="unspecified"
                     />
                 </TestWrapper>
             );
@@ -139,6 +141,7 @@ describe('UI/UX Tests', () => {
                         gems={100}
                         textColor="text-white"
                         mascotMode="image"
+                        gender="unspecified"
                     />
                 </TestWrapper>
             );
@@ -168,6 +171,7 @@ describe('UI/UX Tests', () => {
                         gems={100}
                         textColor="text-white"
                         mascotMode="image"
+                        gender="unspecified"
                     />
                 </TestWrapper>
             );
@@ -195,6 +199,7 @@ describe('UI/UX Tests', () => {
                         gems={100}
                         textColor="text-white"
                         mascotMode="image"
+                        gender="unspecified"
                     />
                 </TestWrapper>
             );
@@ -218,6 +223,7 @@ describe('UI/UX Tests', () => {
                         gems={100}
                         textColor="text-white"
                         mascotMode="image"
+                        gender="unspecified"
                     />
                 </TestWrapper>
             );

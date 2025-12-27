@@ -1,13 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { motion, useSpring, useMotionValue, useTransform } from 'framer-motion';
-// Original static asset
-import cosmicBg from '../../assets/cosmic.webp';
+import React from 'react';
 
-// Import our luxury layers (kept in reserve as requested)
+// Import remaining layers
 import layerBase from '../../assets/layers/layer_a_base_nebula.webp';
 import layerStars from '../../assets/layers/layer_b_starfield.webp';
-import layerGlass from '../../assets/layers/layer_c_glass.webp';
-import layerComets from '../../assets/layers/layer_d_comets.webp';
 
 export type CosmicVariant = 'default' | 'luxury';
 
@@ -28,34 +23,6 @@ export const CosmicBackground: React.FC<CosmicBackgroundProps> = ({
     intensity = 1,
     showComets = true
 }) => {
-    const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-    
-    // Parallax State (Only used in luxury mode)
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
-
-    const springX = useSpring(mouseX, { stiffness: 40, damping: 30, mass: 0.8 });
-    const springY = useSpring(mouseY, { stiffness: 40, damping: 30, mass: 0.8 });
-
-    useEffect(() => {
-        const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-        const handleChange = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-        setPrefersReducedMotion(mediaQuery.matches);
-        mediaQuery.addEventListener('change', handleChange);
-        return () => mediaQuery.removeEventListener('change', handleChange);
-    }, []);
-
-    const handlePointerMove = (e: React.PointerEvent) => {
-        if (prefersReducedMotion || variant !== 'luxury') return;
-        
-        const { clientX, clientY } = e;
-        const { innerWidth, innerHeight } = window;
-        const x = (clientX / innerWidth - 0.5) * 2;
-        const y = (clientY / innerHeight - 0.5) * 2;
-        
-        mouseX.set(x);
-        mouseY.set(y);
-    };
 
     // --- RENDER DEFAULT (STATIC) ---
     if (variant === 'default') {
@@ -67,7 +34,7 @@ export const CosmicBackground: React.FC<CosmicBackgroundProps> = ({
                 {/* Single Static Image Layer (Safe & Basic) */}
                 <div className="absolute inset-0">
                     <img 
-                        src={cosmicBg} 
+                        src={layerStars} 
                         alt="Background" 
                         className="w-full h-full object-cover opacity-80"
                     />
@@ -82,43 +49,28 @@ export const CosmicBackground: React.FC<CosmicBackgroundProps> = ({
         );
     }
 
-    // --- RENDER LUXURY (LAYERED) ---
-    // Transforms for parallax
-    const xStars = useTransform(springX, [-1, 1], [20 * intensity, -20 * intensity]);
-    const yStars = useTransform(springY, [-1, 1], [20 * intensity, -20 * intensity]);
-    const xGlass = useTransform(springX, [-1, 1], [-15 * intensity, 15 * intensity]);
-    const yGlass = useTransform(springY, [-1, 1], [-15 * intensity, 15 * intensity]);
-    const xComets = useTransform(springX, [-1, 1], [-40 * intensity, 40 * intensity]);
-    const yComets = useTransform(springY, [-1, 1], [-40 * intensity, 40 * intensity]);
+    // --- RENDER LUXURY (RANDOM SINGLE LAYER MODE) ---
+    // User Request: "vsetky naraz vypnu a budu sa po kazdom resfreshi menit 1 vrstva len"
+    const randomLayer = React.useMemo(() => {
+        // Removed: cosmicBg (black), layerGlass (glow), layerComets (asteroid/earth)
+        const layers = [layerBase, layerStars];
+        return layers[Math.floor(Math.random() * layers.length)];
+    }, []);
 
     return (
         <div 
-            className={`relative min-h-dvh w-full overflow-hidden bg-[#060819] text-white ${className}`}
-            onPointerMove={handlePointerMove}
+            className={`relative min-h-dvh w-full overflow-hidden bg-black text-white ${className}`}
         >
-            {/* LAYER A: BASE NEBULA */}
             <div className="absolute inset-0">
-                <img src={layerBase} alt="" className="w-full h-full object-cover opacity-90" />
+                <img 
+                    src={randomLayer} 
+                    alt="Random Cosmic Layer" 
+                    className="w-full h-full object-cover opacity-90 transition-opacity duration-1000 ease-in-out" 
+                />
             </div>
-
-            {/* LAYER B: STARFIELD */}
-            <motion.div className="absolute inset-0" style={{ x: xStars, y: yStars, opacity: 0.8 }}>
-                <img src={layerStars} alt="" className="w-full h-full object-cover" />
-            </motion.div>
-
-            {/* LAYER C: GLASS STREAKS */}
-            <motion.div className="absolute inset-0 mix-blend-screen" style={{ x: xGlass, y: yGlass, opacity: 0.4 }}>
-                <img src={layerGlass} alt="" className="w-full h-full object-cover" />
-            </motion.div>
-
-            {/* LAYER D: FOREGROUND ELEMENTS */}
-            {!prefersReducedMotion && showComets && (
-                <motion.div className="absolute inset-0 pointer-events-none" style={{ x: xComets, y: yComets }}>
-                    <img src={layerComets} alt="" className="w-full h-full object-cover opacity-90" />
-                </motion.div>
-            )}
-
-            <div className="absolute inset-0 bg-gradient-to-t from-[#060819] via-transparent to-transparent opacity-80 pointer-events-none" />
+            
+            {/* Subtle overlay to ensure text readability regardless of layer */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40 pointer-events-none" />
             
             <div className="relative z-20 w-full h-full">
                 {children}
