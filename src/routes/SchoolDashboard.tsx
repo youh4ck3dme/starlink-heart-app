@@ -5,8 +5,8 @@ import { useEdupage } from '../features/edupage/hooks/useEdupage';
 import { TimetableLesson, Grade, TimelineItem } from '../core/types/schoolSystem';
 
 // Backgrounds
-import greenBg from '../assets/dashboard-bg.webp';
-import pinkBg from '../assets/dashboard-bg-pink.webp';
+// Image imports removed in favor of CSS gradients
+
 
 // --- Components ---
 
@@ -206,7 +206,7 @@ export default function SchoolDashboard() {
     localStorage.setItem('dashboardTheme', theme);
   }, [theme]);
 
-  const bgImage = theme === 'green' ? greenBg : pinkBg;
+
   const accentColor = theme === 'green' ? 'text-emerald-400' : 'text-pink-400';
   const buttonAccent = theme === 'green' 
     ? 'bg-emerald-500/20 hover:bg-emerald-500/30 border-emerald-500/50' 
@@ -215,10 +215,12 @@ export default function SchoolDashboard() {
   return (
     <div className="relative min-h-dvh w-full overflow-hidden text-white">
       {/* Background */}
-      <img 
-        src={bgImage} 
-        alt="Dashboard Background" 
-        className="absolute inset-0 w-full h-full object-cover"
+      <div 
+        className={`absolute inset-0 w-full h-full transition-colors duration-1000 ${
+          theme === 'green' 
+            ? 'bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-emerald-900 via-green-950 to-black' 
+            : 'bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-pink-900 via-rose-950 to-black'
+        }`}
       />
       
       {/* Overlay */}

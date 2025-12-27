@@ -11,7 +11,7 @@ import { useToast } from "../hooks/use-toast";
 import { useAuth } from "../hooks/useAuth";
 
 // Use existing mascot image as logo
-import logoImage from "../assets/logo_3d.webp";
+import starryAvatar from '../assets/avatars/starry.webp';
 
 const loginSchema = z.object({
   email: z.string().email("Zadaj platný email"),
@@ -168,7 +168,7 @@ export default function AuthPage() {
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 400 }}
           >
-            <img src={logoImage} alt="Starlink Heart" className="h-24 w-auto drop-shadow-2xl" />
+            <img src={starryAvatar} alt="Logo" className="w-16 h-auto drop-shadow-[0_0_15px_rgba(56,189,248,0.5)]" />
           </motion.div>
           <h1 className="text-2xl font-black text-white tracking-tight">Starlink Heart</h1>
         </div>

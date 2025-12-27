@@ -5,7 +5,7 @@ import { DailyMissionsCard } from '../gamification/DailyMissionsCard';
 import { LeaderboardWidget } from '../gamification/LeaderboardWidget';
 import { LeaderboardFull } from '../gamification/LeaderboardFull';
 import { AnimatePresence } from 'framer-motion';
-import logo3d from '../../assets/logo_3d.webp';
+import starryAvatar from '../../assets/avatars/starry.webp';
 
 interface DashboardScreenProps {
     onNewMission: () => void;
@@ -59,7 +59,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
                 <div className="relative w-full max-w-sm flex flex-col items-center justify-center gap-4">
                     {/* Floating 3D Logo */}
                     <img 
-                        src={logo3d} 
+                        src={starryAvatar} 
                         alt="Starlink Heart Logo" 
                         className="w-32 h-auto animate-bounce-slow drop-shadow-lg z-10"
                     />

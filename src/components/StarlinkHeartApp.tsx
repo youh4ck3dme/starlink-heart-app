@@ -526,12 +526,9 @@ const StarlinkHeartApp: React.FC = () => {
                                 exit={{ opacity: 0 }}
                                 className="h-full"
                             >
-                                <IntroScreen 
-                                    onStart={() => setViewMode('dashboard')} 
-                                    avatar={starryAvatar}
-                                    textColor={appBackground.textColor}
-                                />
+                                <IntroScreen onStart={() => setViewMode('dashboard')} />
                             </motion.div>
+
                         )}
 
                         {/* DASHBOARD SCREEN */}

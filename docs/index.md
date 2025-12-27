@@ -9,7 +9,7 @@
 
 | Document                                                                                                        | Purpose                       | Status         |
 | --------------------------------------------------------------------------------------------------------------- | ----------------------------- | -------------- |
-| [Implementation Plan](../../.gemini/antigravity/brain/aeaeba9d-2910-4d80-805e-692e035bbc3a/implementation_plan.md) | Architecture & execution plan | ✅ Approved    |
+| [Store Listing](./play-store/store-listing.md)                                                                     | App store texts & graphics    | ✅ Ready       |
 | [AI Prompts](./ai/prompts.md)                                                                                      | All AI prompts (SSOT)         | ✅ Active      |
 | [Safety Rules](./ai/safety-rules.md)                                                                               | Content safety for kids       | ✅ Active      |
 | [Store Checklist](./play-store/checklist.md)                                                                       | Play Store submission         | 🔲 Not started |

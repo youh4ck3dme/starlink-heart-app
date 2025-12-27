@@ -3,7 +3,11 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import starryAvatar from '../../assets/avatars/starry.webp';
 
-export default function IntroScreen() {
+interface IntroScreenProps {
+  onStart?: () => void; // Optional - if provided, use this; otherwise use router
+}
+
+export default function IntroScreen({ onStart }: IntroScreenProps) {
   const navigate = useNavigate();
   const [stars, setStars] = useState<{ left: string; top: string; delay: string }[]>([]);
 
@@ -18,18 +22,39 @@ export default function IntroScreen() {
   }, []);
 
   const handleStart = () => {
-    navigate('/app');
+    if (onStart) {
+      onStart();
+    } else {
+      navigate('/app');
+    }
   };
+
 
   return (
     <div className="relative w-full h-full min-h-dvh overflow-hidden flex flex-col items-center justify-center">
       {/* 1. Deep Space Background */}
-      <div 
-        className="absolute inset-0 -z-20"
-        style={{
-          background: 'linear-gradient(135deg, #050a14 0%, #0b1226 40%, #1a1a3e 70%, #2a1b3d 100%)'
-        }}
-      />
+        {/* 1. Deep Space Galaxy Background */}
+        <div 
+          className="absolute inset-0 -z-20 bg-black"
+          style={{
+            background: `
+              radial-gradient(circle at 50% 120%, #1a1a40 0%, #000000 70%),
+              radial-gradient(circle at 100% 0%, #0b1026 0%, transparent 40%),
+              radial-gradient(circle at 0% 0%, #150a24 0%, transparent 40%),
+              linear-gradient(to bottom, transparent, #000)
+            `
+          }}
+        />
+        {/* Galaxy Nebulas */}
+        <div className="absolute inset-0 -z-10 opacity-30 mix-blend-screen"
+             style={{
+               background: `
+                 radial-gradient(circle at 20% 40%, rgba(76, 29, 149, 0.4) 0%, transparent 50%),
+                 radial-gradient(circle at 80% 60%, rgba(30, 64, 175, 0.4) 0%, transparent 50%)
+               `,
+               filter: 'blur(60px)'
+             }}
+        />
 
       {/* 2. Layered Stars for Depth */}
       {/* Background (Small, Slow) */}
