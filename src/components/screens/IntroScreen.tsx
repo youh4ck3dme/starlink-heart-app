@@ -13,7 +13,7 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
 
   // Generate random stars on mount - client side only to avoid hydration mismatch
   useEffect(() => {
-    const starArray = Array.from({ length: 50 }).map(() => ({
+    const starArray = Array.from({ length: 90 }).map(() => ({
       left: `${Math.random() * 100}%`,
       top: `${Math.random() * 100}%`,
       delay: `${Math.random() * 3}s`
@@ -72,7 +72,7 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
       ))}
       
       {/* Foreground (Bright, Fast) */}
-      {stars.slice(0, 20).map((star, i) => (
+      {stars.slice(0, 35).map((star, i) => (
         <div 
           key={`fg-${i}`}
           className="absolute w-[3px] h-[3px] bg-white rounded-full animate-twinkle shadow-[0_0_8px_rgba(255,255,255,0.8)]"
@@ -96,10 +96,15 @@ export default function IntroScreen({ onStart }: IntroScreenProps) {
          <div className="absolute inset-0 bg-blue-500/10 blur-xl rounded-full" />
       </div>
 
-      {/* 4. Multiple Comets (Shooting Stars) */}
-      <div className="absolute top-20 -left-20 w-[200px] h-[2px] bg-gradient-to-r from-transparent via-blue-300 to-white animate-comet rotate-45 opacity-0" style={{ animationDelay: '2s' }} />
-      <div className="absolute top-1/3 -right-20 w-[150px] h-[2px] bg-gradient-to-r from-transparent via-cyan-300 to-white animate-comet -rotate-[135deg] opacity-0" style={{ animationDelay: '5s', animationDuration: '7s' }} />
-      <div className="absolute bottom-1/4 -left-20 w-[300px] h-[3px] bg-gradient-to-r from-transparent via-purple-300 to-white animate-comet rotate-[30deg] opacity-0" style={{ animationDelay: '8s', animationDuration: '10s' }} />
+      {/* 4. Comets: 2x every ~7 seconds */}
+      <div
+        className="absolute top-20 -left-20 w-[220px] h-[2px] bg-gradient-to-r from-transparent via-blue-300 to-white animate-comet rotate-45 opacity-0"
+        style={{ animationDelay: '0s', animationDuration: '7s' }}
+      />
+      <div
+        className="absolute top-1/3 -right-20 w-[180px] h-[2px] bg-gradient-to-r from-transparent via-cyan-300 to-white animate-comet -rotate-[135deg] opacity-0"
+        style={{ animationDelay: '3.5s', animationDuration: '7s' }}
+      />
 
 
       {/* 3. Main Content Container */}
