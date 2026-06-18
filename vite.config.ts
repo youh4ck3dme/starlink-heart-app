@@ -114,12 +114,14 @@ export default defineConfig(({ mode }) => {
       },
     },
     build: {
-      chunkSizeWarningLimit: 2500, // Spline 3D is lazy-loaded (~2MB) - acceptable for premium 3D feature
+      chunkSizeWarningLimit: 2500,
       rollupOptions: {
         output: {
           manualChunks: {
             'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-            'spline-vendor': ['@splinetool/react-spline', '@splinetool/runtime'],
+            // spline-vendor intentionally omitted: @splinetool is only ever
+            // imported dynamically (Starry3D.tsx), so letting Rollup handle it
+            // naturally keeps it out of the initial modulepreload list (~4 MB saved).
             'genai-vendor': ['@google/genai'],
             'firebase-vendor': ['firebase/app', 'firebase/firestore', 'firebase/storage'],
             'utils-vendor': ['framer-motion', 'lucide-react', 'zod', 'clsx', 'howler'],
