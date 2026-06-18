@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { db, storage } from '../services/localService';
 import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, limit, startAfter, getDocs, QueryDocumentSnapshot } from '../services/localService';
@@ -7,19 +7,19 @@ import { ref, uploadBytes, getDownloadURL } from '../services/localService';
 import { Heart } from '../types';
 import { generateCosmicResponse, getStarryTip, generateCosmicHint, generateParentGuide } from '../services/geminiService';
 import { hasParentConsent, setParentConsent, clearAllAppData } from '../services/consentService';
-import ParentNotice from './ParentNotice';
-import MascotRenderer, { MascotMode } from './mascot/MascotRenderer';
+import { MascotMode } from './mascot/MascotRenderer';
 import Header from './layout/Header';
 import LiveStarryBackground from './layout/LiveStarryBackground';
-import ChatView from './chat/ChatView';
-import CameraModal from './camera/CameraModal';
 import { useVoiceMode } from '../hooks/useVoiceMode';
-import IntroScreen from './screens/IntroScreen';
-import DashboardScreen from './screens/DashboardScreen';
-import ShopScreen from './screens/ShopScreen';
 import { AVATAR_OPTIONS, BACKGROUND_OPTIONS, BackgroundItem, isBackground } from '../core/config/shopConfig';
 import { useGamification, getAvatarForLevel, getAvatarName, getLevelTitle } from '../features/gamification/context/GamificationContext';
 import { useGameStore } from '../store/gameStore';
+import XPBar from './common/XPBar';
+import PWANotification from './common/PWANotification';
+import { incrementMissionProgress } from '../services/missionService';
+import { useHaptics } from '../hooks/useHaptics';
+import { ChatPanel, DashboardPanel, IntroPanel, ShopPanel } from './starlink-heart/StarlinkHeartPanels';
+import { StarlinkHeartModals } from './starlink-heart/StarlinkHeartModals';
 
 // Compatibility constant for existing logic
 const STARRY_AVATARS = AVATAR_OPTIONS.map(opt => opt.emoji);
@@ -60,53 +60,6 @@ const processHeartDoc = (doc: QueryDocumentSnapshot): Heart => {
         isHint: data.isHint,
     } as Heart;
 };
-
-// --- Helper Components for cleaner code ---
-
-// Helper Components for cleaner code
-// FormatText is used in ParentGuideModal
-const FormatText = ({ text }: { text: string }) => {
-    if (!text) return null;
-    
-    // Split text by [[...]], **...**, or *...*
-    // Using capturing group to keep delimiters in the result array
-    const parts = text.split(/(\[\[[^\]]+\]\]|\*\*[^*]+\*\*|\*[^*]+\*)/g);
-    
-    return (
-        <span className="whitespace-pre-wrap">
-            {parts.map((part, i) => {
-                // Highlight syntax: [[content]] for key terms/numbers
-                if (part.startsWith('[[') && part.endsWith(']]')) {
-                    const content = part.slice(2, -2);
-                    return (
-                        <span key={i} className="inline-block bg-yellow-100 text-yellow-800 px-1.5 rounded border-b-2 border-yellow-400 font-semibold mx-0.5 shadow-sm transform hover:scale-105 transition-transform cursor-default" title="Kľúčový pojem">
-                            {content}
-                        </span>
-                    );
-                }
-                // Bold syntax: **text**
-                if (part.startsWith('**') && part.endsWith('**')) {
-                    return <strong key={i} className="font-bold text-inherit">{part.slice(2, -2)}</strong>;
-                }
-                // Bold/Italic syntax: *text* (rendered as bold here)
-                if (part.startsWith('*') && part.endsWith('*')) {
-                    return <strong key={i} className="font-bold text-inherit">{part.slice(1, -1)}</strong>;
-                }
-                return part;
-            })}
-        </span>
-    );
-};
-
-
-import StarryAvatarDisplay from './common/StarryAvatarDisplay';
-import XPBar from './common/XPBar';
-import StarryHelper from './common/StarryHelper';
-import PWANotification from './common/PWANotification';
-import { incrementMissionProgress } from '../services/missionService';
-import { useHaptics } from '../hooks/useHaptics';
-
-// IntroScreen and DashboardScreen are now imported from ./screens/
 
 const StarlinkHeartApp: React.FC = () => {
     // Hooks
@@ -488,21 +441,14 @@ const StarlinkHeartApp: React.FC = () => {
 
     return (
         <>
-            {/* Main Layout Container */}
             <div className={`flex flex-col min-h-dvh transition-colors duration-700 ${appBackground.className} ${appBackground.textColor} relative`}>
-                
-                {/* Live Starry Background - Only for space/galaxy themes */}
                 {(appBackground.id === 'space' || appBackground.id === 'galaxy' || appBackground.id === 'mars') && (
                     <LiveStarryBackground />
                 )}
 
-                {/* XP Bar - Visible only after Intro and NOT on Dashboard (as Dashboard has its own header) */}
                 {viewMode !== 'intro' && viewMode !== 'dashboard' && <XPBar />}
-
-                {/* PWA Update Notification */}
                 <PWANotification />
 
-                {/* Header - Unified Glassmorphic Component */}
                 {viewMode === 'chat' && (
                     <Header
                         onBack={() => setViewMode('dashboard')}
@@ -514,471 +460,124 @@ const StarlinkHeartApp: React.FC = () => {
                     />
                 )}
 
-                {/* Main Content Area */}
                 <div className="flex-1 overflow-hidden relative z-10 w-full max-w-4xl mx-auto">
                     <AnimatePresence mode="wait">
-                        {/* INTRO SCREEN */}
                         {viewMode === 'intro' && (
-                            <motion.div
-                                key="intro"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="h-full"
-                            >
-                                <IntroScreen onStart={() => setViewMode('dashboard')} />
-                            </motion.div>
-
+                            <IntroPanel onStart={() => setViewMode('dashboard')} />
                         )}
 
-                        {/* DASHBOARD SCREEN */}
                         {viewMode === 'dashboard' && (
-                            <motion.div
-                                key="dashboard"
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.95 }}
-                                className="h-full"
-                            >
-                                <DashboardScreen
-                                    isCoachMode={isTeacherCloneMode}
-                                    onCoachToggle={() => setIsTeacherCloneMode(!isTeacherCloneMode)}
-                                    // Navigation
-                                    onNewMission={() => setViewMode('chat')}
-                                    onProfile={() => setShowProfileModal(true)}
-                                    onCenter={() => setShowCustomizeModal(true)} // Keep for backwards compat if needed, or redirect
-                                    onSchoolDashboard={() => navigate('/dashboard')}
-                                    onEduPage={() => navigate('/dashboard')}
-                                    // Data
-                                    avatar={starryAvatar}
-                                    mascotMode={mascotMode}
-                                    gender={gamificationState.gender}
-                                    gems={gems}
-                                    textColor={appBackground.textColor}
-                                />
-                                
-                                {/* Quick Shop Access Button (floating) */}
-                                <div className="absolute top-20 right-4 z-50">
-                                    <button 
-                                        onClick={() => setViewMode('shop')}
-                                        aria-label="Otvoriť obchod"
-                                        className="bg-gradient-to-r from-purple-500 to-indigo-600 text-white p-3 rounded-full shadow-lg border border-white/20 animate-pulse hover:scale-110 transition-transform"
-                                    >
-                                        <span className="text-xl">🛍️</span>
-                                    </button>
-                                </div>
-                            </motion.div>
+                            <DashboardPanel
+                                isCoachMode={isTeacherCloneMode}
+                                onCoachToggle={() => setIsTeacherCloneMode(!isTeacherCloneMode)}
+                                onNewMission={() => setViewMode('chat')}
+                                onProfile={() => setShowProfileModal(true)}
+                                onCenter={() => setShowCustomizeModal(true)}
+                                onSchoolDashboard={() => navigate('/dashboard')}
+                                onEduPage={() => navigate('/dashboard')}
+                                onOpenShop={() => setViewMode('shop')}
+                                avatar={starryAvatar}
+                                mascotMode={mascotMode}
+                                gender={gamificationState.gender}
+                                gems={gems}
+                                textColor={appBackground.textColor}
+                            />
                         )}
 
-                        {/* SHOP SCREEN */}
                         {viewMode === 'shop' && (
-                            <motion.div
-                                key="shop"
-                                initial={{ opacity: 0, y: 50 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 50 }}
-                                className="h-full"
-                            >
-                                <ShopScreen
-                                    gems={gems}
-                                    level={gamificationState.level}
-                                    unlockedBackgrounds={unlockedBackgrounds}
-                                    currentBackgroundId={appBackground.id}
-                                    onBack={() => setViewMode('dashboard')}
-                                    onPurchase={(item) => {
-                                        purchaseItem(item.type, item.id, item.price);
-                                    }}
-                                    onEquip={(item) => {
-                                        if (isBackground(item)) {
-                                            const bg = BACKGROUND_OPTIONS.find(b => b.id === item.id);
-                                            if (bg) {
-                                                setAppBackground(bg);
-                                                localStorage.setItem(STARRY_BACKGROUND_KEY, bg.id);
-                                            }
+                            <ShopPanel
+                                gems={gems}
+                                level={gamificationState.level}
+                                unlockedBackgrounds={unlockedBackgrounds}
+                                currentBackgroundId={appBackground.id}
+                                onBack={() => setViewMode('dashboard')}
+                                onPurchase={(item) => {
+                                    purchaseItem(item.type, item.id, item.price);
+                                }}
+                                onEquip={(item) => {
+                                    if (isBackground(item)) {
+                                        const bg = BACKGROUND_OPTIONS.find(b => b.id === item.id);
+                                        if (bg) {
+                                            setAppBackground(bg);
+                                            localStorage.setItem(STARRY_BACKGROUND_KEY, bg.id);
                                         }
-                                    }}
-                                />
-                            </motion.div>
+                                    }
+                                }}
+                            />
                         )}
 
-                        {/* CHAT VIEW */}
                         {viewMode === 'chat' && (
-                            <motion.div
-                                key="chat"
-                                initial={{ opacity: 0, x: 50 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -50 }}
-                                transition={{ duration: 0.25, ease: 'easeOut' }}
-                                className="flex-1 flex flex-col h-full"
-                            >
-                                <ChatView 
-                                    hearts={hearts}
-                                    starryAvatar={starryAvatar}
-                                    appBackground={appBackground}
-                                    isLoading={isLoading}
-                                    hasMore={hasMore}
-                                    isLoadingMore={isLoadingMore}
-                                    isSending={isSending}
-                                    hintLoadingId={hintLoadingId}
-                                    parentGuideLoadingId={parentGuideLoadingId}
-                                    newMessage={newMessage}
-                                    setNewMessage={setNewMessage}
-                                    imageFile={imageFile}
-                                    setImageFile={setImageFile}
-                                    imagePreviewUrl={imagePreviewUrl}
-                                    isTeacherCloneMode={isTeacherCloneMode}
-                                    setIsTeacherCloneMode={setIsTeacherCloneMode}
-                                    chatContainerRef={chatContainerRef}
-                                    messagesEndRef={messagesEndRef}
-                                    fileInputRef={fileInputRef}
-                                    onLoadMore={handleLoadMore}
-                                    onSubmit={handleSubmit}
-                                    onOpenCamera={handleOpenCamera}
-                                    onGetHint={handleGetHint}
-                                    onParentGuide={handleParentGuide}
-                                    voiceMode={voiceMode}
-                                />
-                            </motion.div>
+                            <ChatPanel
+                                hearts={hearts}
+                                starryAvatar={starryAvatar}
+                                appBackground={appBackground}
+                                isLoading={isLoading}
+                                hasMore={hasMore}
+                                isLoadingMore={isLoadingMore}
+                                isSending={isSending}
+                                hintLoadingId={hintLoadingId}
+                                parentGuideLoadingId={parentGuideLoadingId}
+                                newMessage={newMessage}
+                                setNewMessage={setNewMessage}
+                                imageFile={imageFile}
+                                setImageFile={setImageFile}
+                                imagePreviewUrl={imagePreviewUrl}
+                                isTeacherCloneMode={isTeacherCloneMode}
+                                setIsTeacherCloneMode={setIsTeacherCloneMode}
+                                chatContainerRef={chatContainerRef}
+                                messagesEndRef={messagesEndRef}
+                                fileInputRef={fileInputRef}
+                                onLoadMore={handleLoadMore}
+                                onSubmit={handleSubmit}
+                                onOpenCamera={handleOpenCamera}
+                                onGetHint={handleGetHint}
+                                onParentGuide={handleParentGuide}
+                                voiceMode={voiceMode}
+                            />
                         )}
                     </AnimatePresence>
                 </div>
             </div>
 
-            {/* --- MODALS --- */}
-
-            {/* Parent Notice Modal (Kids Compliance) */}
-            {showParentNotice && (
-                <ParentNotice 
-                    onAccept={handleConsentAccept}
-                    onCancel={handleConsentCancel}
-                />
-            )}
-
-            {/* Parent Guide Modal - Professional Report Style */}
-            {activeParentGuide && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in-up">
-                    <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
-                        <div className="bg-indigo-600 p-4 flex justify-between items-center shrink-0">
-                            <h2 className="text-white font-bold text-lg flex items-center gap-2">
-                                <span>🛡️</span> Rodičovský Prekladač
-                            </h2>
-                            <button onClick={() => setActiveParentGuide(null)} aria-label="Zatvoriť" className="text-white/80 hover:text-white text-2xl">&times;</button>
-                        </div>
-                        <div className="p-6 overflow-y-auto bg-indigo-50/50">
-                            <div className="prose prose-sm prose-indigo text-gray-700">
-                                <FormatText text={activeParentGuide} />
-                            </div>
-                        </div>
-                        <div className="p-4 bg-white border-t border-gray-100 text-center shrink-0">
-                            <button onClick={() => setActiveParentGuide(null)} className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-colors">
-                                Rozumiem, som pripravený!
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Enhanced Camera Modal */}
-            <CameraModal 
-                isOpen={showCameraModal}
-                onClose={() => setShowCameraModal(false)}
+            <StarlinkHeartModals
+                showParentNotice={showParentNotice}
+                onConsentAccept={handleConsentAccept}
+                onConsentCancel={handleConsentCancel}
+                activeParentGuide={activeParentGuide}
+                onCloseParentGuide={() => setActiveParentGuide(null)}
+                showCameraModal={showCameraModal}
+                onCloseCameraModal={() => setShowCameraModal(false)}
                 onPhotoTaken={handlePhotoTaken}
+                showProfileModal={showProfileModal}
+                onCloseProfileModal={() => setShowProfileModal(false)}
+                starryAvatar={starryAvatar}
+                gemJustEarned={gemJustEarned}
+                gems={gems}
+                showTipModal={showTipModal}
+                isTipLoading={isTipLoading}
+                starryTip={starryTip}
+                onCloseTipModal={() => setShowTipModal(false)}
+                showCustomizeModal={showCustomizeModal}
+                onCloseCustomizeModal={() => setShowCustomizeModal(false)}
+                customApiKey={customApiKey}
+                setCustomApiKey={setCustomApiKey}
+                appBackground={appBackground}
+                setAppBackground={setAppBackground}
+                unlockedBackgrounds={unlockedBackgrounds}
+                purchaseBackground={(bg) => purchaseItem('background', bg.id, bg.price)}
+                level={gamificationState.level}
+                voiceMode={voiceMode}
+                mascotMode={mascotMode}
+                setMascotMode={setMascotMode}
+                onSaveCustomization={saveCustomization}
+                showDeleteConfirm={showDeleteConfirm}
+                onOpenDeleteConfirm={() => setShowDeleteConfirm(true)}
+                onCloseDeleteConfirm={() => setShowDeleteConfirm(false)}
+                onConfirmDelete={() => {
+                    clearAllAppData();
+                    window.location.reload();
+                }}
             />
-
-            {/* Profile Modal */}
-            {showProfileModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-pop-in">
-                    <div className="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-indigo-500 to-purple-600"></div>
-                        <div className="relative z-10 flex flex-col items-center">
-                            <div className="bg-white p-2 rounded-full shadow-lg mb-3">
-                                <StarryAvatarDisplay avatar={starryAvatar} isExcited={gemJustEarned} size="text-6xl" />
-                            </div>
-                            <h2 className="text-2xl font-black text-gray-800 mb-1">Kadet</h2>
-                            <p className="text-gray-500 text-sm mb-6">Prieskumník Vesmíru 🚀</p>
-
-                            <div className="grid grid-cols-2 gap-8 w-full mb-6">
-                                <div className="bg-yellow-50 rounded-2xl p-4 text-center border border-yellow-200">
-                                    <div className="text-3xl mb-1">💎</div>
-                                    <div className="font-bold text-2xl text-yellow-800">{gems}</div>
-                                    <div className="text-xs text-yellow-600 uppercase font-bold tracking-wide">Drahokamy</div>
-                                </div>
-                                <div className="bg-sky-50 rounded-2xl p-4 text-center border border-sky-200">
-                                    <div className="text-3xl mb-1">❤️</div>
-                                    <div className="font-bold text-2xl text-sky-800">∞</div>
-                                    <div className="text-xs text-sky-600 uppercase font-bold tracking-wide">Srdiečka</div>
-                                </div>
-                            </div>
-
-                            <button onClick={() => setShowProfileModal(false)} data-testid="close-profile-btn" className="w-full bg-gray-900 text-white font-bold py-3 rounded-xl hover:bg-gray-800 transition-colors">
-                                Zatvoriť
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Tip Modal */}
-            {showTipModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-pop-in">
-                    <div className="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl text-center relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-sky-400 to-yellow-400"></div>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4 mt-2">Starryho Tip 💡</h2>
-                        <div className="min-h-[100px] flex items-center justify-center text-gray-600 leading-relaxed text-lg">
-                            {isTipLoading ? <span className="animate-spin text-4xl">💫</span> : starryTip}
-                        </div>
-                        <button onClick={() => setShowTipModal(false)} className="mt-6 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-full transition-colors w-full">
-                            Super!
-                        </button>
-                    </div>
-                </div>
-            )}
-            
-            {/* Customization Modal */}
-            {showCustomizeModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-fade-in-up">
-                    <div className="bg-white w-full max-w-md rounded-[2rem] p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-                        <button onClick={() => setShowCustomizeModal(false)} data-testid="close-settings-btn" className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 text-2xl">&times;</button>
-                        
-                        <h3 className="text-lg font-bold text-gray-800 mb-6 text-center">Vzhľad a Téma</h3>
-                        
-                        {/* Avatars - Level Based Progression */}
-                        <div className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                Tvoj Avatar
-                                <span className="text-indigo-600 font-bold">Level {gamificationState.level}</span>
-                            </div>
-                            <span className="text-indigo-500 font-bold normal-case">{getLevelTitle(gamificationState.level)}</span>
-                        </div>
-                        <div className="grid grid-cols-3 gap-3 mb-8">
-                            {AVATAR_OPTIONS.map((option) => {
-                                const isUnlocked = gamificationState.level >= option.levelRequired;
-                                const isSelected = starryAvatar === option.emoji;
-                                
-                                return (
-                                    <div 
-                                        key={option.emoji} 
-                                        className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all ${
-                                            isSelected ? 'bg-sky-100 ring-2 ring-sky-500 transform scale-105 shadow-md' : 
-                                            !isUnlocked ? 'bg-gray-100 opacity-75' :
-                                            'bg-gray-50 border border-gray-200'
-                                        }`}
-                                    >
-                                        <div className={`mb-1 ${!isUnlocked ? 'grayscale opacity-50' : ''}`}>
-                                            <StarryAvatarDisplay 
-                                                avatar={option.emoji} 
-                                                size="text-4xl" 
-                                                isFloating={isSelected}
-                                                isExcited={false}
-                                            />
-                                        </div>
-                                        <span className="text-xs font-bold text-gray-600">{option.name}</span>
-                                        
-                                        {/* Level requirement indicator */}
-                                        {!isUnlocked && (
-                                            <div className="absolute -top-1 -right-1 px-2 py-0.5 rounded-full text-[10px] font-bold shadow-md bg-indigo-500 text-white">
-                                                L{option.levelRequired}
-                                            </div>
-                                        )}
-                                        {isSelected && (
-                                            <div className="absolute -top-1 -right-1 bg-sky-500 text-white rounded-full p-1 shadow-md z-10">
-                                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                        
-                        {/* Backgrounds with Prices */}
-                        <div className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">Prostredie</div>
-                        <div className="grid grid-cols-2 gap-3 mb-4">
-                            {BACKGROUND_OPTIONS.map(bg => {
-                                const isUnlocked = unlockedBackgrounds.includes(bg.id);
-                                const isSelected = appBackground.id === bg.id;
-                                const canAfford = gems >= bg.price;
-                                
-                                return (
-                                    <button 
-                                        key={bg.id} 
-                                        onClick={() => {
-                                            if (isUnlocked) {
-                                                setAppBackground(bg);
-                                            } else if (canAfford) {
-                                                purchaseItem('background', bg.id, bg.price);
-                                            }
-                                        }} 
-                                        className={`relative rounded-xl overflow-hidden h-20 group transition-all duration-300 ${
-                                            isSelected ? 'ring-4 ring-sky-500 ring-offset-2 shadow-lg scale-[1.02]' : 
-                                            !isUnlocked ? 'opacity-60 grayscale' :
-                                            'hover:opacity-90 shadow-sm'
-                                        }`}
-                                    >
-                                        <div className={`absolute inset-0 ${bg.className}`}></div>
-                                        <span className={`relative z-10 text-sm font-bold block mt-1 ${bg.id === 'sky' ? 'text-gray-800' : 'text-white'} drop-shadow-md`}>{bg.name}</span>
-                                        
-                                        {/* Price indicator for locked */}
-                                        {!isUnlocked && (
-                                            <div className={`absolute top-2 right-2 px-2 py-0.5 rounded-full text-[10px] font-bold shadow-md ${
-                                                canAfford ? 'bg-yellow-400 text-yellow-900' : 'bg-gray-400 text-white'
-                                            }`}>
-                                                💎{bg.price}
-                                            </div>
-                                        )}
-                                        
-                                        {/* Checkmark for selected & unlocked */}
-                                        {isSelected && isUnlocked && (
-                                            <div className="absolute top-2 right-2 bg-sky-500 text-white rounded-full p-1 shadow-md animate-pop-in">
-                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                                            </div>
-                                        )}
-                                    </button>
-                                );
-                            })}
-                        </div>
-
-                        {/* Voice Mode Toggle */}
-                        <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <div className="text-xs font-bold tracking-wider text-emerald-700 uppercase flex items-center gap-2">
-                                        🎤 Hlasový režim
-                                    </div>
-                                    <div className="text-sm font-medium text-emerald-900 mt-0.5">
-                                        {voiceMode.isSupported ? 'Diktovanie a čítanie' : 'Nepodporované'}
-                                    </div>
-                                </div>
-                                {voiceMode.isSupported && (
-                                    <button
-                                        onClick={() => voiceMode.toggleVoiceMode(!voiceMode.isEnabled)}
-                                        className={`relative w-14 h-8 rounded-full transition-colors duration-200 ${
-                                            voiceMode.isEnabled ? 'bg-emerald-600' : 'bg-gray-300'
-                                        }`}
-                                        aria-label={voiceMode.isEnabled ? "Vypnúť hlasový režim" : "Zapnúť hlasový režim"}
-                                    >
-                                        <div 
-                                            className={`absolute top-1 left-1 w-6 h-6 rounded-full bg-white shadow-md transition-transform duration-200 ${
-                                                voiceMode.isEnabled ? 'translate-x-6' : 'translate-x-0'
-                                            }`} 
-                                        />
-                                    </button>
-                                )}
-                            </div>
-                            <p className="mt-2 text-xs text-emerald-700/70">
-                                {voiceMode.isSupported 
-                                    ? 'Hovor do mikrofónu a Starlink ti bude odpovedať nahlas.' 
-                                    : 'Tvoj prehliadač nepodporuje hlasové funkcie.'}
-                            </p>
-                        </div>
-
-                        {/* Mascot Mode Selector */}
-                        <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200">
-                            <div className="text-xs font-bold tracking-wider text-indigo-700 uppercase flex items-center gap-2 mb-3">
-                                ✨ Mascot režim
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                                <button
-                                    onClick={() => setMascotMode('image')}
-                                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                                        mascotMode === 'image' 
-                                            ? 'bg-indigo-600 text-white shadow-lg' 
-                                            : 'bg-white/60 text-indigo-700 hover:bg-white'
-                                    }`}
-                                >
-                                    🖼️ Statický
-                                </button>
-                                {/* Rive option removed */}
-                                <button
-                                    onClick={() => setMascotMode('spline3d')}
-                                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                                        mascotMode === 'spline3d' 
-                                            ? 'bg-indigo-600 text-white shadow-lg' 
-                                            : 'bg-white/60 text-indigo-700 hover:bg-white'
-                                    }`}
-                                    title="Načíta ~4MB extra"
-                                >
-                                    🌐 3D Premium
-                                </button>
-                            </div>
-                            <p className="mt-2 text-xs text-indigo-700/70">
-                                {mascotMode === 'spline3d' 
-                                    ? '3D režim stiahne extra 4MB pri zapnutí (premium funkcia).'
-                                    : mascotMode === 'image'
-                                        ? 'Najrýchlejší režim - statický obrázok.'
-                                    : 'Animovaný mascot (nedostupné)'}
-                            </p>
-                        </div>
-
-                        {/* Custom API Key Section */}
-                        <div className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1 mt-6">Vlastný API Kľúč (Voliteľné)</div>
-                        <div className="mb-4">
-                            <input 
-                                type="password" 
-                                value={customApiKey}
-                                onChange={(e) => setCustomApiKey(e.target.value)}
-                                placeholder="Vložte Gemini API Key..."
-                                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
-                            />
-                            <p className="text-[10px] text-gray-400 mt-1 ml-1">Ak ostane prázdne, použije sa predvolený kľúč.</p>
-                        </div>
-                        
-                        <button onClick={saveCustomization} className="mt-6 w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 rounded-xl shadow-md transition-transform active:scale-95">
-                            Uložiť zmeny
-                        </button>
-
-                        {/* Danger Zone - Delete Data */}
-                        <div className="mt-8 pt-6 border-t border-red-100">
-                            <div className="mb-2 text-xs font-semibold text-red-400 uppercase tracking-wider ml-1">Nebezpečná zóna</div>
-                            <button 
-                                onClick={() => setShowDeleteConfirm(true)}
-                                className="w-full bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-3 rounded-xl border border-red-200 transition-colors flex items-center justify-center gap-2"
-                            >
-                                <span>🗑️</span> Vymazať všetky dáta
-                            </button>
-                            <p className="text-[10px] text-red-400 mt-1 ml-1 text-center">Vymaže chat, profil, nastavenia a súhlas.</p>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Delete Confirmation Modal */}
-            {showDeleteConfirm && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in-up">
-                    <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden">
-                        <div className="bg-red-500 p-4">
-                            <h3 className="text-white font-bold text-lg flex items-center gap-2">
-                                <span>⚠️</span> Vymazať všetko?
-                            </h3>
-                        </div>
-                        <div className="p-5">
-                            <p className="text-gray-700 mb-4">
-                                Naozaj vymazať všetky dáta? <strong>Táto akcia sa nedá vrátiť.</strong>
-                            </p>
-                            <p className="text-sm text-gray-500 mb-6">
-                                Bude vymazaný chat, profil, nastavenia a rodičovský súhlas.
-                            </p>
-                            <div className="flex gap-3">
-                                <button 
-                                    onClick={() => setShowDeleteConfirm(false)}
-                                    className="flex-1 px-4 py-3 text-gray-600 font-semibold rounded-xl border-2 border-gray-200 hover:bg-gray-50 transition-colors"
-                                >
-                                    Zrušiť
-                                </button>
-                                <button 
-                                    onClick={() => {
-                                        clearAllAppData();
-                                        window.location.reload();
-                                    }}
-                                    className="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-md transition-colors"
-                                >
-                                    Vymazať
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
         </>
     );
 };
