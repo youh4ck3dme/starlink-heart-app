@@ -1,4 +1,5 @@
-import { initializeApp } from "firebase/app";
+import { getApp, getApps, initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
@@ -19,11 +20,19 @@ const firebaseConfig = {
   appId: process.env.FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+export const isFirebaseConfigured = Boolean(
+  firebaseConfig.apiKey &&
+  firebaseConfig.authDomain &&
+  firebaseConfig.projectId &&
+  firebaseConfig.appId
+);
 
-// Get a reference to the database service and storage service
-const db = getFirestore(app);
-const storage = getStorage(app);
+const app = isFirebaseConfigured
+  ? (getApps().length > 0 ? getApp() : initializeApp(firebaseConfig))
+  : null;
 
-export { db, storage };
+const db = app ? getFirestore(app) : null;
+const storage = app ? getStorage(app) : null;
+const auth = app ? getAuth(app) : null;
+
+export { app, auth, db, storage };

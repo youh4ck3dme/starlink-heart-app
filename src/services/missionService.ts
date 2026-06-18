@@ -1,4 +1,5 @@
 import { db } from './localService';
+import { LeaderboardService } from '../features/gamification/services/LeaderboardService';
 
 export type MissionType = 'PHOTO_TAKEN' | 'MESSAGE_SENT' | 'OPEN_APP';
 
@@ -82,6 +83,7 @@ export const incrementMissionProgress = (type: MissionType) => {
 
     if (changed) {
         saveMissions(updated);
+        void LeaderboardService.recordCurrentUserScore('global');
     }
 };
 
@@ -99,6 +101,7 @@ export const claimMissionReward = (missionId: string): number => {
 
     if (reward > 0) {
         saveMissions(updated);
+        void LeaderboardService.recordCurrentUserScore('global');
     }
     return reward;
 };

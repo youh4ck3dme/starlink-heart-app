@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ChatMessage from '../components/chat/ChatMessage';
 import { Heart } from '../types';
@@ -35,6 +35,10 @@ describe('ChatMessage Component', () => {
         vi.clearAllMocks();
     });
 
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
     describe('User Message Rendering', () => {
         it('renders user message text', () => {
             render(<ChatMessage {...defaultProps} />);
@@ -42,6 +46,7 @@ describe('ChatMessage Component', () => {
         });
 
         it('renders message timestamp', () => {
+            vi.spyOn(Date.prototype, 'toLocaleTimeString').mockReturnValue('10:00 AM');
             render(<ChatMessage {...defaultProps} />);
             expect(screen.getByText('10:00 AM')).toBeInTheDocument();
         });

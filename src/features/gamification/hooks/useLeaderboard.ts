@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { LeaderboardService, LeaderboardEntry, LeaderboardScope } from '../services/LeaderboardService';
 
 export function useLeaderboard(scope: LeaderboardScope = 'global') {
@@ -7,28 +7,17 @@ export function useLeaderboard(scope: LeaderboardScope = 'global') {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let isMounted = true;
-    
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const data = await LeaderboardService.getLeaderboard(scope);
-        const user = await LeaderboardService.getUserRank('current-user');
-        
-        if (isMounted) {
-            setLeaderboard(data);
-            setUserEntry(user || null);
-        }
-      } catch (e) {
-        console.error("Failed to fetch leaderboard", e);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
+    setLoading(true);
+
+    const unsubscribe = LeaderboardService.subscribeLeaderboard(scope, (entries, currentUserEntry) => {
+      setLeaderboard(entries);
+      setUserEntry(currentUserEntry);
+      setLoading(false);
+    });
+
+    return () => {
+      unsubscribe();
     };
-
-    fetchData();
-
-    return () => { isMounted = false; };
   }, [scope]);
 
   return { leaderboard, userEntry, loading };
