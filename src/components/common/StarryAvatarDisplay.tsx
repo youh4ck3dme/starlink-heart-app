@@ -1,4 +1,4 @@
-import starApng from '../../assets/avatars/starry.webp';
+import starApng from '../../assets/avatars/starry.png';
 import cometImg from '../../assets/avatars/cometa.webp';
 import roboImg from '../../assets/avatars/roboto.webp';
 

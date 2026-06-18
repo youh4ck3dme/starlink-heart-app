@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import fallbackImage from "../../assets/avatars/starry.webp";
+import fallbackImage from "../../assets/avatars/starry.png";
 
 type Props = {
   enabled: boolean;

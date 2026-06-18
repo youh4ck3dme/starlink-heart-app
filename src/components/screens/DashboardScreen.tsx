@@ -5,7 +5,7 @@ import { DailyMissionsCard } from '../gamification/DailyMissionsCard';
 import { LeaderboardWidget } from '../gamification/LeaderboardWidget';
 import { LeaderboardFull } from '../gamification/LeaderboardFull';
 import { AnimatePresence } from 'framer-motion';
-import starryAvatar from '../../assets/avatars/starry.webp';
+import starryAvatar from '../../assets/avatars/starry.png';
 
 interface DashboardScreenProps {
     onNewMission: () => void;
@@ -161,4 +161,3 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
 };
 
 export default DashboardScreen;
-

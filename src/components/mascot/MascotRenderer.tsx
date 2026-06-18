@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import starryImg from "../../assets/avatars/starry.webp";
+import starryImg from "../../assets/avatars/starry.png";
 import cometImg from "../../assets/avatars/cometa.webp";
 import robotImg from "../../assets/avatars/roboto.webp";
 

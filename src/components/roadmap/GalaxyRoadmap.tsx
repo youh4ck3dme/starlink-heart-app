@@ -3,7 +3,7 @@ import { motion, useScroll, useSpring } from 'framer-motion';
 import { useHaptics } from '../../hooks/useHaptics';
 
 // Assets
-import starAvatar from '../../assets/avatars/starry.webp';
+import starAvatar from '../../assets/avatars/starry.png';
 import cometAvatar from '../../assets/avatars/cometa.webp';
 // Use roboto.png if webp not available, or keep webp if verified
 import robotAvatar from '../../assets/avatars/roboto.webp';

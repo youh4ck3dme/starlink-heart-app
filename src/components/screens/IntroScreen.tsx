@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import starryAvatar from '../../assets/avatars/starry.webp';
+import starryAvatar from '../../assets/avatars/starry.png';
 
 interface IntroScreenProps {
   onStart?: () => void; // Optional - if provided, use this; otherwise use router
