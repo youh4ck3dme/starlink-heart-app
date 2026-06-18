@@ -11,7 +11,7 @@ import { MascotMode } from './mascot/MascotRenderer';
 import Header from './layout/Header';
 import LiveStarryBackground from './layout/LiveStarryBackground';
 import { useVoiceMode } from '../hooks/useVoiceMode';
-import { AVATAR_OPTIONS, BACKGROUND_OPTIONS, BackgroundItem, isBackground } from '../core/config/shopConfig';
+import { AVATAR_OPTIONS, BACKGROUND_OPTIONS, BackgroundItem, isBackground, isSuperAdmin } from '../core/config/shopConfig';
 import { useGamification, getAvatarForLevel, getAvatarName, getLevelTitle } from '../features/gamification/context/GamificationContext';
 import { useGameStore } from '../store/gameStore';
 import XPBar from './common/XPBar';
@@ -20,6 +20,7 @@ import { incrementMissionProgress } from '../services/missionService';
 import { useHaptics } from '../hooks/useHaptics';
 import { ChatPanel, DashboardPanel, IntroPanel, ShopPanel } from './starlink-heart/StarlinkHeartPanels';
 import { StarlinkHeartModals } from './starlink-heart/StarlinkHeartModals';
+import { useAuth } from '../hooks/useAuth';
 
 // Compatibility constant for existing logic
 const STARRY_AVATARS = AVATAR_OPTIONS.map(opt => opt.emoji);
@@ -67,6 +68,10 @@ const StarlinkHeartApp: React.FC = () => {
     const voiceMode = useVoiceMode();
     const haptics = useHaptics();
     const { state: gamificationState } = useGamification();
+    const { user } = useAuth();
+    
+    // Check if current user is super admin
+    const isSuperAdminUser = isSuperAdmin(user?.email);
     
     // Auto-select avatar based on level (progression system)
     const starryAvatar = getAvatarForLevel(gamificationState.level);
@@ -120,6 +125,15 @@ const StarlinkHeartApp: React.FC = () => {
         const saved = localStorage.getItem('unlockedBackgrounds');
         return saved ? JSON.parse(saved) : ['sky', 'space']; // Free ones
     });
+    
+    // Effect to unlock all items for super admins
+    useEffect(() => {
+        if (isSuperAdminUser) {
+            const allBackgroundIds = BACKGROUND_OPTIONS.map(bg => bg.id);
+            setUnlockedBackgrounds(allBackgroundIds);
+            localStorage.setItem('unlockedBackgrounds', JSON.stringify(allBackgroundIds));
+        }
+    }, [isSuperAdminUser]);
     
     // Advanced Features
     const [isTeacherCloneMode, setIsTeacherCloneMode] = useState(false);
@@ -311,7 +325,21 @@ const StarlinkHeartApp: React.FC = () => {
 
     // Shop - Purchase Item (now using Zustand)
     const purchaseItem = (type: 'avatar' | 'background', id: string, price: number) => {
-        // ✅ Zustand: spendGems returns false if not enough
+        // ✅ Super admins get free access to everything
+        if (isSuperAdminUser) {
+            if (type === 'avatar') {
+                return false; // Avatars are still level-based
+            } else {
+                const newUnlocked = [...unlockedBackgrounds, id];
+                setUnlockedBackgrounds(newUnlocked);
+                localStorage.setItem('unlockedBackgrounds', JSON.stringify(newUnlocked));
+                const bg = BACKGROUND_OPTIONS.find(b => b.id === id);
+                if (bg) setAppBackground(bg);
+                return true;
+            }
+        }
+        
+        // ✅ Regular users: spendGems returns false if not enough
         if (!spendGems(price)) {
             // Could show a "not enough gems" toast here
             return false;
@@ -511,6 +539,7 @@ const StarlinkHeartApp: React.FC = () => {
                                         }
                                     }
                                 }}
+                                isSuperAdmin={isSuperAdminUser}
                             />
                         )}
 

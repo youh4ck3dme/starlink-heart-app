@@ -12,6 +12,7 @@ interface ShopScreenProps {
     onBack: () => void;
     onPurchase: (item: ShopItem) => void;
     onEquip: (item: ShopItem) => void;
+    isSuperAdmin?: boolean;
 }
 
 export default function ShopScreen({
@@ -21,7 +22,8 @@ export default function ShopScreen({
     currentBackgroundId,
     onBack,
     onPurchase,
-    onEquip
+    onEquip,
+    isSuperAdmin = false
 }: ShopScreenProps) {
     const [activeTab, setActiveTab] = useState<'avatars' | 'backgrounds'>('backgrounds');
     const haptics = useHaptics();
@@ -54,6 +56,11 @@ export default function ShopScreen({
                     STAR SHOP
                 </h1>
                 <p className="text-indigo-200 mt-1">Vylepši si svoj vesmír!</p>
+                {isSuperAdmin && (
+                    <div className="mt-3 inline-block bg-gradient-to-r from-yellow-500 to-orange-500 px-4 py-1 rounded-full text-xs font-bold text-white shadow-lg">
+                        ⭐ SUPER ADMIN - Všetko odomknuté
+                    </div>
+                )}
             </div>
 
             {/* Tabs */}
@@ -96,7 +103,7 @@ export default function ShopScreen({
                             {BACKGROUND_OPTIONS.map((bg) => {
                                 const isUnlocked = unlockedBackgrounds.includes(bg.id) || bg.price === 0;
                                 const isEquipped = currentBackgroundId === bg.id;
-                                const canAfford = gems >= bg.price;
+                                const canAfford = isSuperAdmin || gems >= bg.price;
 
                                 return (
                                     <div 
@@ -147,15 +154,18 @@ export default function ShopScreen({
                                                         disabled={!canAfford}
                                                         className={`w-full py-2 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors ${
                                                             canAfford
-                                                            ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/30'
+                                                            ? isSuperAdmin ? 'bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white shadow-lg shadow-yellow-500/30'
+                                                            : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/30'
                                                             : 'bg-white/5 text-white/30 cursor-not-allowed'
                                                         }`}
                                                     >
-                                                        {canAfford ? 'Kúpiť' : 'Málo drahokamov'}
-                                                        <div className="flex items-center gap-1 bg-black/30 px-2 py-0.5 rounded-md">
-                                                            <span>💎</span>
-                                                            <span>{bg.price}</span>
-                                                        </div>
+                                                        {isSuperAdmin ? '🌟 Kúpiť zadarmo' : canAfford ? 'Kúpiť' : 'Málo drahokamov'}
+                                                        {!isSuperAdmin && (
+                                                            <div className="flex items-center gap-1 bg-black/30 px-2 py-0.5 rounded-md">
+                                                                <span>💎</span>
+                                                                <span>{bg.price}</span>
+                                                            </div>
+                                                        )}
                                                     </button>
                                                 )}
                                             </div>

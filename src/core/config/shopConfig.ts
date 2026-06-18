@@ -1,3 +1,6 @@
+// Super Admin Configuration
+export const SUPER_ADMIN_EMAILS = ['u0352652320@gmail.com'];
+
 // Shop Types
 export interface BaseShopItem {
     id: string;
@@ -24,6 +27,12 @@ export type ShopItem = AvatarItem | BackgroundItem;
 // Check helper
 export const isBackground = (item: ShopItem): item is BackgroundItem => item.type === 'background';
 export const isAvatar = (item: ShopItem): item is AvatarItem => item.type === 'avatar';
+
+// Super admin check
+export const isSuperAdmin = (email: string | null | undefined): boolean => {
+    if (!email) return false;
+    return SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
+};
 
 // Avatar Progression Config
 export const AVATAR_OPTIONS: AvatarItem[] = [

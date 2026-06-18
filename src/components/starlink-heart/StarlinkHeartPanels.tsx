@@ -103,6 +103,7 @@ type ShopPanelProps = {
   onBack: () => void;
   onPurchase: (item: ShopItem) => void;
   onEquip: (item: ShopItem) => void;
+  isSuperAdmin?: boolean;
 };
 
 export const ShopPanel: React.FC<ShopPanelProps> = ({
@@ -113,6 +114,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
   onBack,
   onPurchase,
   onEquip,
+  isSuperAdmin = false,
 }) => (
   <motion.div
     key="shop"
@@ -129,6 +131,7 @@ export const ShopPanel: React.FC<ShopPanelProps> = ({
       onBack={onBack}
       onPurchase={onPurchase}
       onEquip={onEquip}
+      isSuperAdmin={isSuperAdmin}
     />
   </motion.div>
 );
