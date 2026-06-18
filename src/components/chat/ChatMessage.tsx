@@ -1,7 +1,26 @@
 import React, { memo } from 'react';
 import { Heart } from '../../types';
+import ImageWidget from '../common/ImageWidget';
 
 // FormatText helper - handles [[...]], **...**, *...* syntax
+// Also extracts external image URLs (iStockPhoto, etc) for widget rendering
+const extractImageUrl = (text: string): string | null => {
+    const urlRegex = /(https?:\/\/[^\s<>"{}|\\^`\[\]]*)/g;
+    const match = text.match(urlRegex);
+    if (match) {
+        for (const url of match) {
+            if (url.includes('istockphoto.com') || url.includes('unsplash.com') || url.includes('pexels.com')) {
+                return url;
+            }
+        }
+    }
+    return null;
+};
+
+const stripUrlsFromText = (text: string): string => {
+    return text.replace(/(https?:\/\/[^\s<>"{}|\\^`\[\]]*)/g, '').trim();
+};
+
 const FormatText = ({ text }: { text: string }) => {
     if (!text) return null;
     
@@ -87,8 +106,23 @@ export default memo(function ChatMessage({
                     
                     <div className={`relative max-w-[90%] rounded-2xl rounded-tl-sm p-4 shadow-sm text-sm md:text-base leading-relaxed ${heart.isHint ? 'bg-yellow-50 border border-yellow-200 text-yellow-900' : `${appBackground.glass} backdrop-blur-md border border-white/20 shadow-lg`}`}>
                         {heart.isHint && <div className="text-xs font-bold text-yellow-600 uppercase tracking-wide mb-1">Super Nápoveda</div>}
+                        
+                        {/* Extract and display external image if present */}
+                        {(() => {
+                            const imageUrl = extractImageUrl(heart.aiResponse.textResponse || '');
+                            return imageUrl ? (
+                                <ImageWidget 
+                                    imageUrl={imageUrl}
+                                    title="Referenčný obrázok"
+                                    sourceUrl={imageUrl}
+                                    sourceName={imageUrl.includes('istockphoto') ? 'iStockPhoto' : 'Zdroj'}
+                                    alt="Reference image"
+                                />
+                            ) : null;
+                        })()}
+
                         <div className={appBackground.id === 'sky' || heart.isHint ? 'text-gray-800' : 'text-gray-100'}>
-                            <FormatText text={heart.aiResponse.textResponse} />
+                            <FormatText text={stripUrlsFromText(heart.aiResponse.textResponse || '')} />
                         </div>
 
                         {/* Speaker Button (TTS) */}
