@@ -15,7 +15,10 @@
     "icons:generate": "node scripts/generate-icons.mjs",
     "test": "vitest",
     "test:e2e": "playwright test",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "firebase:deploy": "npx firebase-tools deploy --only firestore:rules,firestore:indexes",
+    "firebase:deploy:rules": "npx firebase-tools deploy --only firestore:rules",
+    "firebase:deploy:indexes": "npx firebase-tools deploy --only firestore:indexes"
   },
   "dependencies": {
     "@capacitor/core": "^6.2.1",
