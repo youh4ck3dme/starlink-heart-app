@@ -57,6 +57,8 @@ type StarlinkHeartModalsProps = {
   onCloseCustomizeModal: () => void;
   customApiKey: string;
   setCustomApiKey: (key: string) => void;
+  customMistralApiKey: string;
+  setCustomMistralApiKey: (key: string) => void;
   appBackground: BackgroundItem;
   setAppBackground: (bg: BackgroundItem) => void;
   unlockedBackgrounds: string[];
@@ -158,6 +160,8 @@ const CustomizationModal: React.FC<{
   onClose: () => void;
   customApiKey: string;
   setCustomApiKey: (key: string) => void;
+  customMistralApiKey: string;
+  setCustomMistralApiKey: (key: string) => void;
   appBackground: BackgroundItem;
   setAppBackground: (bg: BackgroundItem) => void;
   unlockedBackgrounds: string[];
@@ -174,6 +178,8 @@ const CustomizationModal: React.FC<{
   onClose,
   customApiKey,
   setCustomApiKey,
+  customMistralApiKey,
+  setCustomMistralApiKey,
   appBackground,
   setAppBackground,
   unlockedBackgrounds,
@@ -344,7 +350,7 @@ const CustomizationModal: React.FC<{
         </p>
       </div>
 
-      <div className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1 mt-6">Vlastný API Kľúč (Voliteľné)</div>
+      <div className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1 mt-6">Vlastné API Kľúče (Voliteľné)</div>
       <div className="mb-4">
         <input
           type="password"
@@ -353,7 +359,18 @@ const CustomizationModal: React.FC<{
           placeholder="Vložte Gemini API Key..."
           className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
         />
-        <p className="text-[10px] text-gray-400 mt-1 ml-1">Ak ostane prázdne, použije sa predvolený kľúč.</p>
+        <p className="text-[10px] text-gray-400 mt-1 ml-1">Gemini má prioritu. Ak ostane prázdne, použije sa Mistral (ak je vyplnený).</p>
+      </div>
+
+      <div className="mb-4">
+        <input
+          type="password"
+          value={customMistralApiKey}
+          onChange={(e) => setCustomMistralApiKey(e.target.value)}
+          placeholder="Vložte Mistral API Key..."
+          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+        />
+        <p className="text-[10px] text-gray-400 mt-1 ml-1">Použije sa automaticky, keď nie je dostupný Gemini kľúč.</p>
       </div>
 
       <button onClick={onSaveCustomization} className="mt-6 w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 rounded-xl shadow-md transition-transform active:scale-95">
@@ -449,6 +466,8 @@ export const StarlinkHeartModals: React.FC<StarlinkHeartModalsProps> = (props) =
         onClose={props.onCloseCustomizeModal}
         customApiKey={props.customApiKey}
         setCustomApiKey={props.setCustomApiKey}
+        customMistralApiKey={props.customMistralApiKey}
+        setCustomMistralApiKey={props.setCustomMistralApiKey}
         appBackground={props.appBackground}
         setAppBackground={props.setAppBackground}
         unlockedBackgrounds={props.unlockedBackgrounds}

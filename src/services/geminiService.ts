@@ -3,8 +3,83 @@ import { Heart } from "../types";
 import { checkInputSafety, getSafetyBlockMessage } from "./safetyFilter";
 import { PROF_STARLINK_SYSTEM_PROMPT, TEACHER_CLONE_SYSTEM_PROMPT } from "../config/prompts";
 
-const getApiKey = () => {
-    return localStorage.getItem('custom_api_key') || process.env.API_KEY;
+type AIProvider = 'gemini' | 'mistral';
+
+const getConfiguredKeys = () => {
+    const geminiKey =
+        localStorage.getItem('custom_api_key') ||
+        import.meta.env.VITE_GEMINI_API_KEY ||
+        process.env.API_KEY ||
+        '';
+    const mistralKey =
+        localStorage.getItem('custom_mistral_api_key') ||
+        import.meta.env.VITE_MISTRAL_API_KEY ||
+        process.env.MISTRAL_API_KEY ||
+        '';
+    return { geminiKey, mistralKey };
+};
+
+const getAiProvider = (): { provider: AIProvider; apiKey: string } => {
+    const { geminiKey, mistralKey } = getConfiguredKeys();
+    if (geminiKey) return { provider: 'gemini', apiKey: geminiKey };
+    if (mistralKey) return { provider: 'mistral', apiKey: mistralKey };
+    throw new Error('Chýba API kľúč: pridajte Gemini alebo Mistral kľúč v nastaveniach.');
+};
+
+const normalizeAssistantText = (content: unknown): string => {
+    if (typeof content === 'string') return content;
+    if (Array.isArray(content)) {
+        return content
+            .map((part) => (typeof part === 'string' ? part : (part as any)?.text || ''))
+            .filter(Boolean)
+            .join('\n');
+    }
+    return '';
+};
+
+const extractJsonCandidate = (text: string): string => {
+    const fenced = text.match(/```json\s*([\s\S]*?)```/i);
+    if (fenced?.[1]) return fenced[1].trim();
+    return text.trim();
+};
+
+const parseJsonSafely = <T>(text: string, fallback: T): T => {
+    const candidate = extractJsonCandidate(text);
+    try {
+        return JSON.parse(candidate) as T;
+    } catch {
+        return fallback;
+    }
+};
+
+const generateMistralText = async (
+    apiKey: string,
+    systemInstruction: string,
+    userPrompt: string
+): Promise<string> => {
+    const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+            model: 'mistral-small-latest',
+            temperature: 0.2,
+            messages: [
+                { role: 'system', content: systemInstruction },
+                { role: 'user', content: userPrompt },
+            ],
+        }),
+    });
+
+    if (!response.ok) {
+        const details = await response.text();
+        throw new Error(`Mistral API error (${response.status}): ${details}`);
+    }
+
+    const data = await response.json();
+    return normalizeAssistantText(data?.choices?.[0]?.message?.content);
 };
 
 const fileToBase64 = (file: File): Promise<string> => {
@@ -62,13 +137,8 @@ export const generateCosmicResponse = async (prompt: string, conversationHistory
     // Use filtered prompt (PII removed if detected)
     const safePrompt = safetyCheck.filtered;
 
-    // Dynamically import GoogleGenAI
-    const { GoogleGenAI, Type } = await import("@google/genai");
-
-    // Initialize AI with the environment variable directly as per new standards
-    const ai = new GoogleGenAI({ apiKey: getApiKey() });
-
     try {
+        const { provider, apiKey } = getAiProvider();
         const historyContext = conversationHistory.slice(-5).map(h => 
             h.aiResponse ? `AI (Kouč): ${h.aiResponse.textResponse}` : `Dieťa: ${h.message}`
         ).join('\n');
@@ -86,25 +156,6 @@ export const generateCosmicResponse = async (prompt: string, conversationHistory
                 },
             });
         }
-
-        const responseSchema = {
-            type: Type.OBJECT,
-            properties: {
-                textResponse: {
-                    type: Type.STRING,
-                    description: "Edukačná, hravá odpoveď."
-                },
-                visualAids: {
-                    type: Type.ARRAY,
-                    description: "Pole maximálne 3 relevantných emoji.",
-                    items: {
-                        type: Type.STRING,
-                        description: "Jeden emoji znak."
-                    }
-                }
-            },
-            required: ['textResponse', 'visualAids']
-        };
 
         // --- PROMPT 1: TEACHER CLONE & STANDARD MODE ---
         
@@ -153,19 +204,52 @@ export const generateCosmicResponse = async (prompt: string, conversationHistory
         
         Vždy vráť platný JSON: { textResponse: string, visualAids: string[] }.`;
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
-            contents: { parts },
-            config: {
-                systemInstruction: systemInstruction,
-                responseMimeType: "application/json",
-                responseSchema: responseSchema,
-            }
-        });
-        
-        const text = response.text || "{}";
-        const jsonResponse = JSON.parse(text);
-        return jsonResponse;
+        if (provider === 'gemini') {
+            const { GoogleGenAI, Type } = await import("@google/genai");
+            const ai = new GoogleGenAI({ apiKey });
+            const responseSchema = {
+                type: Type.OBJECT,
+                properties: {
+                    textResponse: {
+                        type: Type.STRING,
+                        description: "Edukačná, hravá odpoveď."
+                    },
+                    visualAids: {
+                        type: Type.ARRAY,
+                        description: "Pole maximálne 3 relevantných emoji.",
+                        items: {
+                            type: Type.STRING,
+                            description: "Jeden emoji znak."
+                        }
+                    }
+                },
+                required: ['textResponse', 'visualAids']
+            };
+
+            const response = await ai.models.generateContent({
+                model: 'gemini-3-flash-preview',
+                contents: { parts },
+                config: {
+                    systemInstruction: systemInstruction,
+                    responseMimeType: "application/json",
+                    responseSchema: responseSchema,
+                }
+            });
+            
+            const text = response.text || "{}";
+            return JSON.parse(text);
+        }
+
+        const mistralPrompt = `${fullPrompt}\n\n${
+            imageFile ? 'Poznámka: dieťa priložilo aj obrázok úlohy.' : ''
+        }\n\nVráť LEN platný JSON objekt: {"textResponse":"...","visualAids":["..."]}`;
+        const mistralText = await generateMistralText(apiKey, systemInstruction, mistralPrompt);
+        const parsed = parseJsonSafely<{ textResponse?: string; visualAids?: string[] }>(mistralText, {});
+
+        return {
+            textResponse: parsed.textResponse || "Skús mi prosím napísať otázku ešte raz trochu inak 😊",
+            visualAids: Array.isArray(parsed.visualAids) ? parsed.visualAids.slice(0, 3) : ['✨'],
+        };
 
     } catch (error) {
         return handleApiError(error);
@@ -173,9 +257,6 @@ export const generateCosmicResponse = async (prompt: string, conversationHistory
 };
 
 export const generateParentGuide = async (conversationHistory: Heart[], image?: File | string): Promise<string> => {
-    const { GoogleGenAI } = await import("@google/genai");
-    const ai = new GoogleGenAI({ apiKey: getApiKey() });
-
     const lastInteraction = conversationHistory.slice(-2); 
     const formattedContext = lastInteraction.map(h => 
         h.aiResponse ? `AI: ${h.aiResponse.textResponse}` : `Dieťa: ${h.message}`
@@ -205,6 +286,7 @@ export const generateParentGuide = async (conversationHistory: Heart[], image?: 
     `;
 
     try {
+        const { provider, apiKey } = getAiProvider();
         const parts: any[] = [{ text: `Analyzuj túto interakciu a priložený vizuál (ak je). Vygeneruj report.\n\nKontext:\n${formattedContext}` }];
 
         const imageData = await processImageInput(image);
@@ -217,14 +299,26 @@ export const generateParentGuide = async (conversationHistory: Heart[], image?: 
             });
         }
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.0-flash-exp', // Using a newer model for better vision capabilities if available, fallback to flash preview if needed.
-            contents: { parts },
-            config: {
-                systemInstruction: systemInstruction,
-            }
-        });
-        return response.text || "Bez odpovede.";
+        if (provider === 'gemini') {
+            const { GoogleGenAI } = await import("@google/genai");
+            const ai = new GoogleGenAI({ apiKey });
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.0-flash-exp',
+                contents: { parts },
+                config: {
+                    systemInstruction: systemInstruction,
+                }
+            });
+            return response.text || "Bez odpovede.";
+        }
+
+        const imageHint = image ? '\nDieťa poslalo aj obrázok úlohy.' : '';
+        const mistralResponse = await generateMistralText(
+            apiKey,
+            systemInstruction,
+            `Analyzuj interakciu a vráť odpoveď v Markdowne pre rodiča.\n\nKontext:\n${formattedContext}${imageHint}`
+        );
+        return mistralResponse || "Bez odpovede.";
 
     } catch (error) {
         console.error("Error generating parent guide:", error instanceof Error ? error.message : String(error));
@@ -237,9 +331,6 @@ export const generateParentGuide = async (conversationHistory: Heart[], image?: 
 };
 
 export const generateCosmicHint = async (conversationHistory: Heart[]): Promise<{ textResponse: string; visualAids: string[] }> => {
-    const { GoogleGenAI, Type } = await import("@google/genai");
-    const ai = new GoogleGenAI({ apiKey: getApiKey() });
-
     const formattedHistory = conversationHistory.map(heart => {
         if (heart.aiResponse?.textResponse) {
             return `Starry: ${heart.aiResponse.textResponse}`;
@@ -260,35 +351,50 @@ export const generateCosmicHint = async (conversationHistory: Heart[]): Promise<
     3. NEPREZRÁDZAJ výsledok.
     Vráť JSON: { textResponse: string, visualAids: string[] }.`;
 
-    const responseSchema = {
-        type: Type.OBJECT,
-        properties: {
-            textResponse: {
-                type: Type.STRING,
-                description: "Nápoveda pre dieťa."
-            },
-            visualAids: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING }
-            }
-        },
-        required: ['textResponse', 'visualAids']
-    };
-
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
-            contents: `História chatu:\n${formattedHistory}\n\nPožiadavka: ${prompt}`,
-            config: {
-                systemInstruction: systemInstruction,
-                responseMimeType: "application/json",
-                responseSchema: responseSchema,
-            }
-        });
-        
-        const text = response.text || "{}";
-        const jsonResponse = JSON.parse(text);
-        return jsonResponse;
+        const { provider, apiKey } = getAiProvider();
+        if (provider === 'gemini') {
+            const { GoogleGenAI, Type } = await import("@google/genai");
+            const ai = new GoogleGenAI({ apiKey });
+            const responseSchema = {
+                type: Type.OBJECT,
+                properties: {
+                    textResponse: {
+                        type: Type.STRING,
+                        description: "Nápoveda pre dieťa."
+                    },
+                    visualAids: {
+                        type: Type.ARRAY,
+                        items: { type: Type.STRING }
+                    }
+                },
+                required: ['textResponse', 'visualAids']
+            };
+
+            const response = await ai.models.generateContent({
+                model: 'gemini-3-flash-preview',
+                contents: `História chatu:\n${formattedHistory}\n\nPožiadavka: ${prompt}`,
+                config: {
+                    systemInstruction: systemInstruction,
+                    responseMimeType: "application/json",
+                    responseSchema: responseSchema,
+                }
+            });
+            
+            const text = response.text || "{}";
+            return JSON.parse(text);
+        }
+
+        const mistralText = await generateMistralText(
+            apiKey,
+            systemInstruction,
+            `História chatu:\n${formattedHistory}\n\nPožiadavka: ${prompt}\n\nVráť LEN JSON: {"textResponse":"...","visualAids":["..."]}`
+        );
+        const parsed = parseJsonSafely<{ textResponse?: string; visualAids?: string[] }>(mistralText, {});
+        return {
+            textResponse: parsed.textResponse || "Skúsme to po krokoch. Čo je prvá vec, ktorú už vieš? 🙂",
+            visualAids: Array.isArray(parsed.visualAids) ? parsed.visualAids.slice(0, 3) : ['💡'],
+        };
 
     } catch (error) {
         return handleApiError(error);
@@ -296,9 +402,6 @@ export const generateCosmicHint = async (conversationHistory: Heart[]): Promise<
 };
 
 export const getStarryTip = async (): Promise<string> => {
-    const { GoogleGenAI } = await import("@google/genai");
-    const ai = new GoogleGenAI({ apiKey: getApiKey() });
-
     const systemInstruction = `
     Si Starry, vesmírny sprievodca.
     Tvojou úlohou je dať krátky, zábavný a užitočný tip pre deti do školy (ako sa lepšie učiť, ako si pamätať veci, motivačný citát).
@@ -306,14 +409,22 @@ export const getStarryTip = async (): Promise<string> => {
     `;
 
     try {
-        const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview',
-            contents: "Daj mi tip na dnes.",
-            config: {
-                systemInstruction: systemInstruction,
-            }
-        });
-        return response.text || "Dnes je skvelý deň na objavovanie!";
+        const { provider, apiKey } = getAiProvider();
+        if (provider === 'gemini') {
+            const { GoogleGenAI } = await import("@google/genai");
+            const ai = new GoogleGenAI({ apiKey });
+            const response = await ai.models.generateContent({
+                model: 'gemini-3-flash-preview',
+                contents: "Daj mi tip na dnes.",
+                config: {
+                    systemInstruction: systemInstruction,
+                }
+            });
+            return response.text || "Dnes je skvelý deň na objavovanie!";
+        }
+
+        const mistralText = await generateMistralText(apiKey, systemInstruction, "Daj mi tip na dnes.");
+        return mistralText || "Dnes je skvelý deň na objavovanie!";
     } catch (error) {
         console.error("Error generating tip:", error instanceof Error ? error.message : String(error));
         return "Hviezdy sú dnes zahalené hmlou. Skús to neskôr!";

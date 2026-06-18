@@ -58,6 +58,7 @@ export function clearAllAppData(): void {
     'starryBackground',
     'starryGems',
     'custom_api_key',
+    'custom_mistral_api_key',
     'hasStarted'
   ];
   

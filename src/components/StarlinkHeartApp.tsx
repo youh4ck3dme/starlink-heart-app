@@ -91,6 +91,7 @@ const StarlinkHeartApp: React.FC = () => {
         return BACKGROUND_OPTIONS.find(bg => bg.id === saved) || BACKGROUND_OPTIONS[1];
     });
     const [customApiKey, setCustomApiKey] = useState('');
+    const [customMistralApiKey, setCustomMistralApiKey] = useState('');
     const [viewMode, setViewMode] = useState<'intro' | 'dashboard' | 'chat' | 'shop'>('intro');
     const [showProfileModal, setShowProfileModal] = useState(false);
     
@@ -161,6 +162,8 @@ const StarlinkHeartApp: React.FC = () => {
 
         const savedApiKey = localStorage.getItem('custom_api_key');
         if (savedApiKey) setCustomApiKey(savedApiKey);
+        const savedMistralApiKey = localStorage.getItem('custom_mistral_api_key');
+        if (savedMistralApiKey) setCustomMistralApiKey(savedMistralApiKey);
 
         const heartsCollection = collection(db, 'hearts');
         const q = query(heartsCollection, orderBy('timestamp', 'desc'), limit(15));
@@ -436,6 +439,11 @@ const StarlinkHeartApp: React.FC = () => {
             localStorage.removeItem('custom_api_key');
             localStorage.removeItem('developerMode');
         }
+        if (customMistralApiKey) {
+            localStorage.setItem('custom_mistral_api_key', customMistralApiKey);
+        } else {
+            localStorage.removeItem('custom_mistral_api_key');
+        }
         setShowCustomizeModal(false);
     }
 
@@ -561,6 +569,8 @@ const StarlinkHeartApp: React.FC = () => {
                 onCloseCustomizeModal={() => setShowCustomizeModal(false)}
                 customApiKey={customApiKey}
                 setCustomApiKey={setCustomApiKey}
+                customMistralApiKey={customMistralApiKey}
+                setCustomMistralApiKey={setCustomMistralApiKey}
                 appBackground={appBackground}
                 setAppBackground={setAppBackground}
                 unlockedBackgrounds={unlockedBackgrounds}
