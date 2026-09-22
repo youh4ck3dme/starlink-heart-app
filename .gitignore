@@ -28,3 +28,16 @@ dist-ssr
 .env.local
 .env.*
 .vercel
+*.patch
+
+# Test Coverage
+coverage/
+junit.xml
+
+# Playwright
+playwright-report/
+test-results/
+
+# Build cache
+tsconfig.tsbuildinfo
+*.tsbuildinfo
