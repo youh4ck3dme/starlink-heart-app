@@ -68,8 +68,8 @@ describe('SplineMascot', () => {
 });
 
 describe('MascotRenderer', () => {
-  it('falls back to image when mode is image', () => {
-    render(<MascotRenderer mode="image" fallbackEmoji="💙⭐" />);
+  it('renders the static mascot image in image mode', () => {
+    render(<MascotRenderer mode="image" avatar="⭐" fallbackEmoji="💙⭐" />);
     expect(screen.getByAltText('Mascot Avatar')).toBeInTheDocument();
   });
 
