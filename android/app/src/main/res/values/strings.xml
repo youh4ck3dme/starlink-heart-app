@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Starlink Heart</string>
+    <string name="title_activity_main">Starlink Heart</string>
+    <string name="package_name">com.starlinkheart.app</string>
+    <string name="custom_url_scheme">com.starlinkheart.app</string>
+</resources>

@@ -1,87 +1,69 @@
-import React, { useState } from 'react';
-import RiveMascot from './RiveMascot';
-import SplineMascot from './SplineMascot';
+import { lazy, Suspense } from 'react';
+import starryImg from "../../assets/avatars/starry.png";
+import cometImg from "../../assets/avatars/cometa.webp";
+import robotImg from "../../assets/avatars/roboto.webp";
 
-type MascotRendererProps = {
-  riveSrc?: string;
-  splineUrl?: string;
-  fallbackEmoji?: string;
-  label?: string;
+const Starry3D = lazy(() => import("./Starry3D"));
+
+export type MascotMode = "image" | "spline3d";
+
+type Props = {
+  mode: MascotMode;
   className?: string;
+  /** pre spline3d */
+  splineScene?: string;
+  avatar?: string;
+  gender?: 'boy' | 'girl' | 'unspecified';
 };
 
-type MascotRendererState = {
-  hasError: boolean;
-};
-
-class MascotErrorBoundary extends React.Component<
-  React.PropsWithChildren<{ fallback: React.ReactNode }>,
-  MascotRendererState
-> {
-  state: MascotRendererState = { hasError: false };
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch() {
-    // Intentionally blank: fallback handles display when rendering fails.
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return this.props.fallback;
-    }
-    return this.props.children;
-  }
-}
-
-const MascotRenderer: React.FC<MascotRendererProps> = ({
-  riveSrc,
-  splineUrl,
-  fallbackEmoji = '💙⭐',
-  label = 'Starlink mascot',
+export default function MascotRenderer({
+  mode,
   className,
-}) => {
-  const [hasError, setHasError] = useState(false);
-  const fallback = (
-    <div
+  splineScene = "PASTE_YOUR_SPLINE_URL_HERE",
+  avatar = "⭐",
+  gender = 'unspecified'
+}: Props) {
+  // Determine which image to show based on the avatar emoji/string
+  let mascotImage = starryImg;
+  if (avatar === '☄️') mascotImage = cometImg;
+  if (avatar === '🤖') mascotImage = robotImg;
+
+  // Shared fallback for Suspense and Image mode
+  const Fallback = (
+    <img
       className={className}
-      role="img"
-      aria-label={label}
-      data-testid="mascot-fallback"
-    >
-      {fallbackEmoji}
-    </div>
+      src={mascotImage}
+      alt="Mascot Avatar"
+      style={{ 
+        width: "100%", 
+        height: "100%", 
+        objectFit: "contain",
+        filter: gender === 'girl' ? 'hue-rotate(300deg)' : 'none'
+      }}
+      loading="eager"
+    />
   );
 
-  if (hasError) {
-    return fallback;
+  // Mode: Static Image (fastest)
+  if (mode === "image") {
+    return Fallback;
   }
 
+  const isSplineConfigured = splineScene && splineScene !== "PASTE_YOUR_SPLINE_URL_HERE";
+  
   return (
-    <MascotErrorBoundary fallback={fallback}>
-      {riveSrc ? (
-        <RiveMascot
-          src={riveSrc}
-          fallbackEmoji={fallbackEmoji}
-          label={label}
-          className={className}
-          onError={() => setHasError(true)}
-        />
-      ) : splineUrl ? (
-        <SplineMascot
-          url={splineUrl}
-          fallbackEmoji={fallbackEmoji}
-          label={label}
-          className={className}
-          onError={() => setHasError(true)}
+    <Suspense fallback={Fallback}>
+      {/* Mode: 3D Spline (only if configured) */}
+      {mode === "spline3d" && isSplineConfigured ? (
+        <Starry3D 
+          className={className} 
+          enabled={true} 
+          scene={splineScene} 
         />
       ) : (
-        fallback
+        /* Default fallback if 3D not configured */
+        Fallback
       )}
-    </MascotErrorBoundary>
+    </Suspense>
   );
-};
-
-export default MascotRenderer;
+}
