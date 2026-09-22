@@ -13,7 +13,7 @@ interface ShopState {
   selectedBackgroundId: string;
   
   // Mascot Mode
-  mascotMode: 'image' | 'spline3d';
+  mascotMode: 'image' | 'spline3d' | 'rive';
   
   // Custom API Key (optional)
   customApiKey: string;
@@ -30,7 +30,7 @@ interface ShopActions {
   
   // Settings
   setSelectedBackground: (id: string) => void;
-  setMascotMode: (mode: 'image' | 'spline3d') => void;
+  setMascotMode: (mode: 'image' | 'spline3d' | 'rive') => void;
   setCustomApiKey: (key: string) => void;
   
   // Reset (for account deletion)

@@ -239,8 +239,8 @@ const CustomizationModal: React.FC<{
         })}
       </div>
 
-      <div className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1">Prostredie</div>
-      <div className="grid grid-cols-2 gap-3 mb-4">
+      <div className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider ml-1" id="settings-bg-label">Prostredie</div>
+      <div className="grid grid-cols-2 gap-3 mb-4" role="radiogroup" aria-labelledby="settings-bg-label">
         {BACKGROUND_OPTIONS.map(bg => {
           const isUnlocked = unlockedBackgrounds.includes(bg.id);
           const isSelected = appBackground.id === bg.id;
@@ -249,6 +249,12 @@ const CustomizationModal: React.FC<{
           return (
             <button
               key={bg.id}
+              type="button"
+              role="radio"
+              aria-checked={isSelected}
+              aria-pressed={isSelected}
+              aria-current={isSelected ? 'true' : undefined}
+              data-testid={`background-option-${bg.id}`}
               onClick={() => {
                 if (isUnlocked) {
                   setAppBackground(bg);
@@ -320,8 +326,12 @@ const CustomizationModal: React.FC<{
         <div className="text-xs font-bold tracking-wider text-indigo-700 uppercase flex items-center gap-2 mb-3">
           ✨ Mascot režim
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Mascot režim">
           <button
+            type="button"
+            role="radio"
+            aria-checked={mascotMode === 'image'}
+            aria-pressed={mascotMode === 'image'}
             onClick={() => setMascotMode('image')}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
               mascotMode === 'image'
@@ -332,6 +342,24 @@ const CustomizationModal: React.FC<{
             🖼️ Statický
           </button>
           <button
+            type="button"
+            role="radio"
+            aria-checked={mascotMode === 'rive'}
+            aria-pressed={mascotMode === 'rive'}
+            onClick={() => setMascotMode('rive')}
+            className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+              mascotMode === 'rive'
+                ? 'bg-indigo-600 text-white shadow-lg'
+                : 'bg-white/60 text-indigo-700 hover:bg-white'
+            }`}
+          >
+            ✨ Rive
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={mascotMode === 'spline3d'}
+            aria-pressed={mascotMode === 'spline3d'}
             onClick={() => setMascotMode('spline3d')}
             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
               mascotMode === 'spline3d'
@@ -346,7 +374,9 @@ const CustomizationModal: React.FC<{
         <p className="mt-2 text-xs text-indigo-700/70">
           {mascotMode === 'spline3d'
             ? '3D režim stiahne extra 4MB pri zapnutí (premium funkcia).'
-            : 'Najrýchlejší režim - statický obrázok.'}
+            : mascotMode === 'rive'
+              ? 'Rive animácia s automatickým emoji/obrázkovým fallbackom.'
+              : 'Najrýchlejší režim - statický obrázok.'}
         </p>
       </div>
 

@@ -66,10 +66,11 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({
                     
                     {/* Starry Avatar */}
                     <div className="w-full aspect-square max-w-[280px] flex items-center justify-center">
-                        <MascotRenderer 
-                             mode="image" 
+                        <MascotRenderer
+                             mode={mascotMode}
                              avatar={avatar}
                              gender={gender}
+                             riveSrc="/animations/starry.riv"
                              className="w-full h-full drop-shadow-2xl hover:scale-105 transition-transform duration-300"
                         />
                     </div>

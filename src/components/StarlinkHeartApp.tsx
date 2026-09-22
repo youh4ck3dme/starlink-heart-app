@@ -143,7 +143,12 @@ const StarlinkHeartApp: React.FC = () => {
 
     // Mascot Mode State
     const [mascotMode, setMascotMode] = useState<MascotMode>(() => {
-        return (localStorage.getItem('mascotMode') as MascotMode) || 'image';
+        const saved = localStorage.getItem('mascotMode') as MascotMode | null;
+        if (saved === 'image' || saved === 'spline3d' || saved === 'rive') {
+            return saved;
+        }
+        // Prefer Rive in production so fallbacks are exercised; static image remains available.
+        return 'rive';
     });
 
     useEffect(() => {
