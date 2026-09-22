@@ -20,9 +20,9 @@ describe('RiveMascot', () => {
 });
 
 describe('MascotRenderer', () => {
-  it('falls back when no mascot source is available', () => {
-    render(<MascotRenderer fallbackEmoji="💙⭐" />);
+  it('renders the static mascot image in image mode', () => {
+    render(<MascotRenderer mode="image" avatar="⭐" />);
 
-    expect(screen.getByTestId('mascot-fallback')).toHaveTextContent('💙⭐');
+    expect(screen.getByAltText('Mascot Avatar')).toBeInTheDocument();
   });
 });
